@@ -12,7 +12,9 @@
     ];
     pkgsFor = nixpkgs.legacyPackages;
   in {
-    overlays.default = _: prev: {};
+    overlays.default = _: prev: {
+      grimblast = prev.callPackage ./grimblast {hyprland = null;};
+    };
 
     packages = genSystems (system: self.overlays.default null pkgsFor.${system});
 
