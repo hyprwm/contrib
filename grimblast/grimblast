@@ -78,7 +78,8 @@ notifyOk() {
 
   TITLE=${2:-"Screenshot"}
   MESSAGE=${1:-"OK"}
-  notify "$TITLE" "$MESSAGE"
+  REST=${@: 3}
+  notify "$TITLE" "$MESSAGE" $REST
 }
 notifyError() {
   if [ $NOTIFY = "yes" ]; then
@@ -167,7 +168,7 @@ else
   if takeScreenshot "$FILE" "$GEOM" "$OUTPUT"; then
     TITLE="Screenshot of $SUBJECT"
     MESSAGE=$(basename "$FILE")
-    notifyOk "$MESSAGE" "$TITLE"
+    notifyOk "$MESSAGE" "$TITLE" -i "$FILE"
     echo "$FILE"
   else
     notifyError "Error taking screenshot with grim"
