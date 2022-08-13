@@ -145,7 +145,7 @@ elif [ "$SUBJECT" = "screen" ] ; then
   WHAT="Screen"
 elif [ "$SUBJECT" = "output" ] ; then
   GEOM=""
-  OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.active == "yes")' | jq -r '.name')
+  OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.focused = "true")' | jq -r '.name')
   WHAT="$OUTPUT"
 elif [ "$SUBJECT" = "window" ] ; then
   WORKSPACES="$(hyprctl monitors -j | jq -r 'map(.activeWorkspace.id)')"
