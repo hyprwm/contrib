@@ -18,8 +18,8 @@
 ## https://github.com/swaywm/sway/blob/master/contrib/grimshot
 
 getTargetDirectory() {
-  test -f "${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs" && \
-    . "${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs"
+  test -f "${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs" && \
+    . "${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs"
 
   echo "${XDG_SCREENSHOTS_DIR:-${XDG_PICTURES_DIR:-$HOME}}"
 }
@@ -78,7 +78,8 @@ notifyOk() {
 
   TITLE=${2:-"Screenshot"}
   MESSAGE=${1:-"OK"}
-  notify "$TITLE" "$MESSAGE"
+  REST=${@: 3}
+  notify "$TITLE" "$MESSAGE" $REST
 }
 notifyError() {
   if [ $NOTIFY = "yes" ]; then
@@ -145,7 +146,7 @@ elif [ "$SUBJECT" = "screen" ] ; then
   WHAT="Screen"
 elif [ "$SUBJECT" = "output" ] ; then
   GEOM=""
-  OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.active == "yes")' | jq -r '.name')
+  OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.focused = "true")' | jq -r '.name')
   WHAT="$OUTPUT"
 elif [ "$SUBJECT" = "window" ] ; then
   MONITORS=$(hyprctl monitors -j)
@@ -176,7 +177,7 @@ else
   if takeScreenshot "$FILE" "$GEOM" "$OUTPUT"; then
     TITLE="Screenshot of $SUBJECT"
     MESSAGE=$(basename "$FILE")
-    notifyOk "$MESSAGE" "$TITLE"
+    notifyOk "$MESSAGE" "$TITLE" -i "$FILE"
     echo "$FILE"
   else
     notifyError "Error taking screenshot with grim"
