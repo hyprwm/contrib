@@ -155,7 +155,7 @@ elif [ "$SUBJECT" = "window" ] ; then
   # Check if user is in fullscreen
   if [ -z "$(jq -r ".[] | select (.workspace.id == "$(echo $WORKSPACES | jq '.[]')" and .size == $SIZE)" <<< $CLIENTS)" ] ; then
     WINDOWS="$(jq -r --argjson workspaces "$WORKSPACES" 'map(select([.workspace.id] | inside($workspaces)))' <<< $CLIENTS )"
-    GEOM=$(echo "$WINDOWS" | jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | slurp)
+    GEOM=$(echo "$WINDOWS" | jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | slurp -r)
     # Check if user exited slurp without selecting the area
     if [ -z "$GEOM" ]; then
       exit 1
