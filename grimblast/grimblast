@@ -148,11 +148,13 @@ elif [ "$SUBJECT" = "output" ] ; then
   OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.active == "yes")' | jq -r '.name')
   WHAT="$OUTPUT"
 elif [ "$SUBJECT" = "window" ] ; then
-  SIZE=$(hyprctl monitors -j | jq -r 'map(.width,.height)')
-  WORKSPACES="$(hyprctl monitors -j | jq -r 'map(.activeWorkspace.id)')"
+  MONITORS=$(hyprctl monitors -j)
+  CLIENTS=$(hyprctl clients -j)
+  SIZE=$(jq -r 'map(.width,.height)' <<< $MONITORS)
+  WORKSPACES="$(jq -r 'map(.activeWorkspace.id)' <<< $MONITORS)"
   # Check if user is in fullscreen
-  if [ -z "$(hyprctl clients -j | jq -r ".[] |select (.workspace.id == "$(echo $WORKSPACES | jq '.[]')" and .size == $SIZE)")" ] ; then
-    WINDOWS="$(hyprctl clients -j | jq -r --argjson workspaces "$WORKSPACES" 'map(select([.workspace.id] | inside($workspaces)))' )"
+  if [ -z "$(jq -r ".[] | select (.workspace.id == "$(echo $WORKSPACES | jq '.[]')" and .size == $SIZE)" <<< $CLIENTS)" ] ; then
+    WINDOWS="$(jq -r --argjson workspaces "$WORKSPACES" 'map(select([.workspace.id] | inside($workspaces)))' <<< $CLIENTS )"
     GEOM=$(echo "$WINDOWS" | jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | slurp)
     # Check if user exited slurp without selecting the area
     if [ -z "$GEOM" ]; then
