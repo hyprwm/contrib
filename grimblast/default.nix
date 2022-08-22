@@ -1,6 +1,6 @@
 {
   lib,
-  stdenv,
+  stdenvNoCC,
   coreutils,
   scdoc,
   makeWrapper,
@@ -12,7 +12,7 @@
   bash,
   hyprland ? null,
 }:
-stdenv.mkDerivation rec {
+stdenvNoCC.mkDerivation {
   pname = "grimblast";
   version = "0.1";
   src = ./.;
