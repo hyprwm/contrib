@@ -24,12 +24,12 @@ mkdir ~/.config/hypr/themes
 
 4. Find the folders for any themes you want to use and copy them to the themes folder in your hyprland config folder. For example, to use the Garden theme run:
 ```
-cp -r ./Garden ~/.config/hypr/themes/
+cp -r ./garden ~/.config/hypr/themes/
 ```
 
 5. Assuming that we are applying the Garden theme, add the following line to the end of your hyprland.conf: 
 ```
-source=~/.config/hypr/themes/Garden/theme.conf
+source=~/.config/hypr/themes/garden/theme.conf
 ```
 
 Be advised that these themes **DO NOT** provide a complete hyprland configuration. You will still need to handle all basic user-specific configuration in your `hyprland.conf` such as monitor setup, input device configuration, keybinds, execs, etc. This is done so that your basic user preferences can be kept separate and portable accross various themes.
