@@ -44,7 +44,7 @@ The goal of this repository is to provide a collection of themes/rices that may 
 
 1. Create a folder for your theme at `$HOME/.config/hypr/themes/<YOUR THEME>`. This is where you will place any and all files directly related to your theme, including:
 
-	- Theme-related Hyprland configs (See #2)
+	- Theme-related Hyprland configs.
 	- Theme-relevant application configs (waybar, eww, dunst, kitty, etc.)
 	- Wallpapers
 	- Scripts
