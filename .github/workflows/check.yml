@@ -1,0 +1,19 @@
+name: Check scripts
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+
+  checks:
+    name: Check scripts
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: cachix/install-nix-action@v17
+        with:
+          install_url: https://nixos.org/nix/install
+          extra_nix_config: |
+            auto-optimise-store = true
+            experimental-features = nix-command flakes
+      - run: nix run nixpkgs#shellcheck -- -S error grimblast/grimblast
