@@ -38,6 +38,6 @@ stdenvNoCC.mkDerivation {
     description = "A helper for screenshots within hyprland, based on grimshot";
     license = licenses.mit;
     platforms = platforms.unix;
-    maintainer = with maintainers; [misterio77];
+    maintainers = with maintainers; [misterio77];
   };
 }
