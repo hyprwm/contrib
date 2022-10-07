@@ -80,7 +80,7 @@ notifyOk() {
   TITLE=${2:-"Screenshot"}
   MESSAGE=${1:-"OK"}
   REST=${@: 3}
-  notify "$TITLE" "$MESSAGE" "$REST"
+  notify "$TITLE" "$MESSAGE" $REST
 }
 notifyError() {
   if [ $NOTIFY = "yes" ]; then
