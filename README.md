@@ -13,7 +13,7 @@ Install by running the Makefile or just copying the `grimblast` script in your `
 ## Monitor
 
 Simple Utility to cycle between Arrays of monitors.
-Install by running the Makefile or just copying the scripts in monitor dir in your `~/.bin`.
+Install by just copying the scripts in monitor dir in your `~/.bin`.
 
 # Contributing
 
