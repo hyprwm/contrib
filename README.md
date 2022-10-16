@@ -10,6 +10,11 @@ A Hyprland version of Grimshot.
 
 Install by running the Makefile or just copying the `grimblast` script in your `~/.bin`.
 
+## Monitor
+
+Simple Utility to cycle between Arrays of monitors.
+Install by running the Makefile or just copying the scripts in monitor dir in your `~/.bin`.
+
 # Contributing
 
 Contributions are welcome! Please open a PR with your utility and describe how
