@@ -1,0 +1,21 @@
+#!/bin/python3
+
+'''
+This script tells the next monitor with respect of currently focused window.
+Uses hyprctl.
+'''
+
+import json
+import subprocess
+
+command=subprocess.run("hyprctl monitors -j",shell=True,capture_output=True,check=True,text=True)
+
+datali=json.loads(command.stdout)
+monLength=len(datali)
+
+mon=datali[0]['name']
+for idx,data in enumerate(datali):
+    if data['focused']:
+        mon=datali[(idx+1) % monLength]['name']
+
+print(mon)

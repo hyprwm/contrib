@@ -1,0 +1,6 @@
+#!/bin/bash
+
+hash hyprctl &>/dev/null || exit
+LOC=`realpath $(dirname ${BASH_SOURCE:-$0})`
+[ -f "$LOC/next-mon" ] || exit
+hyprctl dispatcher focusmonitor "$($LOC/next-mon)" &>/dev/null
