@@ -1,0 +1,98 @@
+# this is a functional, parseable sample configuration
+#   but needs to be customized based on your preferences
+#   before deploying
+
+pyprconf:
+  bindreload: SUPER+CTRL,C
+  bindunload: SUPER+ALT+CTRL,C
+
+# sections that start with x- are ignored
+# by the pyprconf parser, but can be used
+# as templates for other sections
+x-autospace: &autospace
+  bind:
+    SUPER,{key}: workspace,name:{@}
+    SUPER+SHIFT,{key}: movetoworkspace,name:{@}
+    SUPER+ALT,{key}: exec,{cmd}
+  events:
+  - event: createworkspace
+    match: ^({@})$
+    dispatch:
+    - exec {cmd}
+
+x-logopenwindow:
+  events:
+  - event: openwindow
+    match: ^(.*),(.*),(.*),(.*)$
+
+activeborders:
+  tokens:
+    color_active: 0x8800ccde
+    color_full: 0xffff0000
+    color_resize: 0xFFe7691e
+    opt: general:col.active_border
+  keyword:
+    - '{opt} {color_active}'
+  events:
+  - event: fullscreen
+    match: ^(1)$
+    keyword:
+    - '{opt} {color_full}'
+  - event: fullscreen
+    match: ^(0)$
+    keyword:
+    - '{opt} {color_active}'
+  - event: submap
+    match: ^(resize)$
+    gate:
+      set: resize
+    keyword:
+    - decoration:dim_inactive 1
+    - '{opt} {color_resize}'
+  - event: submap
+    match: ^$
+    gate:
+      check: resize
+      reset: resize
+    keyword:
+    - decoration:dim_inactive 0
+    - '{opt} {color_active}'
+
+workspaces:
+  range: [1,10,1]
+  bind:
+    SUPER,{#}: workspace,{#}
+    SUPER+SHIFT,{#}: movetoworkspace,{#}
+
+workspace10:
+  bind:
+    SUPER,0: workspace,10
+    SUPER+SHIFT,0: movetoworkspace,10
+
+grimblast:
+  tokens:
+    key: P
+    notify: '--notify '
+  bind:
+    SUPER,{key}: exec,{@} {notify}save active
+    SUPERSHIFT,{key}: exec,{@} {notify}save area
+    SUPERALT,{key}: exec,{@} {notify}save output
+    SUPERCTRL,{key}: exec,{@} {notify}save window
+
+browse:
+  <<: *autospace
+  tokens:
+    cmd: handlr launch x-scheme-handler/https
+    key: B
+
+htop:
+  <<: *autospace
+  tokens:
+    cmd: gtk-launch htop.desktop
+    key: grave
+
+incognito:
+  <<: *autospace
+  tokens:
+    cmd: brave-beta --incognito
+    key: I
