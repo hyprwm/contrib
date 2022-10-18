@@ -16,4 +16,4 @@ jobs:
           extra_nix_config: |
             auto-optimise-store = true
             experimental-features = nix-command flakes
-      - run: nix run nixpkgs#shellcheck -- -S error grimblast/grimblast
+      - run: nix run nixpkgs#shellcheck -- -S error grimblast/grimblast shellevents/shellevents shellevents/shellevents_default.sh shellevents/notifywindow.sh shellevents/submaps.sh
