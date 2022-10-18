@@ -1,5 +1,7 @@
 # shellcheck shell=sh
 
+# shellevents sample event file
+
 # send a notification whenever
 # a window with the title Reddit
 # is opened

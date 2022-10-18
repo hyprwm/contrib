@@ -1,5 +1,7 @@
 # shellcheck shell=sh
 
+# shellevents sample event file
+
 # when entering the resize submap dim all inactive windows and
 # add a very loud border to the active window
 
