@@ -1,0 +1,6 @@
+[submodule "themes/neon"]
+	path = themes/neon
+	url = https://github.com/taylor85345/neon-hyprland-theme
+[submodule "themes/garden"]
+	path = themes/garden
+	url = https://github.com/taylor85345/garden-hyprland-theme
