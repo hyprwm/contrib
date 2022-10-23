@@ -3,7 +3,9 @@
 #   before deploying
 
 pyprconf:
+  # create a binding to send SIGUSR1 to the pyprconf pid
   bindreload: SUPER+CTRL,C
+  # create a binding to send SIGUSR2 to the pyprconf pid
   bindunload: SUPER+ALT+CTRL,C
 
 # sections that start with x- are ignored

@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyprconf"
+version = "0.0.1"
+description = "templated configuration and event handling for Hyprland"
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = [
+  "pyyaml"
+]
+
+[project.scripts]
+pyprconf = "pyprconf.pyprconf:main" 
