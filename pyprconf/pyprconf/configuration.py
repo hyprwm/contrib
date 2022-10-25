@@ -4,7 +4,6 @@ from collections import defaultdict
 from dataclasses import dataclass
 import os
 import re
-import sys
 from typing import Any, Callable, Dict, List, Tuple, Union
 
 COMMAND_TYPES = ["keyword", "dispatch"]
@@ -12,28 +11,35 @@ COMMAND_TYPES = ["keyword", "dispatch"]
 
 @dataclass
 class EventHandler:
-    send: Union[bytes, None] = None
+    send: Union[str, None] = None
     set: Union[str, None] = None
     reset: Union[str, None] = None
     check: Union[str, None] = None
 
 
 HandlerDict = Dict[str, Dict[re.Pattern, List[EventHandler]]]
-Loaders = List[bytes]
+Loaders = List[str]
 Unloaders = Loaders
 Logger = Callable[[object], None]
 
 
 @dataclass
 class Configuration:
-    unloaders: Union[Loaders, None]
+    unloaders: Union[Unloaders, None]
     handlers: Union[HandlerDict, None]
 
 
-def batch(batch: List[str]):
+def batch(batch: List[str]) -> str:
     if batch:
-        return f"[[BATCH]] {str.join(';', batch)}".encode()
+        return f"[[BATCH]] {str.join(';', batch)}"
     return None
+
+
+def safe_format_map(format: str, map: Dict[str, Any]) -> str:
+    """like str.format_map but ignores indexed positional format specifiers"""
+    safe_format = re.sub(r"{(\d+)}", lambda m: f"**]{m.group(1)}**]", format)
+    formatted = safe_format.format_map(map)
+    return re.sub(r"\*\*\](\d+)\*\*\]", lambda m: f"{{{m.group(1)}}}", formatted)
 
 
 def _register_tokens(tokens: Dict[str, str], section: Dict[str, Any]) -> Dict[str, str]:
@@ -44,7 +50,9 @@ def _register_tokens(tokens: Dict[str, str], section: Dict[str, Any]) -> Dict[st
 def _resolve_commands(
     command: str, commands: Dict[str, Any], tokens: Dict[str, str]
 ) -> List[str]:
-    return list(f"/{command} {keyword}".format_map(tokens) for keyword in commands)
+    return list(
+        safe_format_map(f"/{command} {keyword}", tokens) for keyword in commands
+    )
 
 
 def _resolve_binds(
@@ -59,7 +67,10 @@ def _resolve_binds(
 
 
 def _register_handlers(
-    handlers: HandlerDict, events: List[Dict[str, Any]], tokens: Dict[str, str]
+    log: Logger,
+    handlers: HandlerDict,
+    events: List[Dict[str, Any]],
+    tokens: Dict[str, str],
 ):
     for event in events:
         try:
@@ -91,10 +102,7 @@ def _register_handlers(
             )
 
         except KeyError as err:
-            print(
-                f"Event in section '{tokens['@']}' missing required key: {err.args[0]}",
-                file=sys.stderr,
-            )
+            log(f"Event in section '{tokens['@']}' missing required key: {err.args[0]}")
             continue
 
 
@@ -162,7 +170,7 @@ def parse(configdict: Dict[str, Any], log: Logger) -> Tuple[Loaders, Configurati
                 loaders.append(binds)
                 unloaders.append(unbinds)
             if "events" in section:
-                _register_handlers(handlers, section["events"], tokens)
+                _register_handlers(log, handlers, section["events"], tokens)
 
     handlers.default_factory = None
     return [batch(loader) for loader in loaders], Configuration(

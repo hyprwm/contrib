@@ -16,5 +16,5 @@ command-line tool `pyprconf` in $HOME/.local/bin`.
 ### `hyprland.conf`
 
 ```
-exec-once pyprconf /path/to/conf.yaml
+exec-once $HOME/.local/bin/pyprconf /path/to/conf.yaml
 ```

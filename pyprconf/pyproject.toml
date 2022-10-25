@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyprconf"
-version = "0.0.1"
+version = "0.0.2"
 description = "templated configuration and event handling for Hyprland"
 readme = "README.md"
 requires-python = ">=3.7"
@@ -13,4 +13,8 @@ dependencies = [
 ]
 
 [project.scripts]
-pyprconf = "pyprconf.pyprconf:main" 
+pyprconf = "pyprconf.pyprconf:main"
+resig = "resig.resig:main"
+
+[tool.setuptools]
+packages = ["pyprconf", "resig"]

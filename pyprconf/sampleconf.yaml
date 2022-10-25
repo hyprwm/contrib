@@ -22,10 +22,13 @@ x-autospace: &autospace
     dispatch:
     - exec {cmd}
 
-x-logopenwindow:
+logopenwindow:
   events:
   - event: openwindow
     match: ^(.*),(.*),(.*),(.*)$
+    dispatch:
+    # the event data are available as positional tokens
+    - 'exec notify-send "Address: {0}" "Workspace: {1}\nClass: {2}\nTitle: {3}"'
 
 activeborders:
   tokens:

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # pyprconf - dynamic, templated configuration
 #   and event handling for Hyprland
@@ -19,8 +19,8 @@ from typing import Callable, Dict, List, Union
 
 import yaml
 
-import configuration
-from configuration import Configuration, EventHandler
+import pyprconf.configuration as configuration
+from pyprconf.configuration import Configuration, EventHandler
 
 SOCK1_ADDR = "/tmp/hypr/" + os.environ["HYPRLAND_INSTANCE_SIGNATURE"] + "/.socket.sock"
 
@@ -79,9 +79,9 @@ def configure():
         with open(file, mode="rb") as f:
             yamldoc.update(yaml.load(f, Loader=yaml.CSafeLoader))
 
-    loaders, config = configuration.parse(yamldoc, logger=log)
+    loaders, config = configuration.parse(yamldoc, log=log)
     for loader in loaders:
-        send(loader)
+        send(str(loader).encode())
     enabled = True
 
 
@@ -96,10 +96,10 @@ def unload(*_):
     enabled = False
     if config:
         for unloader in config.unloaders:
-            send(unloader)
+            send(str(unloader).encode())
 
 
-def process_handler(send: Callable[[bytes], str], handler: EventHandler):
+def process_handler(send: Callable[[bytes], str], handler: EventHandler, data: str):
     if handler.check:
         if not check_gate(handler.check):
             log(f"gate check failed: {handler.check}")
@@ -113,7 +113,8 @@ def process_handler(send: Callable[[bytes], str], handler: EventHandler):
         update_gate(handler.reset, False)
         log(f"reset gate: {handler.reset}")
     if handler.send:
-        send(handler.send)
+        datalist = data.split(",")
+        send(str(handler.send).format(*datalist).encode())
 
 
 def main():
@@ -144,7 +145,10 @@ def main():
                     if pattern.fullmatch(data):
                         log(f"matched event <{name}> {pattern.pattern}: {data}")
                         for eventhandler in eventhandlers:
-                            process_handler(send, eventhandler)
+                            try:
+                                process_handler(send, eventhandler, data)
+                            except Exception as err:
+                                log(f"error in event handler: {err}")
 
     except KeyboardInterrupt:
         log("stopped with keyboard interrupt")
