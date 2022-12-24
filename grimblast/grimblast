@@ -51,7 +51,7 @@ FILE=${3:-$(getTargetDirectory)/$(date -Ins).png}
 
 if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "copysave" ] && [ "$ACTION" != "check" ]; then
   echo "Usage:"
-  echo "  grimblast [--notify] [--cursor] (copy|save|copysave) [active|screen|output|area|window] [FILE|-]"
+  echo "  grimblast [--notify] [--cursor] (copy|save|copysave) [active|screen|output|area] [FILE|-]"
   echo "  grimblast check"
   echo "  grimblast usage"
   echo ""
@@ -66,8 +66,7 @@ if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "copysav
   echo "  active: Currently active window."
   echo "  screen: All visible outputs."
   echo "  output: Currently active output."
-  echo "  area: Manually select a region."
-  echo "  window: Manually select a window."
+  echo "  area: Manually select a region or window."
   exit
 fi
 
@@ -130,13 +129,6 @@ if [ "$ACTION" = "check" ] ; then
   check jq
   check notify-send
   exit
-elif [ "$SUBJECT" = "area" ] ; then
-  GEOM=$(slurp -d)
-  # Check if user exited slurp without selecting the area
-  if [ -z "$GEOM" ]; then
-    exit 1
-  fi
-  WHAT="Area"
 elif [ "$SUBJECT" = "active" ] ; then
   FOCUSED=$(hyprctl activewindow -j)
   GEOM=$(echo "$FOCUSED" | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')
@@ -149,15 +141,17 @@ elif [ "$SUBJECT" = "output" ] ; then
   GEOM=""
   OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true)' | jq -r '.name')
   WHAT="$OUTPUT"
-elif [ "$SUBJECT" = "window" ] ; then
+elif [ "$SUBJECT" = "area" ] ; then
   WORKSPACES="$(hyprctl monitors -j | jq -r 'map(.activeWorkspace.id)')"
   WINDOWS="$(hyprctl clients -j | jq -r --argjson workspaces "$WORKSPACES" 'map(select([.workspace.id] | inside($workspaces)))' )"
-  GEOM=$(echo "$WINDOWS" | jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | slurp -r)
+  GEOM=$(echo "$WINDOWS" | jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | slurp)
   # Check if user exited slurp without selecting the area
   if [ -z "$GEOM" ]; then
    exit 1
   fi
-  WHAT="Window"
+  WHAT="Area"
+elif [ "$SUBJECT" = "window" ] ; then
+  die "Subject 'window' is now included in 'area'"
 else
   die "Unknown subject to take a screen shot from" "$SUBJECT"
 fi
