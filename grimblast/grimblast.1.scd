@@ -6,7 +6,7 @@ grimblast - a helper for screenshots within hyprland
 
 # SYNOPSIS
 
-*grimblast* [--notify] [--cursor] (copy|save) [TARGET] [FILE]++
+*grimblast* [--notify] [--cursor] (copy|save|copysave|edit) [TARGET] [FILE]++
 *grimblast* check++
 *grimblast* usage
 
@@ -26,6 +26,14 @@ grimblast - a helper for screenshots within hyprland
 
 *copy*
 	Copy the screenshot data (as image/png) into the clipboard.
+
+*copysave* 
+	Combine the previous 2 options.
+
+*edit*
+	Open screenshot in the image editor of your choice. The default is
+	gimp, but you can set a different one with the enviroment variable
+	$GRIMBLAST_EDITOR. Example: `export GRIMBLAST_EDITOR=gimp`.
 
 # DESCRIPTION
 
