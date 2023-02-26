@@ -16,4 +16,4 @@ jobs:
           extra_nix_config: |
             auto-optimise-store = true
             experimental-features = nix-command flakes
-      - run: nix run nixpkgs#shellcheck -- -S error grimblast/grimblast shellevents/shellevents shellevents/*.sh grimblast/screenshot.sh
+      - run: nix run nixpkgs#shellcheck -- -S error grimblast/grimblast shellevents/shellevents shellevents/*.sh grimblast/screenshot.sh scratchpad/scratchpad
