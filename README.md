@@ -21,3 +21,9 @@ See `shellevents_default.sh` for the supported function names. Example event fil
 Contributions are welcome! Please open a PR with your utility and describe how
 it helps the Hypr ecosystem. Also provide a screen recording if possible,
 demonstrating its usage.
+
+# Changelog
+
+Added the `edit` option to Grimblast. read the [man page](grimblast/grimblast.1.scd) for more information.
+
+A rofi script is also included.

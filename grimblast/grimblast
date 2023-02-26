@@ -24,6 +24,20 @@ getTargetDirectory() {
   echo "${XDG_SCREENSHOTS_DIR:-${XDG_PICTURES_DIR:-$HOME}}"
 }
 
+tmp_editor_directory () {
+  echo "/tmp"
+}
+
+#Detect if $GRIMPBLAST_EDITOR env exist
+env_editor_confirm () {
+  if [ $(printenv GRIMBLAST_EDITOR; echo $?) -eq 0 ]; then
+    echo "GRIMBLAST_EDITOR is set. Continuing..."
+  else
+    echo "GRIMBLAST_EDITOR is not set. Defaulting to gimp"
+    GRIMBLAST_EDITOR=gimp
+  fi
+}
+
 NOTIFY=no
 CURSOR=
 
@@ -48,10 +62,11 @@ done
 ACTION=${1:-usage}
 SUBJECT=${2:-screen}
 FILE=${3:-$(getTargetDirectory)/$(date -Ins).png}
+FILE_EDITOR=${3:-$(tmp_editor_directory)/$(date -Ins).png}
 
-if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "copysave" ] && [ "$ACTION" != "check" ]; then
+if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "edit" ] && [ "$ACTION" != "copysave" ] && [ "$ACTION" != "check" ]; then
   echo "Usage:"
-  echo "  grimblast [--notify] [--cursor] (copy|save|copysave) [active|screen|output|area] [FILE|-]"
+  echo "  grimblast [--notify] [--cursor] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
   echo "  grimblast check"
   echo "  grimblast usage"
   echo ""
@@ -59,6 +74,7 @@ if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "copysav
   echo "  copy: Copy the screenshot data into the clipboard."
   echo "  save: Save the screenshot to a regular file or '-' to pipe to STDOUT."
   echo "  copysave: Combine the previous 2 options."
+  echo "  edit: Open screenshot in the image editor of your choice (default is gimp). See man page for info."
   echo "  check: Verify if required tools are installed and exit."
   echo "  usage: Show this message and exit."
   echo ""
@@ -167,6 +183,17 @@ elif [ "$ACTION" = "save" ] ; then
     echo "$FILE"
   else
     notifyError "Error taking screenshot with grim"
+  fi
+elif [ "$ACTION" = "edit" ] ; then
+  env_editor_confirm
+  if takeScreenshot "$FILE_EDITOR" "$GEOM" "$OUTPUT"; then
+    TITLE="Screenshot of $SUBJECT"
+    MESSAGE="Open screenshot in image editor"
+    notifyOk "$MESSAGE" "$TITLE" -i "$FILE_EDITOR"
+    $GRIMBLAST_EDITOR $FILE_EDITOR
+    echo "$FILE_EDITOR"
+  else
+    notifyError "Error taking screenshot"
   fi
 else
   if [ "$ACTION" = "copysave" ] ; then
