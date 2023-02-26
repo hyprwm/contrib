@@ -16,6 +16,24 @@ Invoke shell functions in response to Hyprland socket2 events. Install with `mak
 
 See `shellevents_default.sh` for the supported function names. Example event files can be found in `submaps.sh` and `notifywindow.sh`.
 
+## Scratchpad
+A Bash script that instantly sends focused window to a special workspace named `scratchpad`
+and makes it easier to retrieve the window back to the current workspace.
+
+Install by running the Makefile `sudo make install`
+Uninstall by running the Makefile `sudo make uninstall`
+
+Usage:
+
+To send the window to scratchpad
+> bind = SUPER, s, exec, scratchpad
+
+To get back the window
+>bind = SUPERSHIFT, s, exec, scratchpad -g
+
+use `-h` flag to get help.
+
+
 # Contributing
 
 Contributions are welcome! Please open a PR with your utility and describe how
@@ -27,3 +45,5 @@ demonstrating its usage.
 Added the `edit` option to Grimblast. read the [man page](grimblast/grimblast.1.scd) for more information.
 
 A rofi script is also included.
+
+Added Scratchpad Script.
