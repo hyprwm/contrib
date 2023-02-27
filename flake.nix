@@ -14,6 +14,7 @@
   in {
     overlays.default = _: prev: {
       grimblast = prev.callPackage ./grimblast {hyprland = null;};
+      scratchpad = prev.callPackage ./scratchpad {hyprland = null;};
     };
 
     packages = genSystems (system: self.overlays.default null pkgsFor.${system});
