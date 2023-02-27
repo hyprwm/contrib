@@ -89,14 +89,13 @@ fi
 notify() {
 	notify-send -t 3000 -a grimblast "$@"
 }
+
 notifyOk() {
 	[ "$NOTIFY" = "no" ] && return
 
-	TITLE=${2:-"Screenshot"}
-	MESSAGE=${1:-"OK"}
-	REST=${@:3}
-	notify "$TITLE" "$MESSAGE" $REST
+	notify "$@"
 }
+
 notifyError() {
 	if [ $NOTIFY = "yes" ]; then
 		TITLE=${2:-"Screenshot"}
@@ -179,7 +178,7 @@ elif [ "$ACTION" = "save" ]; then
 	if takeScreenshot "$FILE" "$GEOM" "$OUTPUT"; then
 		TITLE="Screenshot of $SUBJECT"
 		MESSAGE=$(basename "$FILE")
-		notifyOk "$MESSAGE" "$TITLE" -i "$FILE"
+		notifyOk "$TITLE" "$MESSAGE" -i "$FILE"
 		echo "$FILE"
 	else
 		notifyError "Error taking screenshot with grim"
@@ -189,8 +188,8 @@ elif [ "$ACTION" = "edit" ]; then
 	if takeScreenshot "$FILE_EDITOR" "$GEOM" "$OUTPUT"; then
 		TITLE="Screenshot of $SUBJECT"
 		MESSAGE="Open screenshot in image editor"
-		notifyOk "$MESSAGE" "$TITLE" -i "$FILE_EDITOR"
-		$GRIMBLAST_EDITOR $FILE_EDITOR
+		notifyOk "$TITLE" "$MESSAGE" -i "$FILE_EDITOR"
+		$GRIMBLAST_EDITOR "$FILE_EDITOR"
 		echo "$FILE_EDITOR"
 	else
 		notifyError "Error taking screenshot"
@@ -198,7 +197,7 @@ elif [ "$ACTION" = "edit" ]; then
 else
 	if [ "$ACTION" = "copysave" ]; then
 		takeScreenshot - "$GEOM" "$OUTPUT" | tee "$FILE" | wl-copy --type image/png || die "Clipboard error"
-		notifyOk "$WHAT copied to buffer and saved to $FILE"
+		notifyOk "$WHAT copied to buffer and saved to $FILE" -i "$FILE"
 		echo "$FILE"
 	else
 		notifyError "Error taking screenshot with grim"
