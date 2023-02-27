@@ -18,45 +18,45 @@
 ## https://github.com/swaywm/sway/blob/master/contrib/grimshot
 
 getTargetDirectory() {
-  test -f "${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs" && \
-    . "${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs"
+	test -f "${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs" &&
+		. "${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs"
 
-  echo "${XDG_SCREENSHOTS_DIR:-${XDG_PICTURES_DIR:-$HOME}}"
+	echo "${XDG_SCREENSHOTS_DIR:-${XDG_PICTURES_DIR:-$HOME}}"
 }
 
-tmp_editor_directory () {
-  echo "/tmp"
+tmp_editor_directory() {
+	echo "/tmp"
 }
 
-#Detect if $GRIMPBLAST_EDITOR env exist
-env_editor_confirm () {
-  if [ $(printenv GRIMBLAST_EDITOR; echo $?) -eq 0 ]; then
-    echo "GRIMBLAST_EDITOR is set. Continuing..."
-  else
-    echo "GRIMBLAST_EDITOR is not set. Defaulting to gimp"
-    GRIMBLAST_EDITOR=gimp
-  fi
+#Detect if $GRIMBLAST_EDITOR env exist
+env_editor_confirm() {
+	if [ -n "$GRIMBLAST_EDITOR" ]; then
+		echo "GRIMBLAST_EDITOR is set. Continuing..."
+	else
+		echo "GRIMBLAST_EDITOR is not set. Defaulting to gimp"
+		GRIMBLAST_EDITOR=gimp
+	fi
 }
 
 NOTIFY=no
 CURSOR=
 
 while [ $# -gt 0 ]; do
-  key="$1"
+	key="$1"
 
-  case $key in
-    -n|--notify)
-      NOTIFY=yes
-      shift # past argument
-      ;;
-    -c|--cursor)
-      CURSOR=yes
-      shift # past argument
-      ;;
-    *)    # unknown option
-      break # done with parsing --flags
-      ;;
-  esac
+	case $key in
+	-n | --notify)
+		NOTIFY=yes
+		shift # past argument
+		;;
+	-c | --cursor)
+		CURSOR=yes
+		shift # past argument
+		;;
+	*)     # unknown option
+		break # done with parsing --flags
+		;;
+	esac
 done
 
 ACTION=${1:-usage}
@@ -65,142 +65,142 @@ FILE=${3:-$(getTargetDirectory)/$(date -Ins).png}
 FILE_EDITOR=${3:-$(tmp_editor_directory)/$(date -Ins).png}
 
 if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "edit" ] && [ "$ACTION" != "copysave" ] && [ "$ACTION" != "check" ]; then
-  echo "Usage:"
-  echo "  grimblast [--notify] [--cursor] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
-  echo "  grimblast check"
-  echo "  grimblast usage"
-  echo ""
-  echo "Commands:"
-  echo "  copy: Copy the screenshot data into the clipboard."
-  echo "  save: Save the screenshot to a regular file or '-' to pipe to STDOUT."
-  echo "  copysave: Combine the previous 2 options."
-  echo "  edit: Open screenshot in the image editor of your choice (default is gimp). See man page for info."
-  echo "  check: Verify if required tools are installed and exit."
-  echo "  usage: Show this message and exit."
-  echo ""
-  echo "Targets:"
-  echo "  active: Currently active window."
-  echo "  screen: All visible outputs."
-  echo "  output: Currently active output."
-  echo "  area: Manually select a region or window."
-  exit
+	echo "Usage:"
+	echo "  grimblast [--notify] [--cursor] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
+	echo "  grimblast check"
+	echo "  grimblast usage"
+	echo ""
+	echo "Commands:"
+	echo "  copy: Copy the screenshot data into the clipboard."
+	echo "  save: Save the screenshot to a regular file or '-' to pipe to STDOUT."
+	echo "  copysave: Combine the previous 2 options."
+	echo "  edit: Open screenshot in the image editor of your choice (default is gimp). See man page for info."
+	echo "  check: Verify if required tools are installed and exit."
+	echo "  usage: Show this message and exit."
+	echo ""
+	echo "Targets:"
+	echo "  active: Currently active window."
+	echo "  screen: All visible outputs."
+	echo "  output: Currently active output."
+	echo "  area: Manually select a region or window."
+	exit
 fi
 
 notify() {
-  notify-send -t 3000 -a grimblast "$@"
+	notify-send -t 3000 -a grimblast "$@"
 }
 notifyOk() {
-  [ "$NOTIFY" = "no" ] && return
+	[ "$NOTIFY" = "no" ] && return
 
-  TITLE=${2:-"Screenshot"}
-  MESSAGE=${1:-"OK"}
-  REST=${@: 3}
-  notify "$TITLE" "$MESSAGE" $REST
+	TITLE=${2:-"Screenshot"}
+	MESSAGE=${1:-"OK"}
+	REST=${@:3}
+	notify "$TITLE" "$MESSAGE" $REST
 }
 notifyError() {
-  if [ $NOTIFY = "yes" ]; then
-    TITLE=${2:-"Screenshot"}
-    MESSAGE=${1:-"Error taking screenshot with grim"}
-    notify -u critical "$TITLE" "$MESSAGE"
-  else
-    echo "$1"
-  fi
+	if [ $NOTIFY = "yes" ]; then
+		TITLE=${2:-"Screenshot"}
+		MESSAGE=${1:-"Error taking screenshot with grim"}
+		notify -u critical "$TITLE" "$MESSAGE"
+	else
+		echo "$1"
+	fi
 }
 
 die() {
-  MSG=${1:-Bye}
-  notifyError "Error: $MSG"
-  exit 2
+	MSG=${1:-Bye}
+	notifyError "Error: $MSG"
+	exit 2
 }
 
 check() {
-  COMMAND=$1
-  if command -v "$COMMAND" > /dev/null 2>&1; then
-    RESULT="OK"
-  else
-    RESULT="NOT FOUND"
-  fi
-  echo "   $COMMAND: $RESULT"
+	COMMAND=$1
+	if command -v "$COMMAND" >/dev/null 2>&1; then
+		RESULT="OK"
+	else
+		RESULT="NOT FOUND"
+	fi
+	echo "   $COMMAND: $RESULT"
 }
 
 takeScreenshot() {
-  FILE=$1
-  GEOM=$2
-  OUTPUT=$3
-  if [ -n "$OUTPUT" ]; then
-    grim ${CURSOR:+-c} -o "$OUTPUT" "$FILE" || die "Unable to invoke grim"
-  elif [ -z "$GEOM" ]; then
-    grim ${CURSOR:+-c} "$FILE" || die "Unable to invoke grim"
-  else
-    grim ${CURSOR:+-c} -g "$GEOM" "$FILE" || die "Unable to invoke grim"
-  fi
+	FILE=$1
+	GEOM=$2
+	OUTPUT=$3
+	if [ -n "$OUTPUT" ]; then
+		grim ${CURSOR:+-c} -o "$OUTPUT" "$FILE" || die "Unable to invoke grim"
+	elif [ -z "$GEOM" ]; then
+		grim ${CURSOR:+-c} "$FILE" || die "Unable to invoke grim"
+	else
+		grim ${CURSOR:+-c} -g "$GEOM" "$FILE" || die "Unable to invoke grim"
+	fi
 }
 
-if [ "$ACTION" = "check" ] ; then
-  echo "Checking if required tools are installed. If something is missing, install it to your system and make it available in PATH..."
-  check grim
-  check slurp
-  check hyprctl
-  check wl-copy
-  check jq
-  check notify-send
-  exit
-elif [ "$SUBJECT" = "active" ] ; then
-  FOCUSED=$(hyprctl activewindow -j)
-  GEOM=$(echo "$FOCUSED" | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')
-  APP_ID=$(echo "$FOCUSED" | jq -r '.class')
-  WHAT="$APP_ID window"
-elif [ "$SUBJECT" = "screen" ] ; then
-  GEOM=""
-  WHAT="Screen"
-elif [ "$SUBJECT" = "output" ] ; then
-  GEOM=""
-  OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true)' | jq -r '.name')
-  WHAT="$OUTPUT"
-elif [ "$SUBJECT" = "area" ] ; then
-  WORKSPACES="$(hyprctl monitors -j | jq -r 'map(.activeWorkspace.id)')"
-  WINDOWS="$(hyprctl clients -j | jq -r --argjson workspaces "$WORKSPACES" 'map(select([.workspace.id] | inside($workspaces)))' )"
-  GEOM=$(echo "$WINDOWS" | jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | slurp)
-  # Check if user exited slurp without selecting the area
-  if [ -z "$GEOM" ]; then
-   exit 1
-  fi
-  WHAT="Area"
-elif [ "$SUBJECT" = "window" ] ; then
-  die "Subject 'window' is now included in 'area'"
+if [ "$ACTION" = "check" ]; then
+	echo "Checking if required tools are installed. If something is missing, install it to your system and make it available in PATH..."
+	check grim
+	check slurp
+	check hyprctl
+	check wl-copy
+	check jq
+	check notify-send
+	exit
+elif [ "$SUBJECT" = "active" ]; then
+	FOCUSED=$(hyprctl activewindow -j)
+	GEOM=$(echo "$FOCUSED" | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')
+	APP_ID=$(echo "$FOCUSED" | jq -r '.class')
+	WHAT="$APP_ID window"
+elif [ "$SUBJECT" = "screen" ]; then
+	GEOM=""
+	WHAT="Screen"
+elif [ "$SUBJECT" = "output" ]; then
+	GEOM=""
+	OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true)' | jq -r '.name')
+	WHAT="$OUTPUT"
+elif [ "$SUBJECT" = "area" ]; then
+	WORKSPACES="$(hyprctl monitors -j | jq -r 'map(.activeWorkspace.id)')"
+	WINDOWS="$(hyprctl clients -j | jq -r --argjson workspaces "$WORKSPACES" 'map(select([.workspace.id] | inside($workspaces)))')"
+	GEOM=$(echo "$WINDOWS" | jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | slurp)
+	# Check if user exited slurp without selecting the area
+	if [ -z "$GEOM" ]; then
+		exit 1
+	fi
+	WHAT="Area"
+elif [ "$SUBJECT" = "window" ]; then
+	die "Subject 'window' is now included in 'area'"
 else
-  die "Unknown subject to take a screen shot from" "$SUBJECT"
+	die "Unknown subject to take a screen shot from" "$SUBJECT"
 fi
 
-if [ "$ACTION" = "copy" ] ; then
-  takeScreenshot - "$GEOM" "$OUTPUT" | wl-copy --type image/png || die "Clipboard error"
-  notifyOk "$WHAT copied to buffer"
-elif [ "$ACTION" = "save" ] ; then
-  if takeScreenshot "$FILE" "$GEOM" "$OUTPUT"; then
-    TITLE="Screenshot of $SUBJECT"
-    MESSAGE=$(basename "$FILE")
-    notifyOk "$MESSAGE" "$TITLE" -i "$FILE"
-    echo "$FILE"
-  else
-    notifyError "Error taking screenshot with grim"
-  fi
-elif [ "$ACTION" = "edit" ] ; then
-  env_editor_confirm
-  if takeScreenshot "$FILE_EDITOR" "$GEOM" "$OUTPUT"; then
-    TITLE="Screenshot of $SUBJECT"
-    MESSAGE="Open screenshot in image editor"
-    notifyOk "$MESSAGE" "$TITLE" -i "$FILE_EDITOR"
-    $GRIMBLAST_EDITOR $FILE_EDITOR
-    echo "$FILE_EDITOR"
-  else
-    notifyError "Error taking screenshot"
-  fi
+if [ "$ACTION" = "copy" ]; then
+	takeScreenshot - "$GEOM" "$OUTPUT" | wl-copy --type image/png || die "Clipboard error"
+	notifyOk "$WHAT copied to buffer"
+elif [ "$ACTION" = "save" ]; then
+	if takeScreenshot "$FILE" "$GEOM" "$OUTPUT"; then
+		TITLE="Screenshot of $SUBJECT"
+		MESSAGE=$(basename "$FILE")
+		notifyOk "$MESSAGE" "$TITLE" -i "$FILE"
+		echo "$FILE"
+	else
+		notifyError "Error taking screenshot with grim"
+	fi
+elif [ "$ACTION" = "edit" ]; then
+	env_editor_confirm
+	if takeScreenshot "$FILE_EDITOR" "$GEOM" "$OUTPUT"; then
+		TITLE="Screenshot of $SUBJECT"
+		MESSAGE="Open screenshot in image editor"
+		notifyOk "$MESSAGE" "$TITLE" -i "$FILE_EDITOR"
+		$GRIMBLAST_EDITOR $FILE_EDITOR
+		echo "$FILE_EDITOR"
+	else
+		notifyError "Error taking screenshot"
+	fi
 else
-  if [ "$ACTION" = "copysave" ] ; then
-    takeScreenshot - "$GEOM" "$OUTPUT" | tee "$FILE" | wl-copy --type image/png || die "Clipboard error"
-    notifyOk "$WHAT copied to buffer and saved to $FILE"
-    echo "$FILE"
-  else
-    notifyError "Error taking screenshot with grim"
-  fi
+	if [ "$ACTION" = "copysave" ]; then
+		takeScreenshot - "$GEOM" "$OUTPUT" | tee "$FILE" | wl-copy --type image/png || die "Clipboard error"
+		notifyOk "$WHAT copied to buffer and saved to $FILE"
+		echo "$FILE"
+	else
+		notifyError "Error taking screenshot with grim"
+	fi
 fi
