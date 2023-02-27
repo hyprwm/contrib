@@ -39,11 +39,15 @@ use `-h` flag to get help.
 Contributions are welcome! Please open a PR with your utility and describe how
 it helps the Hypr ecosystem. Also provide a screen recording if possible,
 demonstrating its usage.
+If your utility is written in bash, please add it to the
+[checks](https://github.com/hyprwm/contrib/blob/main/.github/workflows/check.yml).
 
 # Changelog
 
+### 2022-02-26
 Added the `edit` option to Grimblast. read the [man page](grimblast/grimblast.1.scd) for more information.
 
 A rofi script is also included.
 
+### 2022-02-27
 Added Scratchpad Script.
