@@ -16,6 +16,24 @@ Invoke shell functions in response to Hyprland socket2 events. Install with `mak
 
 See `shellevents_default.sh` for the supported function names. Example event files can be found in `submaps.sh` and `notifywindow.sh`.
 
+## try_swap_workspace
+
+Inspired from [this discussion on the hyprland repository](https://github.com/hyprwm/Hyprland/discussions/835) try_swap_workspace is a binding to mimic the 'arbitrary workspace on arbitrary monitor' on arbitrary monitor behavior known from may window managers.
+This means:
+- if a workspace is not displayed on any monitor and should be displayed, it gets displayed on the currently focused monitor
+- if a workspace is already displayed on another monitor and should displayed on the currently focused monitor, the displayed workspace on the focused monitor will be swapped with the workspace on the monitor that should be displayed on the focused monitor
+
+Install by running the Makefile `sudo make install`
+Uninstall by running the Makefile `sudo make uninstall`
+
+Usage:
+
+To send the window to scratchpad
+> bind= ALT,1,exec, try_swap_workspace 1
+
+use `-h` flag to get help.
+use `-c` flag to check dependencies
+
 ## Scratchpad
 A Bash script that instantly sends focused window to a special workspace named `scratchpad`
 and makes it easier to retrieve the window back to the current workspace.
