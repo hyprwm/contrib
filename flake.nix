@@ -17,6 +17,7 @@
       hyprprop = prev.callPackage ./hyprprop {};
       scratchpad = prev.callPackage ./scratchpad {hyprland = null;};
       shellevents = prev.callPackage ./shellevents {hyprland = null;};
+      try_swap_workspace = prev.callPackage ./try_swap_workspace {};
     };
 
     packages = genSystems (system: self.overlays.default null pkgsFor.${system});
