@@ -1,5 +1,7 @@
-PREFIX ?= /usr
-BINDIR ?= $(PREFIX)/bin
+DESTDIR ?= /
+PREFIX ?= $(DESTDIR)usr/local
+EXEC_PREFIX ?= $(PREFIX)
+BINDIR ?= $(EXEC_PREFIX)/bin
 
 install: try_swap_workspace
 	@install -v -D -m 0755 try_swap_workspace --target-directory "$(BINDIR)"
