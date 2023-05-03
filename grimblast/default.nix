@@ -18,7 +18,7 @@ stdenvNoCC.mkDerivation {
   src = ./.;
 
   buildInputs = [bash scdoc];
-  makeFlags = ["DESTDIR=$(out)", "PREFIX=/usr"];
+  makeFlags = ["PREFIX=$(out)"];
   nativeBuildInputs = [makeWrapper];
 
   postInstall = ''
