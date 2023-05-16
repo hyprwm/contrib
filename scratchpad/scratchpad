@@ -120,7 +120,7 @@ getBack() {
 			_selected_client="${_clients_on_spad[0]}"
 		}
 	}
-	[ -z "$_selected_client" ] && _selected_client="$(echo "${_clients_on_spad[*]}" | "${_menu_cmd[@]}")"
+	[ -z "$_selected_client" ] && _selected_client="$(echo "${_clients_on_spad[*]}" | eval "${_menu_cmd[*]}")"
 	_address="$(echo "$_selected_client" | awk '{print $NF}')"
 	hyprctl dispatch movetoworkspace "$_current_workspace,address:$_address"
 	IFS="$_ifs"
