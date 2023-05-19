@@ -4,7 +4,7 @@
 
 # Variables
 _listing=false
-_menu_cmd=("rofi" "-dmenu" "-i")
+_menu_cmd="rofi -dmenu -i"
 green="\033[0;32m"
 red="\033[0;31m"
 blue="\033[0;34m"
