@@ -171,6 +171,13 @@ elif [ "$SUBJECT" = "area" ]; then
     hyprpicker_pid=-1
   fi
 
+  # get fade & fadeOut animation and unset it
+  # this removes the black border seen around screenshots
+  FADE="$(hyprctl -j animations | jq -jr '.[0][] | select(.name == "fade") | .name, ",", (if .enabled == true then "1" else "0" end), ",", (.speed|floor), ",", .bezier')"
+  FADEOUT="$(hyprctl -j animations | jq -jr '.[0][] | select(.name == "fadeOut") | .name, ",", (if .enabled == true then "1" else "0" end), ",", (.speed|floor), ",", .bezier')"
+  hyprctl keyword animation 'fade,0,1,default' >/dev/null
+  hyprctl keyword animation 'fadeOut,0,1,default' >/dev/null
+
   WORKSPACES="$(hyprctl monitors -j | jq -r 'map(.activeWorkspace.id)')"
   WINDOWS="$(hyprctl clients -j | jq -r --argjson workspaces "$WORKSPACES" 'map(select([.workspace.id] | inside($workspaces)))')"
   GEOM=$(echo "$WINDOWS" | jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | slurp)
@@ -178,6 +185,11 @@ elif [ "$SUBJECT" = "area" ]; then
   if [ ! $hyprpicker_pid -eq -1 ]; then
     kill $hyprpicker_pid
   fi
+
+  # reset fade
+  hyprctl keyword animation "$FADE" >/dev/null
+  hyprctl keyword animation "$FADEOUT" >/dev/null
+
   # Check if user exited slurp without selecting the area
   if [ -z "$GEOM" ]; then
     exit 1
