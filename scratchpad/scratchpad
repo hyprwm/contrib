@@ -4,7 +4,7 @@
 
 # Variables
 _listing=false
-_menu_cmd="rofi -dmenu -i"
+_menu_cmd="rofi -dmenu -i -p scratchpad"
 green="\033[0;32m"
 red="\033[0;31m"
 blue="\033[0;34m"
@@ -94,6 +94,8 @@ takes() {
 getBack() {
 	_ifs="$IFS"
 	IFS=$'\n'$'\n'
+
+        if pgrep "${_menu_cmd%% *}" >/dev/null; then exit; fi # Menu running already? → exit
 
 	_current_workspace="$(hyprctl monitors -j | jq '.[] | select(.focused==true)' | jq -j '.activeWorkspace.name')"
 
