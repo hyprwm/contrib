@@ -6,7 +6,7 @@ grimblast - a helper for screenshots within hyprland
 
 # SYNOPSIS
 
-*grimblast* [--notify] [--cursor] (copy|save|copysave|edit) [TARGET] [FILE]++
+*grimblast* [--notify] [--cursor] [--freeze] [--scale <scale>] (copy|save|copysave|edit) [TARGET] [FILE]++
 *grimblast* check++
 *grimblast* usage
 
@@ -17,6 +17,12 @@ grimblast - a helper for screenshots within hyprland
 
 *--cursor*
 	Include cursors in the screenshot.
+
+*--freeze*
+	Freezes the screen before area selection.
+
+*--scale <scale>*
+	Passes the `-s` argument to `grim`.
 
 *save*
 	Save the screenshot into a regular file. Grimblast will write image
@@ -35,6 +41,12 @@ grimblast - a helper for screenshots within hyprland
 	gimp, but you can set a different one with the enviroment variable
 	$GRIMBLAST_EDITOR. Example: `export GRIMBLAST_EDITOR=gimp`.
 
+*check*
+	Verify whether the required tools are installed.
+
+*usage*
+	Show help message.
+
 # DESCRIPTION
 
 Grimblast is an easy-to-use screenshot utility for hyprland, based on grimshot.
@@ -51,12 +63,12 @@ An example usage pattern is to add these bindings to your hyprland config:
 # Super+P: Current window
 # Super+Shift+p: Select area
 # Super+Alt+p Current output
-# Super+Ctrl+p Select a window
+# Super+Ctrl+p All outputs
 
-bindsym Mod4+p       exec grimblast save active
-bindsym Mod4+Shift+p exec grimblast save area
-bindsym Mod4+Mod1+p  exec grimblast save output
-bindsym Mod4+Ctrl+p  exec grimblast save window
+bind = SUPER, p, exec, grimblast save active
+bind = SUPER SHIFT, p, exec, grimblast save area
+bind = SUPER ALT, p, exec, grimblast save output
+bind = SUPER CTRL, p, exec, grimblast save screen
 ```
 
 # TARGETS
@@ -70,11 +82,8 @@ _screen_
 	Captures the entire screen. This includes all visible outputs.
 
 _area_
-	Allows manually selecting a rectangular region, and captures that.
-
-_window_
-	Allows manually selecting a single window (by clicking on it), and
-	captures it.
+	Allows manually selecting a rectangular region or window (by clicking on it),
+	and captures that.
 
 _output_
 	Captures the currently active output.
