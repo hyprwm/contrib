@@ -51,6 +51,55 @@ To get back the window
 
 use `-h` flag to get help.
 
+# Installing
+
+## Manual
+
+Clone the repo, cd to your desired tool, run `make` to build. To install, run
+`make install`. You may need root privileges.
+
+## Nix
+
+In your configuration flake, add
+```nix
+{
+  inputs.hyprland-contrib = {
+    url = "github:hyprwm/contrib";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  # ...
+}
+```
+
+To make `inputs` available in your configurations, add this
+```nix
+# for Home Manager
+homeConfigurations.YOURCONFIG = inputs.home-manager.lib.homeManagerConfiguration {
+  pkgs = ...;
+  modules = ...;
+
+  extraSpecialArgs = {inherit inputs;};
+}
+
+# for NixOS
+nixosConfigurations.YOURHOSTNAME = inputs.nixpkgs.nixosSystem {
+  system = "...";
+  modules = ...;
+
+  specialArgs = {inherit inputs;};
+}
+```
+
+For the final step, add packages to your `environment.systemPackages` or
+`home.packages` in this format:
+```nix
+{pkgs, inputs, ...}: {
+  environment.systemPackages = [ # or home.packages
+    inputs.hyprland-contrib.pacakges.${pkgs.system}.grimblast # or any other package
+  ];
+}
+```
 
 # Contributing
 
