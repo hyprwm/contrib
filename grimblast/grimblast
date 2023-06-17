@@ -41,6 +41,7 @@ env_editor_confirm() {
 NOTIFY=no
 CURSOR=
 FREEZE=
+SCALE=
 
 while [ $# -gt 0 ]; do
   key="$1"
@@ -58,6 +59,16 @@ while [ $# -gt 0 ]; do
     FREEZE=yes
     shift # past argument
     ;;
+  -s | --scale)
+    shift # past argument
+    if [ $# -gt 0 ]; then
+      SCALE="$1" # assign the next argument to SCALE
+      shift      # past argument
+    else
+      echo "Error: Missing argument for --scale option."
+      exit 1
+    fi
+    ;;
   *)      # unknown option
     break # done with parsing --flags
     ;;
@@ -71,7 +82,7 @@ FILE_EDITOR=${3:-$(tmp_editor_directory)/$(date -Ins).png}
 
 if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "edit" ] && [ "$ACTION" != "copysave" ] && [ "$ACTION" != "check" ]; then
   echo "Usage:"
-  echo "  grimblast [--notify] [--cursor] [--freeze] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
+  echo "  grimblast [--notify] [--cursor] [--freeze] [--scale <scale>] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
   echo "  grimblast check"
   echo "  grimblast usage"
   echo ""
@@ -132,11 +143,11 @@ takeScreenshot() {
   GEOM=$2
   OUTPUT=$3
   if [ -n "$OUTPUT" ]; then
-    grim ${CURSOR:+-c} -o "$OUTPUT" "$FILE" || die "Unable to invoke grim"
+    grim ${CURSOR:+-c} ${SCALE:+-s} "$SCALE" -o "$OUTPUT" "$FILE" || die "Unable to invoke grim"
   elif [ -z "$GEOM" ]; then
-    grim ${CURSOR:+-c} "$FILE" || die "Unable to invoke grim"
+    grim ${CURSOR:+-c} ${SCALE:+-s} "$SCALE" "$FILE" || die "Unable to invoke grim"
   else
-    grim ${CURSOR:+-c} -g "$GEOM" "$FILE" || die "Unable to invoke grim"
+    grim ${CURSOR:+-c} ${SCALE:+-s} "$SCALE" -g "$GEOM" "$FILE" || die "Unable to invoke grim"
   fi
 }
 
