@@ -96,7 +96,7 @@ For the final step, add packages to your `environment.systemPackages` or
 ```nix
 {pkgs, inputs, ...}: {
   environment.systemPackages = [ # or home.packages
-    inputs.hyprland-contrib.pacakges.${pkgs.system}.grimblast # or any other package
+    inputs.hyprland-contrib.packages.${pkgs.system}.grimblast # or any other package
   ];
 }
 ```
