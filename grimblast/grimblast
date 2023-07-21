@@ -123,7 +123,14 @@ notifyError() {
   fi
 }
 
+killHyprpicker() {
+  if [ ! $HYPRPICKER_PID -eq -1 ]; then
+    kill $HYPRPICKER_PID
+  fi
+}
+
 die() {
+  killHyprpicker
   MSG=${1:-Bye}
   notifyError "Error: $MSG"
   exit 2
@@ -199,6 +206,7 @@ elif [ "$SUBJECT" = "area" ]; then
 
   # Check if user exited slurp without selecting the area
   if [ -z "$GEOM" ]; then
+    killHyprpicker
     exit 1
   fi
   WHAT="Area"
@@ -241,6 +249,4 @@ else
   fi
 fi
 
-if [ ! $HYPRPICKER_PID -eq -1 ]; then
-  kill $HYPRPICKER_PID
-fi
+killHyprpicker
