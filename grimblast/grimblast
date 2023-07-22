@@ -42,6 +42,7 @@ NOTIFY=no
 CURSOR=
 FREEZE=
 SCALE=
+HYPRPICKER_PID=-1
 
 while [ $# -gt 0 ]; do
   key="$1"
@@ -122,7 +123,14 @@ notifyError() {
   fi
 }
 
+killHyprpicker() {
+  if [ ! $HYPRPICKER_PID -eq -1 ]; then
+    kill $HYPRPICKER_PID
+  fi
+}
+
 die() {
+  killHyprpicker
   MSG=${1:-Bye}
   notifyError "Error: $MSG"
   exit 2
@@ -177,9 +185,7 @@ elif [ "$SUBJECT" = "area" ]; then
   if [ "$FREEZE" = "yes" ] && [ "$(command -v "hyprpicker")" ] >/dev/null 2>&1; then
     hyprpicker -r -z &
     sleep 0.2
-    hyprpicker_pid=$!
-  else
-    hyprpicker_pid=-1
+    HYPRPICKER_PID=$!
   fi
 
   # get fade & fadeOut animation and unset it
@@ -193,9 +199,6 @@ elif [ "$SUBJECT" = "area" ]; then
   WINDOWS="$(hyprctl clients -j | jq -r --argjson workspaces "$WORKSPACES" 'map(select([.workspace.id] | inside($workspaces)))')"
   GEOM=$(echo "$WINDOWS" | jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | slurp)
 
-  if [ ! $hyprpicker_pid -eq -1 ]; then
-    kill $hyprpicker_pid
-  fi
 
   # reset fade
   hyprctl keyword animation "$FADE" >/dev/null
@@ -203,6 +206,7 @@ elif [ "$SUBJECT" = "area" ]; then
 
   # Check if user exited slurp without selecting the area
   if [ -z "$GEOM" ]; then
+    killHyprpicker
     exit 1
   fi
   WHAT="Area"
@@ -244,3 +248,5 @@ else
     notifyError "Error taking screenshot with grim"
   fi
 fi
+
+killHyprpicker
