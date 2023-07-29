@@ -5,6 +5,7 @@
   scdoc,
   makeShellWrapper,
   libnotify,
+  procps,
   bash,
 }:
 stdenvNoCC.mkDerivation {
@@ -21,6 +22,7 @@ stdenvNoCC.mkDerivation {
       "${lib.makeBinPath [
       coreutils
       libnotify
+      procps
     ]}"
   '';
 

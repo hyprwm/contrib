@@ -5,6 +5,7 @@
   libnotify,
   gnused,
   jq,
+  procps,
   bash,
   hyprland ? null,
 }:
@@ -23,6 +24,7 @@ stdenvNoCC.mkDerivation {
         gnused
         jq
         libnotify
+        procps
       ]
       ++ lib.optional (hyprland != null) hyprland)}"
   '';
