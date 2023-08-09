@@ -170,7 +170,8 @@ if [ "$ACTION" = "check" ]; then
   check notify-send
   exit
 elif [ "$SUBJECT" = "active" ]; then
-  FOCUSED=$(hyprctl activewindow -j)
+  hyprvars=$(hyprctl activewindow -j | cut -d' ' -f2- | head -n -1 | tail -n +4)
+  FOCUSED=$(echo -e "{\n$hyprvars\n}")
   GEOM=$(echo "$FOCUSED" | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')
   APP_ID=$(echo "$FOCUSED" | jq -r '.class')
   WHAT="$APP_ID window"
@@ -179,7 +180,8 @@ elif [ "$SUBJECT" = "screen" ]; then
   WHAT="Screen"
 elif [ "$SUBJECT" = "output" ]; then
   GEOM=""
-  OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true)' | jq -r '.name')
+  hyprvars=$(hyprctl monitors -j | cut -d' ' -f2- | head -n -1 | tail -n +4)
+  OUTPUT=$(echo -e "{\n$hyprvars\n}" | jq -r 'select(.focused == true)' | jq -r '.name')
   WHAT="$OUTPUT"
 elif [ "$SUBJECT" = "area" ]; then
   if [ "$FREEZE" = "yes" ] && [ "$(command -v "hyprpicker")" ] >/dev/null 2>&1; then
@@ -190,14 +192,18 @@ elif [ "$SUBJECT" = "area" ]; then
 
   # get fade & fadeOut animation and unset it
   # this removes the black border seen around screenshots
-  FADE="$(hyprctl -j animations | jq -jr '.[0][] | select(.name == "fade") | .name, ",", (if .enabled == true then "1" else "0" end), ",", (.speed|floor), ",", .bezier')"
-  FADEOUT="$(hyprctl -j animations | jq -jr '.[0][] | select(.name == "fadeOut") | .name, ",", (if .enabled == true then "1" else "0" end), ",", (.speed|floor), ",", .bezier')"
+  hyprvars=$(hyprctl animations -j | cut -d' ' -f2- | head -n -1 | tail -n +4)
+  hyprvars2=$(echo -e "[{\n$hyprvars\n}]" | head -n -8)
+  FADE=$(echo -e "$hyprvars2\n}]"  | jq -r '.[] | select(.name == "fade") | .name, ",", (if .enabled == true then "1" else "0" end), ",", (.speed|floor), ",", .bezier')
+  FADEOUT=$(echo -e "$hyprvars2\n}]"  | jq -r '.[] | select(.name == "fadeOut") | .name, ",", (if .enabled == true then "1" else "0" end), ",", (.speed|floor), ",", .bezier')
   hyprctl keyword animation 'fade,0,1,default' >/dev/null
   hyprctl keyword animation 'fadeOut,0,1,default' >/dev/null
 
-  WORKSPACES="$(hyprctl monitors -j | jq -r 'map(.activeWorkspace.id)')"
-  WINDOWS="$(hyprctl clients -j | jq -r --argjson workspaces "$WORKSPACES" 'map(select([.workspace.id] | inside($workspaces)))')"
-  GEOM=$(echo "$WINDOWS" | jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | slurp)
+  hyprvars=$(hyprctl monitors -j | cut -d' ' -f2- | head -n -1 | tail -n +4)
+  WORKSPACES=$(echo -e "{\n$hyprvars\n}" |  jq '.activeWorkspace | .id')
+  hyprvars=$(hyprctl clients -j| cut -d' ' -f2- | head -n -1 | tail -n +4)
+  WINDOWS=$(echo -e "[{\n$hyprvars\n}]" | jq -r --argjson workspaces "$WORKSPACES" '.[] | select(.workspace.id == $workspaces)')
+  GEOM=$(echo "$WINDOWS" | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | slurp)
 
 
   # reset fade
