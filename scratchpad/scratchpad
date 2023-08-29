@@ -95,7 +95,7 @@ getBack() {
 	_ifs="$IFS"
 	IFS=$'\n'$'\n'
 
-        if pgrep "${_menu_cmd%% *}" >/dev/null; then exit; fi # Menu running already? → exit
+	if pgrep "${_menu_cmd%% *}" >/dev/null; then exit; fi # Menu running already? → exit
 
 	_current_workspace="$(hyprctl monitors -j | jq '.[] | select(.focused==true)' | jq -j '.activeWorkspace.name')"
 
@@ -125,6 +125,10 @@ getBack() {
 	[ -z "$_selected_client" ] && _selected_client="$(echo "${_clients_on_spad[*]}" | eval "${_menu_cmd[*]}")"
 	_address="$(echo "$_selected_client" | awk '{print $NF}')"
 	hyprctl dispatch movetoworkspace "$_current_workspace,address:$_address"
+	hyprctl dispatch focuswindow "address:$_address"
+	[ "$(hyprctl activewindow -j | jq '.floating')" = true ] && {
+		hyprctl dispatch bringactivetotop none
+	}
 	IFS="$_ifs"
 }
 
