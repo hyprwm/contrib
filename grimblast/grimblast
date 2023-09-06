@@ -3,10 +3,11 @@
 ## Requirements:
 ##  - `grim`: screenshot utility for wayland
 ##  - `slurp`: to select an area
-##  - `hyprctl`: to read properties of current window
-##  - `wl-copy`: clipboard utility
+##  - `hyprctl`: to read properties of current window (provided by Hyprland)
+##  - `hyprpicker`: to freeze the screen when selecting area
+##  - `wl-copy`: clipboard utility (provided by wl-clipboard)
 ##  - `jq`: json utility to parse hyprctl output
-##  - `notify-send`: to show notifications
+##  - `notify-send`: to show notifications (provided by libnotify)
 ## Those are needed to be installed, if unsure, run `grimblast check`
 ##
 ## See `man 1 grimblast` or `grimblast usage` for further details.
@@ -198,7 +199,6 @@ elif [ "$SUBJECT" = "area" ]; then
   WORKSPACES="$(hyprctl monitors -j | jq -r 'map(.activeWorkspace.id)')"
   WINDOWS="$(hyprctl clients -j | jq -r --argjson workspaces "$WORKSPACES" 'map(select([.workspace.id] | inside($workspaces)))')"
   GEOM=$(echo "$WINDOWS" | jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | slurp)
-
 
   # reset fade
   hyprctl keyword animation "$FADE" >/dev/null
