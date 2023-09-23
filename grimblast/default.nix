@@ -1,43 +1,50 @@
 {
   lib,
   stdenvNoCC,
-  coreutils,
-  scdoc,
   makeWrapper,
-  wl-clipboard,
-  libnotify,
-  slurp,
+  scdoc,
+  coreutils,
   grim,
   jq,
-  bash,
+  libnotify,
+  slurp,
+  wl-clipboard,
   hyprland ? null,
 }:
 stdenvNoCC.mkDerivation {
   pname = "grimblast";
   version = "0.1";
+
   src = ./.;
 
-  buildInputs = [bash scdoc];
+  nativeBuildInputs = [
+    makeWrapper
+  ];
+
+  buildInputs = [
+    scdoc
+  ];
+
   makeFlags = ["PREFIX=$(out)"];
-  nativeBuildInputs = [makeWrapper];
 
   postInstall = ''
     wrapProgram $out/bin/grimblast --prefix PATH ':' \
       "${lib.makeBinPath ([
-        wl-clipboard
         coreutils
-        libnotify
-        slurp
         grim
         jq
+        libnotify
+        slurp
+        wl-clipboard
       ]
       ++ lib.optional (hyprland != null) hyprland)}"
   '';
 
   meta = with lib; {
-    description = "A helper for screenshots within hyprland, based on grimshot";
+    description = "A helper for screenshots within Hyprland, based on grimshot";
     license = licenses.mit;
     platforms = platforms.unix;
     maintainers = with maintainers; [misterio77];
+    mainProgram = "grimblast";
   };
 }
