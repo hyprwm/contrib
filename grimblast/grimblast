@@ -42,6 +42,7 @@ env_editor_confirm() {
 NOTIFY=no
 CURSOR=
 FREEZE=
+WAIT=no
 SCALE=
 HYPRPICKER_PID=-1
 
@@ -60,6 +61,15 @@ while [ $# -gt 0 ]; do
   -f | --freeze)
     FREEZE=yes
     shift # past argument
+    ;;
+  -w | --wait)
+    shift
+    WAIT=$1
+    if echo "$WAIT" | grep "[^0-9]" -q; then
+      echo "Invalid value for wait '$WAIT'" >&2
+      exit 3
+    fi
+    shift
     ;;
   -s | --scale)
     shift # past argument
@@ -84,7 +94,7 @@ FILE_EDITOR=${3:-$(tmp_editor_directory)/$(date -Ins).png}
 
 if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "edit" ] && [ "$ACTION" != "copysave" ] && [ "$ACTION" != "check" ]; then
   echo "Usage:"
-  echo "  grimblast [--notify] [--cursor] [--freeze] [--scale <scale>] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
+  echo "  grimblast [--notify] [--cursor] [--freeze] [--wait N] [--scale <scale>] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
   echo "  grimblast check"
   echo "  grimblast usage"
   echo ""
@@ -160,6 +170,12 @@ takeScreenshot() {
   fi
 }
 
+wait() {
+  if [ "$WAIT" != "no" ]; then
+    sleep "$WAIT"
+  fi
+}
+
 if [ "$ACTION" = "check" ]; then
   echo "Checking if required tools are installed. If something is missing, install it to your system and make it available in PATH..."
   check grim
@@ -215,6 +231,8 @@ elif [ "$SUBJECT" = "window" ]; then
 else
   die "Unknown subject to take a screen shot from" "$SUBJECT"
 fi
+
+wait
 
 if [ "$ACTION" = "copy" ]; then
   takeScreenshot - "$GEOM" "$OUTPUT" | wl-copy --type image/png || die "Clipboard error"

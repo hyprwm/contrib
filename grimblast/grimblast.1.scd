@@ -6,7 +6,7 @@ grimblast - a helper for screenshots within hyprland
 
 # SYNOPSIS
 
-*grimblast* [--notify] [--cursor] [--freeze] [--scale <scale>] (copy|save|copysave|edit) [TARGET] [FILE]++
+*grimblast* [--notify] [--cursor] [--freeze] [--wait N] [--scale <scale>] (copy|save|copysave|edit) [TARGET] [FILE]++
 *grimblast* check++
 *grimblast* usage
 
@@ -20,6 +20,11 @@ grimblast - a helper for screenshots within hyprland
 
 *--freeze*
 	Freezes the screen before area selection.
+
+*--wait N*
+	Wait for N seconds before taking a screenshot. Waits after any
+	manual selection is made. Recommended to combine with --notify in
+	order to know when the screenshot has been taken.
 
 *--scale <scale>*
 	Passes the `-s` argument to `grim`.
