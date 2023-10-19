@@ -17,6 +17,7 @@ jobs:
         - scratchpad/scratchpad
         - hyprprop/hyprprop
         - try_swap_workspace/try_swap_workspace
+        - hdrop/hdrop
 
     steps:
       - uses: actions/checkout@v3
