@@ -51,7 +51,7 @@ basicChecks() {
     exit 1
   }
   pgrep Hyprland &>/dev/null || {
-    notify "hdrop: Hyprland session could not be detected. hdrop only works in Hyperland."
+    notify "hdrop: Hyprland session could not be detected. hdrop only works in Hyprland."
     exit 1
   }
 }
