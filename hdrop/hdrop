@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+# This script emulates the main feature of tdrop (https://github.com/noctuid/tdrop) in Hyprland, namely:
+#
+# 1) launching a program if it's not already running
+# 2) bringing it to the foreground if it's already running and not in the foreground
+# 3) hiding it, if it's currently in the foreground
+#
+# Several instances of the same program can be used concurrently, if different class names are assigned to each instance. Presently there is only support for -a (foot terminal emulator) and --class (kitty terminal emulator).
+#
+# Example in Hyprland config:
+#
+# bind = $mainMod, code:48, exec, hdrop kitty -1 --class kitty_1
+# bind = $mainMod CTRL, code:48, exec, hdrop kitty -1 --class kitty_2
+# bind = $mainMod, code:47, exec, hdrop kitty -1 --class kitty_hx sh hx
+#
+# Dependency: jq
+
+commandline="${*:1}"
+CLASS="$1"
+ACTIVE_WORKSPACE="$(hyprctl activeworkspace -j | jq -r .id)"
+
+TEMP=$(getopt -q --options a: --longoptions class: -n 'hdrop' -- "$@")
+
+eval set -- "$TEMP"
+
+while true; do
+  case "$1" in
+  -a)
+    CLASS="$2"
+    shift 2
+    ;;
+  --class)
+    CLASS="$2"
+    shift 2
+    ;;
+  --)
+    shift
+    break
+    ;;
+  *) break ;;
+  esac
+done
+
+if [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id!=$ACTIVE_WORKSPACE)") ]]; then
+  hyprctl dispatch -- movetoworkspacesilent $ACTIVE_WORKSPACE,"$CLASS"
+  # hyprctl dispatch -- focuswindow "$CLASS"
+elif [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id==$ACTIVE_WORKSPACE)") ]]; then
+  hyprctl dispatch -- movetoworkspacesilent special:hdrop,"$CLASS"
+else
+  hyprctl dispatch -- exec $commandline
+fi
