@@ -20,7 +20,7 @@ commandline="${*:1}"
 CLASS="$1"
 ACTIVE_WORKSPACE="$(hyprctl activeworkspace -j | jq -r .id)"
 
-TEMP=$(getopt -q --options a: --longoptions class: -n 'hdrop' -- "$@")
+TEMP=$(getopt -q --options a: --longoptions class: -n hdrop -- "$@")
 
 eval set -- "$TEMP"
 
