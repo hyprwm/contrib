@@ -25,7 +25,7 @@
 ##
 ## Dependency: jq
 ##
-## Part of https://github.com/hyprwm/contrib
+## Part of: https://github.com/hyprwm/contrib
 ## Author: Schweber (https://github.com/Schweber)
 
 check() {
@@ -93,7 +93,7 @@ while true; do
 done
 
 if [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id!=$ACTIVE_WORKSPACE)") ]]; then
-  hyprctl dispatch -- movetoworkspacesilent $ACTIVE_WORKSPACE,"$CLASS"
+  hyprctl dispatch -- movetoworkspacesilent "$ACTIVE_WORKSPACE","$CLASS"
   hyprctl dispatch -- focuswindow "$CLASS"
 elif [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id==$ACTIVE_WORKSPACE)") ]]; then
   hyprctl dispatch -- movetoworkspacesilent special:hdrop,"$CLASS"
