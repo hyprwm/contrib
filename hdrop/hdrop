@@ -8,7 +8,7 @@
 ##
 ## Several instances of the same program can be run concurrently, if different class names are assigned to each instance. Presently there is only support for the following flags:
 ##
-## -a (foot terminal emulator)
+## -a ('foot' terminal emulator)
 ## --class (all other programs).
 ##
 ## Please feel free to report missing flags for other programs!
@@ -27,6 +27,7 @@
 ##
 ## Part of: https://github.com/hyprwm/contrib
 ## Author: Schweber (https://github.com/Schweber)
+## License: AGPL
 
 check() {
   command -v "$1" 1>/dev/null
