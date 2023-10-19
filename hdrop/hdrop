@@ -6,7 +6,7 @@
 # 2) bringing it to the foreground if it's already running and not in the foreground
 # 3) hiding it, if it's currently in the foreground
 #
-# Several instances of the same program can be used concurrently, if different class names are assigned to each instance. Presently there is only support for -a (foot terminal emulator) and --class (kitty terminal emulator).
+# Several instances of the same program can be run concurrently, if different class names are assigned to each instance. Presently there is only support for -a (foot terminal emulator) and --class (kitty terminal emulator).
 #
 # Example in Hyprland config:
 #
@@ -44,7 +44,7 @@ done
 
 if [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id!=$ACTIVE_WORKSPACE)") ]]; then
   hyprctl dispatch -- movetoworkspacesilent $ACTIVE_WORKSPACE,"$CLASS"
-  # hyprctl dispatch -- focuswindow "$CLASS"
+  hyprctl dispatch -- focuswindow "$CLASS"
 elif [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id==$ACTIVE_WORKSPACE)") ]]; then
   hyprctl dispatch -- movetoworkspacesilent special:hdrop,"$CLASS"
 else
