@@ -2,7 +2,6 @@
   lib,
   stdenvNoCC,
   makeWrapper,
-  scdoc,
   coreutils,
   util-linux,
   jq,
@@ -20,7 +19,6 @@ stdenvNoCC.mkDerivation {
   ];
 
   buildInputs = [
-    scdoc
   ];
 
   makeFlags = ["PREFIX=$(out)"];
