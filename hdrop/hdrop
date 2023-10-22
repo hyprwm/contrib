@@ -59,16 +59,15 @@ basicChecks() {
 
 basicChecks
 
-if [[ $# -eq 0 ]]; then
-  notify "hdrop: missing Argument. Append the command you would like to execute, e.g. 'hdrop librewolf'"
-  exit 1
-fi
-
 commandline="${*:1}"
 CLASS="$1"
 ACTIVE_WORKSPACE="$(hyprctl activeworkspace -j | jq -r .id)"
 
 case "$1" in
+"")
+  notify "hdrop: missing Argument. Append the command you would like to execute, e.g. 'hdrop librewolf'"
+  exit 1
+  ;;
 "foot")
   TEMP=$(getopt --options a: -n hdrop -- "$@")
   ;;
