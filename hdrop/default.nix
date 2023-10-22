@@ -38,7 +38,7 @@ stdenvNoCC.mkDerivation {
     description = "Emulate 'tdrop' in Hyprland (show and hide specific programs per keybind)";
     license = licenses.agpl;
     platforms = platforms.unix;
-    maintainers = with maintainers; [Schweber];
+    maintainers = with maintainers; [];
     mainProgram = "hdrop";
   };
 }
