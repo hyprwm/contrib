@@ -2,7 +2,6 @@
   lib,
   stdenvNoCC,
   makeWrapper,
-  scdoc,
   coreutils,
   util-linux,
   jq,
@@ -20,7 +19,6 @@ stdenvNoCC.mkDerivation {
   ];
 
   buildInputs = [
-    scdoc
   ];
 
   makeFlags = ["PREFIX=$(out)"];
@@ -40,7 +38,7 @@ stdenvNoCC.mkDerivation {
     description = "Emulate 'tdrop' in Hyprland (show and hide specific programs per keybind)";
     license = licenses.agpl;
     platforms = platforms.unix;
-    maintainers = with maintainers; [Schweber];
+    maintainers = with maintainers; [];
     mainProgram = "hdrop";
   };
 }
