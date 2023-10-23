@@ -18,9 +18,6 @@ stdenvNoCC.mkDerivation {
     makeWrapper
   ];
 
-  buildInputs = [
-  ];
-
   makeFlags = ["PREFIX=$(out)"];
 
   postInstall = ''
