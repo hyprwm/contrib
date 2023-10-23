@@ -51,6 +51,17 @@ To get back the window
 
 use `-h` flag to get help.
 
+## hdrop
+
+This script emulates the main feature of tdrop (https://github.com/noctuid/tdrop) in Hyprland, namely:
+
+ - if the specified program is not running: launch it and bring it to the foreground.
+ - if the specified program is already running on another workspace: bring it to the current workspace and focus it.
+ - if the specified program is already on the current workspace: move it to special:hdrop workspace, hiding it until called up again by hdrop.
+
+Several instances of the same program can be run concurrently, if different class names are assigned to each instance. 
+
+
 # Installing
 
 ## Manual
