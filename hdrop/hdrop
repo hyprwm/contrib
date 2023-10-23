@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+
+## This script emulates the main feature of tdrop (https://github.com/noctuid/tdrop) in Hyprland, namely:
+##
+## - if a program is not running: launch it and bring it to the foreground.
+## - if a program is already running on another workspace: bring it to the current workspace and focus it.
+## - if a program is already on the current workspace: move it to special:hdrop workspace, hiding it until called up again by hdrop.
+##
+## Several instances of the same program can be run concurrently, if different class names are assigned to each instance. Presently there is only support for the following flags:
+##
+## -a ('foot' terminal emulator)
+## --class (all other programs).
+##
+## Please feel free to report missing flags for other programs!
+##
+## Example bindings in Hyprland config:
+##
+## bind = $mainMod, b, exec, hdrop librewolf
+## bind = $mainMod, x, exec, hdrop kitty --class kitty_1
+## bind = $mainMod CTRL, x, exec, hdrop kitty --class kitty_2
+## bind = $mainMod, c, exec, hdrop foot -a foot_1
+## bind = $mainMod CTRL, c, exec, hdrop foot -a foot_2
+##
+## Note: defining a class name is only necessary when running several instances of the same program.
+##
+## Dependency: jq
+##
+## Part of: https://github.com/hyprwm/contrib
+## Author: Schweber (https://github.com/Schweber)
+## License: AGPL
+
+check() {
+  command -v "$1" 1>/dev/null
+}
+
+notify() {
+  # shellcheck disable=SC2015
+  check notify-send && {
+    notify-send "$@"
+  } || {
+    echo "$@"
+  }
+}
+
+basicChecks() {
+  check jq || {
+    notify "hdrop: Missing dependency 'jq'"
+    exit 1
+  }
+  check hyprctl || {
+    notify "hdrop: 'hyprctl' can't be executed"
+    exit 1
+  }
+  pgrep Hyprland &>/dev/null || {
+    notify "hdrop: Hyprland session could not be detected. hdrop only works in Hyprland."
+    exit 1
+  }
+}
+
+basicChecks
+
+commandline="${*:1}"
+CLASS="$1"
+ACTIVE_WORKSPACE="$(hyprctl activeworkspace -j | jq -r .id)"
+
+case "$1" in
+"")
+  notify "hdrop: missing Argument. Append the command you would like to execute, e.g. 'hdrop librewolf'"
+  exit 1
+  ;;
+"foot")
+  TEMP=$(getopt --options a: -n hdrop -- "$@")
+  ;;
+*)
+  TEMP=$(getopt --longoptions class: -n hdrop -- "$@")
+  ;;
+esac
+
+eval set -- "$TEMP"
+
+while true; do
+  case "$1" in
+  -a | --class)
+    CLASS="$2"
+    shift 2
+    ;;
+  --)
+    shift
+    break
+    ;;
+  *) break ;;
+  esac
+done
+
+if [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id!=$ACTIVE_WORKSPACE)") ]]; then
+  hyprctl dispatch -- movetoworkspacesilent "$ACTIVE_WORKSPACE","$CLASS"
+  hyprctl dispatch -- focuswindow "$CLASS"
+elif [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id==$ACTIVE_WORKSPACE)") ]]; then
+  hyprctl dispatch -- movetoworkspacesilent special:hdrop,"$CLASS"
+else
+  $commandline || notify "hdrop: Error executing given command '$commandline'"
+fi
