@@ -61,8 +61,8 @@ This script is meant to be started with keybindings and emulates the main featur
 
 Several instances of the same program can be run concurrently, if different class names are assigned to each instance. Presently there is support for the following flags:
 
- >-a ('foot' terminal emulator)
- >--class (all other programs).
+ `-a` ('foot' terminal emulator)
+ `--class` (all other programs).
 
  Example bindings in Hyprland config:
 
