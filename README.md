@@ -67,6 +67,7 @@ Several instances of the same program can be run concurrently, if different clas
  Example bindings in Hyprland config:
 
  >bind = $mainMod, b, exec, hdrop librewolf
+
  >bind = $mainMod, x, exec, hdrop kitty --class kitty_1
  >bind = $mainMod CTRL, x, exec, hdrop kitty --class kitty_2
  
