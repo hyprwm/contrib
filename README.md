@@ -73,6 +73,10 @@ Several instances of the same program can be run concurrently, if different clas
 >
  >bind = $mainMod CTRL, x, exec, hdrop kitty --class kitty_2
  
+If you want to run a program on boot and have it wait in the background until called up by hdrop you can use this:
+
+>exec-once = [workspace special:hdrop silent] librewolf
+
 # Installing
 
 ## Manual

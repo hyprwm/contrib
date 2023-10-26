@@ -23,8 +23,11 @@
 ##
 ## Note: defining a class name is only necessary when running several instances of the same program.
 ##
-## Dependency: jq
+## If you want to run a program on boot and have it wait in the background until called up by hdrop you can use this:
 ##
+## exec-once = [workspace special:hdrop silent] librewolf
+##
+## Dependencies: bash jq hyprland
 ## Part of: https://github.com/hyprwm/contrib
 ## Author: Schweber (https://github.com/Schweber)
 ## License: AGPL
