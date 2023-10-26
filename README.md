@@ -57,7 +57,7 @@ This script is meant to be started with keybindings and emulates the main featur
 
  - if the specified program is not running: launch it and bring it to the foreground.
  - if the specified program is already running on another workspace: bring it to the current workspace and focus it.
- - if the specified program is already on the current workspace: move it to special:hdrop workspace, hiding it until called up again by hdrop.
+ - if the specified program is already on the current workspace: move it to special:hdrop workspace, thereby hiding it until called up again by hdrop.
 
 Several instances of the same program can be run concurrently, if different class names are assigned to each instance. Presently there is support for the following flags:
 
