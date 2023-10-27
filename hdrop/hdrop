@@ -2,11 +2,11 @@
 
 ## This script emulates the main feature of tdrop (https://github.com/noctuid/tdrop) in Hyprland, namely:
 ##
-## - if a program is not running: launch it and bring it to the foreground.
-## - if a program is already running on another workspace: bring it to the current workspace and focus it.
-## - if a program is already on the current workspace: move it to special:hdrop workspace, hiding it until called up again by hdrop.
+## - if the specified program is not running: launch it and bring it to the foreground.
+## - if the specified program is already running on another workspace: bring it to the current workspace and focus it.
+## - if the specified program is already on the current workspace: move it to workspace 'special:hdrop', thereby hiding it until called up again by hdrop.
 ##
-## Several instances of the same program can be run concurrently, if different class names are assigned to each instance. Presently there is only support for the following flags:
+## Several instances of the same program can be run concurrently, if different class names are assigned to each instance. Presently there is support for the following flags:
 ##
 ## -a ('foot' terminal emulator)
 ## --class (all other programs).
@@ -23,8 +23,11 @@
 ##
 ## Note: defining a class name is only necessary when running several instances of the same program.
 ##
-## Dependency: jq
+## If you want to run a program on boot and have it wait in the background until called up by hdrop you can use this:
 ##
+## exec-once = [workspace special:hdrop silent] librewolf
+##
+## Dependencies: bash jq hyprland
 ## Part of: https://github.com/hyprwm/contrib
 ## Author: Schweber (https://github.com/Schweber)
 ## License: AGPL
@@ -52,7 +55,7 @@ basicChecks() {
     exit 1
   }
   pgrep Hyprland &>/dev/null || {
-    notify "hdrop: Hyprland session could not be detected. hdrop only works in Hyprland."
+    notify "hdrop: Hyprland session could not be detected" "hdrop only works in Hyprland"
     exit 1
   }
 }
@@ -65,7 +68,7 @@ ACTIVE_WORKSPACE="$(hyprctl activeworkspace -j | jq -r .id)"
 
 case "$1" in
 "")
-  notify "hdrop: missing Argument. Append the command you would like to execute, e.g. 'hdrop librewolf'"
+  notify "hdrop: missing Argument" "Append the command you would like to execute, e.g. 'hdrop librewolf'"
   exit 1
   ;;
 "foot")
@@ -93,10 +96,10 @@ while true; do
 done
 
 if [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id!=$ACTIVE_WORKSPACE)") ]]; then
-  hyprctl dispatch -- movetoworkspacesilent "$ACTIVE_WORKSPACE","$CLASS"
-  hyprctl dispatch -- focuswindow "$CLASS"
+  hyprctl dispatch -- movetoworkspacesilent "$ACTIVE_WORKSPACE","$CLASS" || notify "hdrop: Error moving '$commandline' to current workspace"
+  hyprctl dispatch -- focuswindow "$CLASS" || notify "hdrop: Error focusing '$commandline' on current workspace"
 elif [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id==$ACTIVE_WORKSPACE)") ]]; then
-  hyprctl dispatch -- movetoworkspacesilent special:hdrop,"$CLASS"
+  hyprctl dispatch -- movetoworkspacesilent special:hdrop,"$CLASS" || notify "hdrop: Error moving '$commandline' to workspace 'special:hdrop'"
 else
-  $commandline || notify "hdrop: Error executing given command '$commandline'"
+  $commandline || notify "hdrop: Error executing given command" "'$commandline'"
 fi
