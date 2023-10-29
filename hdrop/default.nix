@@ -33,7 +33,7 @@ stdenvNoCC.mkDerivation {
 
   meta = with lib; {
     description = "Emulate 'tdrop' in Hyprland (show and hide specific programs per keybind)";
-    license = licenses.agpl;
+    license = licenses.agpl3;
     platforms = platforms.unix;
     # maintainers = with maintainers; [];
     mainProgram = "hdrop";
