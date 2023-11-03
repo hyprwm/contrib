@@ -20,6 +20,10 @@ event_activewindow() {
   : # WINDOWCLASS WINDOWTITLE
 }
 
+event_activewindowv2() {
+  : # WINDOWADDRESS
+}
+
 event_fullscreen() {
   : # ENTER (0 if leaving fullscreen, 1 if entering)
 }
