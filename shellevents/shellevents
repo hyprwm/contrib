@@ -73,6 +73,7 @@ while true; do
     "workspace") WORKSPACENAME="$1" event_workspace ;;
     "focusedmon") MONNAME="$1" WORKSPACENAME="$2" event_focusedmon ;;
     "activewindow") WINDOWCLASS="$1" WINDOWTITLE="$2" event_activewindow ;;
+    "activewindowv2") WINDOWADDRESS="$1" event_activewindowv2 ;;
     "fullscreen") ENTER="$1" event_fullscreen ;;
     "monitorremoved") MONITORNAME="$1" event_monitorremoved ;;
     "monitoradded") MONITORNAME="$1" event_monitoradded ;;
