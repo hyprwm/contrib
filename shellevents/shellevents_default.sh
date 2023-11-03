@@ -64,6 +64,10 @@ event_movewindow() {
   : # WINDOWADDRESS WORKSPACENAME
 }
 
+event_windowtitle() {
+  : # WINDOWADDRESS
+}
+
 event_openlayer() {
   : # NAMESPACE
 }

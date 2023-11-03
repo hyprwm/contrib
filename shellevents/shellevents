@@ -84,6 +84,7 @@ while true; do
     "openwindow") WINDOWADDRESS="$1" WORKSPACENAME="$2" WINDOWCLASS="$3" WINDOWTITLE="$4" event_openwindow ;;
     "closewindow") WINDOWADDRESS="$1" event_closewindow ;;
     "movewindow") WINDOWADDRESS="$1" WORKSPACENAME="$2" event_movewindow ;;
+    "windowtitle") WINDOWADDRESS="$1" event_windowtitle ;;
     "openlayer") NAMESPACE="$1" event_openlayer ;;
     "closelayer") NAMESPACE="$1" event_closelayer ;;
     "submap") SUBMAPNAME="$1" event_submap ;;
