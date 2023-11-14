@@ -1,37 +1,5 @@
 #!/usr/bin/env bash
 
-## This script emulates the main feature of tdrop (https://github.com/noctuid/tdrop) in Hyprland, namely:
-##
-## - if the specified program is not running: launch it and bring it to the foreground.
-## - if the specified program is already running on another workspace: bring it to the current workspace and focus it.
-## - if the specified program is already on the current workspace: move it to workspace 'special:hdrop', thereby hiding it until called up again by hdrop.
-##
-## Several instances of the same program can be run concurrently, if different class names are assigned to each instance. Presently there is support for the following flags:
-##
-## -a ('foot' terminal emulator)
-## --class (all other programs).
-##
-## Please feel free to report missing flags for other programs!
-##
-## Example bindings in Hyprland config:
-##
-## bind = $mainMod, b, exec, hdrop librewolf
-## bind = $mainMod, x, exec, hdrop kitty --class kitty_1
-## bind = $mainMod CTRL, x, exec, hdrop kitty --class kitty_2
-## bind = $mainMod, c, exec, hdrop foot -a foot_1
-## bind = $mainMod CTRL, c, exec, hdrop foot -a foot_2
-##
-## Note: defining a class name is only necessary when running several instances of the same program.
-##
-## If you want to run a program on boot and have it wait in the background until called up by hdrop you can use this:
-##
-## exec-once = [workspace special:hdrop silent] librewolf
-##
-## Dependencies: bash jq hyprland
-## Part of: https://github.com/hyprwm/contrib
-## Author: Schweber (https://github.com/Schweber/hdrop)
-## License: AGPL
-
 check() {
   command -v "$1" 1>/dev/null
 }
@@ -41,7 +9,8 @@ notify() {
   check notify-send && {
     notify-send "$@"
   } || {
-    hyprctl notify 0 5000 0 "$@"
+    echo "$@"
+    # hyprctl notify 0 5000 0 "$@"
   }
 }
 
@@ -51,8 +20,44 @@ ACTIVE_WORKSPACE="$(hyprctl activeworkspace -j | jq -r .id)"
 
 case "$1" in
 "")
-  notify "hdrop: missing Argument" "Append the command you would like to execute, e.g. 'hdrop librewolf'"
+  notify "hdrop: missing Argument" "Append the command you would like to execute, e.g. 'hdrop librewolf'" "Run 'hdrop -h' for more information"
   exit 1
+  ;;
+"-h" | "--help")
+  echo ""
+  echo "This script emulates the main feature of tdrop (https://github.com/noctuid/tdrop) in Hyprland, namely:"
+  echo ""
+  echo " - if the specified program is not running: launch it and bring it to the foreground."
+  echo " - if the specified program is already running on another workspace: bring it to the current workspace and focus it."
+  echo " - if the specified program is already on the current workspace: move it to workspace 'special:hdrop', thereby hiding it until called up again by hdrop."
+  echo ""
+  echo "Several instances of the same program can be run concurrently, if different class names are assigned to each instance. Presently there is support for the following flags:"
+  echo ""
+  echo " -a ('foot' terminal emulator)"
+  echo " --class (all other programs)."
+  echo ""
+  echo "Please feel free to report missing flags for other programs!"
+  echo ""
+  echo "Example bindings in Hyprland config:"
+  echo ""
+  echo ' bind = $mainMod, b, exec, hdrop librewolf'
+  echo ' bind = $mainMod, x, exec, hdrop kitty --class kitty_1'
+  echo ' bind = $mainMod CTRL, x, exec, hdrop kitty --class kitty_2'
+  echo ' bind = $mainMod, c, exec, hdrop foot -a foot_1'
+  echo ' bind = $mainMod CTRL, c, exec, hdrop foot -a foot_2'
+  echo ""
+  echo "Note: defining a class name is only necessary when running several instances of the same program."
+  echo ""
+  echo "If you want to run a program on boot and have it wait in the background until called up by hdrop you can use this:"
+  echo ""
+  echo " exec-once = [workspace special:hdrop silent] librewolf"
+  echo ""
+  echo "Dependencies: bash jq hyprland"
+  echo "Part of: https://github.com/hyprwm/contrib"
+  echo "Author: Schweber (https://github.com/Schweber/hdrop)"
+  echo "License: AGPL3"
+  echo ""
+  exit
   ;;
 "foot")
   TEMP=$(getopt --options a: -n hdrop -- "$@")
