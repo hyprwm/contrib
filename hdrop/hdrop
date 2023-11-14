@@ -1,17 +1,7 @@
 #!/usr/bin/env bash
 
-check() {
-  command -v "$1" 1>/dev/null
-}
-
 notify() {
-  # shellcheck disable=SC2015
-  check notify-send && {
-    notify-send "$@"
-  } || {
-    echo "$@"
-    # hyprctl notify 0 5000 0 "$@"
-  }
+  notify-send "$@" || hyprctl notify 0 5000 0 "$@"
 }
 
 commandline="${*:1}"
@@ -20,7 +10,7 @@ ACTIVE_WORKSPACE="$(hyprctl activeworkspace -j | jq -r .id)"
 
 case "$1" in
 "")
-  notify "hdrop: missing Argument" "Append the command you would like to execute, e.g. 'hdrop librewolf'" "Run 'hdrop -h' for more information"
+  notify "hdrop: missing Argument" "Append the command you would like to execute, e.g. 'hdrop librewolf' \nRun 'hdrop -h' for more information"
   exit 1
   ;;
 "-h" | "--help")
