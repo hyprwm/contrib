@@ -29,7 +29,7 @@
 ##
 ## Dependencies: bash jq hyprland
 ## Part of: https://github.com/hyprwm/contrib
-## Author: Schweber (https://github.com/Schweber)
+## Author: Schweber (https://github.com/Schweber/hdrop)
 ## License: AGPL
 
 check() {
@@ -41,26 +41,9 @@ notify() {
   check notify-send && {
     notify-send "$@"
   } || {
-    echo "$@"
+    hyprctl notify 0 5000 0 "$@"
   }
 }
-
-basicChecks() {
-  check jq || {
-    notify "hdrop: Missing dependency 'jq'"
-    exit 1
-  }
-  check hyprctl || {
-    notify "hdrop: 'hyprctl' can't be executed"
-    exit 1
-  }
-  pgrep Hyprland &>/dev/null || {
-    notify "hdrop: Hyprland session could not be detected" "hdrop only works in Hyprland"
-    exit 1
-  }
-}
-
-basicChecks
 
 commandline="${*:1}"
 CLASS="$1"
