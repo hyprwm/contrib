@@ -67,9 +67,9 @@ case "$1" in
   ;;
 esac
 
-ACTIVE_WORKSPACE="$(hyprctl activeworkspace -j | jq -r .id)"
-COMMANDLINE="${*:1}"
 CLASS="$1"
+COMMANDLINE="${*:1}"
+ACTIVE_WORKSPACE="$(hyprctl activeworkspace -j | jq -r .id)" || notify "hdrop: error executing dependencies 'hyprctl' or 'jq'" "Check terminal output of 'hdrop $COMMANDLINE'"
 
 case "$1" in
 foot)
