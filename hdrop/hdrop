@@ -1,83 +1,106 @@
 #!/usr/bin/env bash
 
+print_help() {
+  echo ""
+  echo "Usage: hdrop [OPTIONS] [COMMAND]"
+  echo ""
+  echo "Arguments:"
+  echo "  [COMMAND]"
+  echo "          The usual command you would run to start the desired program"
+  echo ""
+  echo "Options:"
+  echo "  -b, --background"
+  echo "          changes the default behaviour: if the specified program is"
+  echo "          not running, launch it in the background instead of foreground."
+  echo "          Thereafter 'hdrop -b' will work the same as without this flag."
+  echo ""
+  echo "  -h, --help"
+  echo "          Print this help message"
+  echo ""
+  echo "  -V, --version"
+  echo "          Print version"
+  echo ""
+  echo "Multiple instances:"
+  echo ""
+  echo "Multiple instances of the same program can be run concurrently, if"
+  echo "different class names are assigned to each instance. Presently there is"
+  echo "support for the following flags in the [COMMAND] string:"
+  echo ""
+  echo " -a         ('foot' terminal emulator)"
+  echo " --class    (all other programs)."
+  echo ""
+  echo "See man page for more information"
+}
+
+print_version() {
+  echo "hdrop version: 0.2.1"
+}
+
 notify() {
   notify-send "$@" || hyprctl notify 0 5000 0 "$@"
 }
 
-commandline="${*:1}"
-CLASS="$1"
-ACTIVE_WORKSPACE="$(hyprctl activeworkspace -j | jq -r .id)"
+BACKGROUND=""
 
 case "$1" in
 "")
-  notify "hdrop: missing Argument" "Append the command you would like to execute, e.g. 'hdrop librewolf' \nRun 'hdrop -h' for more information"
+  notify "hdrop: missing Argument" "Run 'hdrop -h' for more information"
+  print_help
   exit 1
   ;;
-"-h" | "--help")
-  echo ""
-  echo "This script emulates the main feature of tdrop (https://github.com/noctuid/tdrop) in Hyprland, namely:"
-  echo ""
-  echo " - if the specified program is not running: launch it and bring it to the foreground."
-  echo " - if the specified program is already running on another workspace: bring it to the current workspace and focus it."
-  echo " - if the specified program is already on the current workspace: move it to workspace 'special:hdrop', thereby hiding it until called up again by hdrop."
-  echo ""
-  echo "Several instances of the same program can be run concurrently, if different class names are assigned to each instance. Presently there is support for the following flags:"
-  echo ""
-  echo " -a ('foot' terminal emulator)"
-  echo " --class (all other programs)."
-  echo ""
-  echo "Please feel free to report missing flags for other programs!"
-  echo ""
-  echo "Example bindings in Hyprland config:"
-  echo ""
-  echo ' bind = $mainMod, b, exec, hdrop librewolf'
-  echo ' bind = $mainMod, x, exec, hdrop kitty --class kitty_1'
-  echo ' bind = $mainMod CTRL, x, exec, hdrop kitty --class kitty_2'
-  echo ' bind = $mainMod, c, exec, hdrop foot -a foot_1'
-  echo ' bind = $mainMod CTRL, c, exec, hdrop foot -a foot_2'
-  echo ""
-  echo "Note: defining a class name is only necessary when running several instances of the same program."
-  echo ""
-  echo "If you want to run a program on boot and have it wait in the background until called up by hdrop you can use this:"
-  echo ""
-  echo " exec-once = [workspace special:hdrop silent] librewolf"
-  echo ""
-  echo "Dependencies: bash jq hyprland"
-  echo "Part of: https://github.com/hyprwm/contrib"
-  echo "Author: Schweber (https://github.com/Schweber/hdrop)"
-  echo "License: AGPL3"
-  echo ""
+-h | --help)
+  print_help
   exit
   ;;
-"foot")
-  TEMP=$(getopt --options a: -n hdrop -- "$@")
+-V | --version)
+  print_version
+  exit
   ;;
-*)
-  TEMP=$(getopt --longoptions class: -n hdrop -- "$@")
+-b | --background)
+  BACKGROUND="hyprctl dispatch -- exec [workspace special:hdrop silent] "
+  shift
+  ;;
+-*)
+  notify "hdrop: unrecognized flag" "Run 'hdrop -h' for more information"
+  print_help
+  exit 1
   ;;
 esac
 
-eval set -- "$TEMP"
+ACTIVE_WORKSPACE="$(hyprctl activeworkspace -j | jq -r .id)"
+COMMANDLINE="${*:1}"
+CLASS="$1"
 
-while true; do
-  case "$1" in
-  -a | --class)
-    CLASS="$2"
-    shift 2
-    ;;
-  --)
-    shift
-    break
-    ;;
-  *) break ;;
-  esac
-done
+case "$1" in
+foot)
+  OPT=$(getopt --options a: -n hdrop -- "$@")
+  ;;
+telegram-desktop)
+  CLASS="org.telegram.desktop"
+  ;;
+*)
+  OPT=$(getopt --longoptions class: -n hdrop -- "$@")
+  ;;
+esac
+
+if [[ -n $OPT ]]; then
+  eval set -- "$OPT"
+  while true; do
+    case "$1" in
+    -a | --class)
+      CLASS="$2"
+      shift 2
+      ;;
+    *) break ;;
+    esac
+  done
+fi
 
 if [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id!=$ACTIVE_WORKSPACE)") ]]; then
-  hyprctl dispatch -- movetoworkspacesilent "$ACTIVE_WORKSPACE","$CLASS" || notify "hdrop: Error moving '$commandline' to current workspace"
-  hyprctl dispatch -- focuswindow "$CLASS" || notify "hdrop: Error focusing '$commandline' on current workspace"
+  hyprctl dispatch -- movetoworkspacesilent "$ACTIVE_WORKSPACE","$CLASS" || notify "hdrop: Error moving '$COMMANDLINE' to current workspace"
+  hyprctl dispatch -- focuswindow "$CLASS" || notify "hdrop: Error focusing '$COMMANDLINE' on current workspace"
 elif [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id==$ACTIVE_WORKSPACE)") ]]; then
-  hyprctl dispatch -- movetoworkspacesilent special:hdrop,"$CLASS" || notify "hdrop: Error moving '$commandline' to workspace 'special:hdrop'"
+  hyprctl dispatch -- movetoworkspacesilent special:hdrop,"$CLASS" || notify "hdrop: Error moving '$COMMANDLINE' to workspace 'special:hdrop'"
 else
-  $commandline || notify "hdrop: Error executing given command" "'$commandline'"
+  $BACKGROUND $COMMANDLINE || notify "hdrop: Error executing given command" "$COMMANDLINE"
 fi
