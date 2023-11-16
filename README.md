@@ -79,33 +79,7 @@ This script emulates the main features of [tdrop](https://github.com/noctuid/tdr
 > -V, --version  
 > Print version
 
-#### Multiple instances:
-
-Multiple instances of the same program can be run concurrently, if different class names are assigned to each instance. Presently there is support for the following flags in the [COMMAND] string:
-
-> -a ('foot' terminal emulator)  
-> --class (all other programs).
-
-#### Example bindings in Hyprland config:
-
-> bind = $mainMod, b, exec, hdrop librewolf'  
-> bind = $mainMod, x, exec, hdrop kitty --class kitty_1'  
-> bind = $mainMod CTRL, x, exec, hdrop kitty --class kitty_2'  
-> bind = $mainMod, c, exec, hdrop foot -a foot_1'  
-> bind = $mainMod CTRL, c, exec, hdrop foot -a foot_2'
-
-Note: defining a class name is only necessary when running several instances of the same program.
-
-If you want to run a program on boot and have it wait in the background until called up by hdrop you can use this:
-
-> exec-once = hdrop -b librewolf
-
-Please feel free to report missing flags or peculiarities for other programs!
-
-Dependencies: bash jq hyprland  
-Author: Schweber (https://github.com/Schweber/hdrop)  
-License: AGPL3
-
+See man page for further information.
 
 # Installing
 
