@@ -133,7 +133,7 @@ getBack() {
 }
 
 send() {
-  hyprctl dispatch movetoworkspace "special:scratchpad"
+  hyprctl dispatch movetoworkspacesilent "special:scratchpad"
 }
 
 getArgs() {
