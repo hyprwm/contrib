@@ -1,0 +1,61 @@
+name: Bug Report
+description: Something is not working right
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening a new issue, take a moment to search through the current open ones.
+
+        ---
+
+  - type: input
+    id: program
+    attributes:
+      label: Program
+      description: Program where the bug was encountered
+    validations:
+      required: true
+
+  - type: input
+    id: maintainers
+    attributes:
+      label: Maintainers of the program
+      description: Ping maintainers so they can help you. They can be found in the [README](../README.md)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Bug or Regression?
+      description: Is this a bug or a regression?
+      options:
+        - Bug
+        - Regression
+    validations:
+      required: true
+
+  - type: textarea
+    id: desc
+    attributes:
+      label: Description
+      description: "What went wrong?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: "How can someone else reproduce the issue?"
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Hyprland crash reports, program logs, images, videos
+      description: |
+        Anything that can help. Please always ATTACH and not paste them.
+
