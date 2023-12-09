@@ -11,16 +11,16 @@ hdrop - run, show and hide programs on Hyprland
 # OPTIONS
 
 *[COMMAND]* 
-    The usual command you would run to start the desired program
+	The usual command you would run to start the desired program
 
 *-b, --background*  
-    changes the default behaviour: if the specified program is not running, launch it in the background instead of foreground. Thereafter 'hdrop -b' will work the same as without this flag.
+	changes the default behaviour: if the specified program is not running, launch it in the background instead of foreground. Thereafter 'hdrop -b' will work the same as without this flag.
 
 *-h, --help*  
-    Print help message
+	Print help message
 
 *-V, --version*  
-    Print version
+	Print version
 
 # Description
 
