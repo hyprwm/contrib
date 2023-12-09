@@ -4,8 +4,7 @@ print_help() {
   echo ""
   echo "Usage: hdrop [OPTIONS] [COMMAND]"
   echo ""
-  echo "Arguments:"
-  echo "  [COMMAND]"
+  echo "Command:"
   echo "          The usual command you would run to start the desired program"
   echo ""
   echo "Options:"
@@ -33,7 +32,7 @@ print_help() {
 }
 
 print_version() {
-  echo "hdrop version: 0.2.1"
+  echo "hdrop version: 0.2.4"
 }
 
 notify() {
@@ -69,11 +68,14 @@ esac
 
 CLASS="$1"
 COMMANDLINE="${*:1}"
-ACTIVE_WORKSPACE="$(hyprctl activeworkspace -j | jq -r .id)" || notify "hdrop: error executing dependencies 'hyprctl' or 'jq'" "Check terminal output of 'hdrop $COMMANDLINE'"
+ACTIVE_WORKSPACE="$(hyprctl activeworkspace -j | jq -r .id)" || notify "hdrop: Error executing dependencies 'hyprctl' or 'jq'" "Check terminal output of 'hdrop $COMMANDLINE'"
 
 case "$1" in
 foot)
   OPT=$(getopt --options a: -n hdrop -- "$@")
+  ;;
+logseq)
+  CLASS="Logseq"
   ;;
 telegram-desktop)
   CLASS="org.telegram.desktop"
@@ -85,15 +87,15 @@ esac
 
 if [[ -n $OPT ]]; then
   eval set -- "$OPT"
-  while true; do
-    case "$1" in
-    -a | --class)
-      CLASS="$2"
-      shift 2
-      ;;
-    *) break ;;
-    esac
-  done
+  # while true; do
+  case "$1" in
+  -a | --class)
+    CLASS="$2"
+    # shift 2
+    ;;
+  # *) break ;;
+  esac
+  # done
 fi
 
 if [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id!=$ACTIVE_WORKSPACE)") ]]; then
