@@ -21,7 +21,7 @@ body:
     id: maintainers
     attributes:
       label: Maintainers of the program
-      description: Ping maintainers so they can help you. They can be found in the [README](../README.md)
+      description: Ping maintainers so they can help you. They can be found in the [README](https://github/hyprwm/contrib)
     validations:
       required: true
 
