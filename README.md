@@ -10,7 +10,7 @@ Community scripts and utilities for Hypr projects
 | [shellevents](./shellevents)               | Invoke shell functions in response to Hyprland socket2 events                                                                                                        | @trippwill            |
 | [try_swap_workspace](./try_swap_workspace) | Binding to mimic the 'arbitrary workspace on arbitrary monitor' behavior                                                                                             | @schievel1            |
 | [scratchpad](./scratchpad)                 | A Bash script that instantly sends focused window to a special workspace named `scratchpad` and makes it easier to retrieve the window back to the current workspace | @niksingh710          |
-| [hdrop](./hdrop)                           | [tdrop](https://github.com/noctuid/tdrop) for Hyprland                                                                                                               | @Schweber             |
+| [hdrop](./hdrop)                           | Run, show and hide programs via keybind. Emulates [tdrop](https://github.com/noctuid/tdrop) in Hyprland                                                              | @Schweber             |
 
 # Installing
 
