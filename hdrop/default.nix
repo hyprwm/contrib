@@ -11,7 +11,7 @@
 }:
 stdenvNoCC.mkDerivation {
   pname = "hdrop";
-  version = "0.2.4";
+  version = "0.3.0";
 
   src = ./.;
 
@@ -37,7 +37,6 @@ stdenvNoCC.mkDerivation {
     description = "Emulate 'tdrop' in Hyprland (show and hide specific programs per keybind)";
     license = licenses.agpl3;
     platforms = platforms.unix;
-    # maintainers = with maintainers; [];
     mainProgram = "hdrop";
   };
 }
