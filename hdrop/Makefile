@@ -11,7 +11,7 @@ all: hdrop.1
 hdrop.1: hdrop.1.scd
 	scdoc < $< > $@
 
-install: 
+install: hdrop.1 hdrop
 	@install -v -D -m 0644 hdrop.1 --target-directory "$(MAN1DIR)"
 	@install -v -D -m 0755 hdrop --target-directory "$(BINDIR)"
 
