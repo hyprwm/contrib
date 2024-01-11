@@ -59,23 +59,6 @@ It provides a convenient interface over grim, slurp and jq, and supports
 storing the screenshot either directly to the clipboard using wl-copy or to a
 file.
 
-# EXAMPLES
-
-An example usage pattern is to add these bindings to your hyprland config:
-
-```
-# Screenshots:
-# Super+P: Current window
-# Super+Shift+p: Select area
-# Super+Alt+p Current output
-# Super+Ctrl+p All outputs
-
-bind = SUPER, p, exec, grimblast save active
-bind = SUPER SHIFT, p, exec, grimblast save area
-bind = SUPER ALT, p, exec, grimblast save output
-bind = SUPER CTRL, p, exec, grimblast save screen
-```
-
 # TARGETS
 
 grimblast can capture the following named targets:
@@ -89,6 +72,8 @@ _screen_
 _area_
 	Allows manually selecting a rectangular region or window (by clicking on it),
 	and captures that.
+	Slurp can be customized by setting its arguments in the *SLURP_ARGS*
+	environment variable.
 
 _output_
 	Captures the currently active output.
@@ -98,7 +83,28 @@ _output_
 Grimblast will print the filename of the captured screenshot to stdout if called
 with the _save_ subcommand.
 
+# EXAMPLES
+
+An example usage pattern is to add these bindings to your hyprland config:
+
+```
+# Screenshots:
+# Super+P: Current window
+# Super+Shift+p: Select area
+# Super+Alt+p Current output
+# Super+Ctrl+p All outputs
+
+# Optionally, customize slurp's appearance
+env = SLURP_ARGS, -d -b -B F050F022 -b 10101022 -c ff00ff
+
+bind = SUPER, p, exec, grimblast save active
+bind = SUPER SHIFT, p, exec, grimblast save area
+bind = SUPER ALT, p, exec, grimblast save output
+bind = SUPER CTRL, p, exec, grimblast save screen
+```
+
 # SEE ALSO
 
 *grim*(1)
+*slurp*(1)
 *grimshot*(1)
