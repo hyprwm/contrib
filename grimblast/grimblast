@@ -187,14 +187,17 @@ if [ "$ACTION" = "check" ]; then
   check notify-send
   exit
 elif [ "$SUBJECT" = "active" ]; then
+  wait
   FOCUSED=$(hyprctl activewindow -j)
   GEOM=$(echo "$FOCUSED" | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')
   APP_ID=$(echo "$FOCUSED" | jq -r '.class')
   WHAT="$APP_ID window"
 elif [ "$SUBJECT" = "screen" ]; then
+  wait
   GEOM=""
   WHAT="Screen"
 elif [ "$SUBJECT" = "output" ]; then
+  wait
   GEOM=""
   OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true)' | jq -r '.name')
   WHAT="$OUTPUT"
@@ -226,13 +229,12 @@ elif [ "$SUBJECT" = "area" ]; then
     exit 1
   fi
   WHAT="Area"
+  wait
 elif [ "$SUBJECT" = "window" ]; then
   die "Subject 'window' is now included in 'area'"
 else
   die "Unknown subject to take a screen shot from" "$SUBJECT"
 fi
-
-wait
 
 if [ "$ACTION" = "copy" ]; then
   takeScreenshot - "$GEOM" "$OUTPUT" | wl-copy --type image/png || die "Clipboard error"
