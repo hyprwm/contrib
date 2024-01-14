@@ -1,5 +1,12 @@
 # Changelog
 
+### 2024-01-14
+
+hdrop: 0.3.0 -> 0.4.0  
+Add `-c | --class`  
+Improve Documentation
+Refactor
+
 ### 2024-01-11
 
 Make Grimblast respect the `$SLURP_ARGS` environment variable, which controls
