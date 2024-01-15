@@ -72,7 +72,7 @@ If hdrop can't match an already running program and starts a new instance instea
 
 Run *hdrop -v [COMMAND]* _in the terminal_ to see maximum output for troubleshooting and find out the actual class name. Then use *hdrop -c CLASSNAME* to make it work. *hdrop -i [COMMAND]* might be sufficient, as long as a case insensitive (partial) match is sufficient.
 
-Please report instances of programs with differing class names, so that i can add them to *hdrop*.
+Please report instances of programs with differing class names, so that they can be added to *hdrop*.
 
 # License 
 
