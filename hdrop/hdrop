@@ -13,10 +13,15 @@ print_help() {
   echo "          not running, launch it in the background instead of foreground."
   echo "          Thereafter 'hdrop -b' will work the same as without this flag."
   echo ""
+  echo "  -c, --class"
+  echo "          Set classname of the program to be run. Use this if the"
+  echo "          classname is different from the name of the [COMMAND]"
+  echo "          and hdrop has not yet a hardcoded replacement."
+  echo ""
   echo "  -i, --insensitive"
   echo "          Case insensitive partial matching of class names."
-  echo "          Try this if a running program is not recognized and a new"
-  echo "          instance is launched instead."
+  echo "          You can try this if a running program is not recognized and"
+  echo "          a new instance is launched instead."
   echo ""
   echo "  -v, --verbose"
   echo "          Show notifications regarding the matching process."
@@ -41,7 +46,7 @@ print_help() {
 }
 
 print_version() {
-  echo "hdrop version: 0.3.0"
+  echo "hdrop version: 0.4.0"
 }
 
 notify() {
@@ -67,18 +72,20 @@ hdrop_flags() {
       ;;
     -b | --background)
       BACKGROUND="hyprctl dispatch -- exec [workspace special:hdrop silent] "
+      ;;
+    -c | --class)
       shift
+      CLASS_OVERRIDE="$1"
       ;;
     -i | --insensitive)
       INSENSITIVE=true
-      shift
       ;;
     -v | --verbose)
       VERBOSE=true
-      shift
       ;;
     *) break ;;
     esac
+    shift
   done
 }
 
@@ -91,22 +98,26 @@ while true; do
     print_help
     exit 1
     ;;
-  -*)
-    HDROP_FLAGS+=("$1")
+  -c | --class)
+    HDROP_FLAGS+=("$1" "$2")
     shift
     ;;
-  *)
-    break
+  -*)
+    HDROP_FLAGS+=("$1")
     ;;
+  *) break ;;
   esac
+  shift
 done
 
 BACKGROUND=""
 INSENSITIVE=false
 VERBOSE=false
 
+# shellcheck disable=SC2128
 if [[ -n $HDROP_FLAGS ]]; then
-  hdrop_flags $(getopt --options bivVh --longoptions background,insensitive,verbose,version,help -n hdrop -- "${HDROP_FLAGS[@]}")
+  # shellcheck disable=SC2046 # avoids having to run 'eval set -- "$HDROP_FLAGS"' to remove leading whitespace
+  hdrop_flags $(getopt --options bc:ivVh --longoptions background,class:,insensitive,verbose,version,help -n hdrop -- "${HDROP_FLAGS[@]}")
 fi
 
 CLASS="$1"
@@ -119,9 +130,11 @@ foot)
   ;;
 logseq)
   CLASS="Logseq"
+  if $VERBOSE; then notify_low "hdrop: Using '$CLASS' as hardcoded classname of '$1' for matching"; fi
   ;;
 telegram-desktop)
   CLASS="org.telegram.desktop"
+  if $VERBOSE; then notify_low "hdrop: Using '$CLASS' as hardcoded classname of '$1' for matching"; fi
   ;;
 *)
   OPT=$(getopt --longoptions class: -n hdrop -- "$@")
@@ -129,10 +142,11 @@ telegram-desktop)
 esac
 
 if [[ -n $OPT ]]; then
-  eval set -- "$OPT"
+  eval set -- "$OPT" # remove leading whitespace
   case "$1" in
   -a | --class)
     CLASS="$2"
+    if $VERBOSE; then notify_low "hdrop: Extracted '$CLASS' from [COMMAND] for matching"; fi
     ;;
   esac
 fi
@@ -141,6 +155,11 @@ if $INSENSITIVE && [[ $(hyprctl clients -j | jq -r ".[] | select((.class |test(\
   if $VERBOSE; then notify_low "hdrop: --insensitive -> Insensitive (partial) match of class '$CLASS' successful"; fi
   CLASS=$(hyprctl clients -j | jq -r ".[] | select((.class |match(\"$CLASS\";\"i\"))) | .class" | head -1) || notify "hdrop: Error assigning case insensitive (partial) match to CLASS"
   if $VERBOSE; then notify_low "hdrop: --insensitive -> Using class '$CLASS' after insensitive (partial) matching"; fi
+fi
+
+if [[ -n $CLASS_OVERRIDE ]]; then
+  if $VERBOSE; then notify_low "hdrop: --class -> Using given class '$CLASS_OVERRIDE' instead of '$CLASS' for matching"; fi
+  CLASS="$CLASS_OVERRIDE"
 fi
 
 if [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id!=$ACTIVE_WORKSPACE)") ]]; then
@@ -152,5 +171,5 @@ elif [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .works
   if $VERBOSE; then notify_low "hdrop: Matched class '$CLASS' on current workspace and moved it to workspace 'special:hdrop'"; fi
 else
   $BACKGROUND $COMMANDLINE || notify "hdrop: Error executing given command" "$COMMANDLINE"
-  if $VERBOSE; then notify_low "hdrop: No running program matches class '$CLASS'" "Currently active classes are '$(hyprctl clients -j | jq -r '.[] | select(.mapped==true) | .class' | sort | tr '\n' ' ')'. Executed '$COMMANDLINE' in case it was not running already."; fi
+  if $VERBOSE; then notify_low "hdrop: No running program matches class '$CLASS'." "Currently active classes are '$(hyprctl clients -j | jq -r '.[] | select(.mapped==true) | .class' | sort | tr '\n' ' ')'. Executed '$COMMANDLINE' in case it was not running already."; fi
 fi

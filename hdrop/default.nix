@@ -7,11 +7,12 @@
   util-linux,
   jq,
   libnotify,
-  hyprland ? null,
+  withHyprland ? true,
+  hyprland,
 }:
 stdenvNoCC.mkDerivation {
   pname = "hdrop";
-  version = "0.3.0";
+  version = "0.4.0";
 
   src = ./.;
 
@@ -30,13 +31,16 @@ stdenvNoCC.mkDerivation {
         jq
         libnotify
       ]
-      ++ lib.optional (hyprland != null) hyprland)}"
+      ++ lib.optional withHyprland hyprland)}"
   '';
 
   meta = with lib; {
-    description = "Emulate 'tdrop' in Hyprland (show and hide specific programs per keybind)";
+    description = "Emulate 'tdrop' in Hyprland (run, show and hide specific programs per keybind)";
+    homepage = "https://github.com/Schweber/hdrop";
+    changelog = "https://github.com/Schweber/hdrop/releases/tag/v${version}";
     license = licenses.agpl3;
-    platforms = platforms.unix;
+    platforms = platforms.linux;
+    maintainers = with maintainers; [Schweber];
     mainProgram = "hdrop";
   };
 }
