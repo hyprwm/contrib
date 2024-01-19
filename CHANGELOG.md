@@ -1,5 +1,10 @@
 # Changelog
 
+### 2024-01-19
+
+hdrop: -> 0.4.4
+Fix --class quoting
+
 ### 2024-01-14
 
 hdrop: 0.3.0 -> 0.4.0  
