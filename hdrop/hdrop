@@ -46,7 +46,7 @@ print_help() {
 }
 
 print_version() {
-  echo "hdrop version: 0.4.2"
+  echo "hdrop version: 0.4.4"
 }
 
 notify() {
@@ -117,7 +117,7 @@ VERBOSE=false
 # shellcheck disable=SC2128
 if [[ -n $HDROP_FLAGS ]]; then
   # shellcheck disable=SC2046 # avoids having to run 'eval set -- "$HDROP_FLAGS"' to remove leading whitespace
-  hdrop_flags $(getopt --options bc:ivVh --longoptions background,class:,insensitive,verbose,version,help -n hdrop -- "${HDROP_FLAGS[@]}")
+  hdrop_flags $(getopt -u --options bc:ivVh --longoptions background,class:,insensitive,verbose,version,help -n hdrop -- "${HDROP_FLAGS[@]}")
 fi
 
 CLASS="$1"
