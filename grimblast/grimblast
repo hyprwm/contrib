@@ -134,6 +134,13 @@ notifyError() {
   fi
 }
 
+resetFade() {
+  if [[ -n $FADE && -n $FADEOUT ]]; then
+    hyprctl keyword animation "$FADE" >/dev/null
+    hyprctl keyword animation "$FADEOUT" >/dev/null
+  fi
+}
+
 killHyprpicker() {
   if [ ! $HYPRPICKER_PID -eq -1 ]; then
     kill $HYPRPICKER_PID
@@ -167,6 +174,7 @@ takeScreenshot() {
     grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} "$FILE" || die "Unable to invoke grim"
   else
     grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -g "$GEOM" "$FILE" || die "Unable to invoke grim"
+    resetFade
   fi
 }
 
@@ -220,13 +228,10 @@ elif [ "$SUBJECT" = "area" ]; then
   # shellcheck disable=2086 # if we don't split, spaces mess up slurp
   GEOM=$(echo "$WINDOWS" | jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | slurp $SLURP_ARGS)
 
-  # reset fade
-  hyprctl keyword animation "$FADE" >/dev/null
-  hyprctl keyword animation "$FADEOUT" >/dev/null
-
   # Check if user exited slurp without selecting the area
   if [ -z "$GEOM" ]; then
     killHyprpicker
+    resetFade
     exit 1
   fi
   WHAT="Area"

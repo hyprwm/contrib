@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-01-25
+
+grimblast: fixed border still visible when taking screenshot of an area
+
 ### 2024-01-19
 
 hdrop: -> 0.4.4
