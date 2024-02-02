@@ -238,8 +238,8 @@ else
 fi
 
 if [ "$ACTION" = "copy" ]; then
-  takeScreenshot /tmp/grimblast-copy-image "$GEOM" "$OUTPUT" | wl-copy --type image/png || die "Clipboard error"
-  notifyOk "$WHAT copied to buffer" -i /tmp/grimblast-copy-image
+  takeScreenshot - "$GEOM" "$OUTPUT" | tee "/tmp/grimblast_copy_file" | wl-copy --type image/png || die "Clipboard error"
+  notifyOk "$WHAT copied to buffer" -i "/tmp/grimblast_copy_file"
 elif [ "$ACTION" = "save" ]; then
   if takeScreenshot "$FILE" "$GEOM" "$OUTPUT"; then
     TITLE="Screenshot of $SUBJECT"
