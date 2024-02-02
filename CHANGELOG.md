@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-02-01
+
+Show a screenshot preview on the notification when using `copy` mode and `--notify`
+
 ### 2024-01-11
 
 Make Grimblast respect the `$SLURP_ARGS` environment variable, which controls
