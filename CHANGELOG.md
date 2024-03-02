@@ -1,5 +1,10 @@
 # Changelog
 
+### 2024-03-02
+
+hdrop: 0.4.4 -> 0.5.0
+Add --floating and associated options
+
 ### 2024-01-25
 
 grimblast: fixed border still visible when taking screenshot of an area

@@ -9,10 +9,11 @@
   libnotify,
   withHyprland ? true,
   hyprland,
+  gawk,
 }:
 stdenvNoCC.mkDerivation {
   pname = "hdrop";
-  version = "0.4.4";
+  version = "0.5.0";
 
   src = ./.;
 
@@ -30,6 +31,7 @@ stdenvNoCC.mkDerivation {
         util-linux
         jq
         libnotify
+        gawk
       ]
       ++ lib.optional withHyprland hyprland)}"
   '';
