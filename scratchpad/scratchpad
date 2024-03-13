@@ -3,6 +3,7 @@
 # Nikhil Singh <nik.singh710@gmail.com>
 
 # Variables
+_action=send
 _listing=false
 _menu_cmd="rofi -dmenu -i -p scratchpad"
 green="\033[0;32m"
@@ -70,11 +71,10 @@ help() {
         Usefull if you want to have multiple scratchpads.
     -g: To bring back client from scratchpad to current workspace.
         if only one client is present then no menu is popped and client will me moved.
-        if want menu before moving even if count of client is one then use -l.
-        <no further args will be evaluated> 
+        if want menu before moving even if count of client is one then use in combination with -l.
     -l: Forces to display list even if only one window is on scratchpad.
         (Usefull if u don't remember which single window is at scratchpad)
-    -t: Takes you to the scratchpad <no further args will be evaluated>
+    -t: Takes you to the scratchpad
     -m: Sets the menu program. e.g 'scratchpad -m "rofi -dmenu -i"'
                                    'scratchpad -m "bemenu"'
         This program will be used to display list of clients present on scratchpad with there address.
@@ -147,21 +147,20 @@ getArgs() {
 			exit 0
 			;;
 		-g)
-			getBack
-			exit 0
+			_action="getBack"
 			;;
 		-l)
 			_listing=true
 			;;
 		-t)
-			takes
+			_action="takes"
 			;;
 		-m)
 			_menu_cmd=("$2")
 			shift
 			;;
 		-c)
-			checkUtils
+			_action="checkUtils"
 			;;
 		-n)
 			default_scratchpad_name="$2"
@@ -176,8 +175,8 @@ getArgs() {
 		esac
 		shift
 	done
-	send
 }
 
 basicChecks
 getArgs "$@"
+"$_action"
