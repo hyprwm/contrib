@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-03-13
+
+scratchpad: allow supplying command flags in any order
+
 ### 2024-03-02
 
 hdrop: 0.4.4 -> 0.5.0
