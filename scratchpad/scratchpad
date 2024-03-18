@@ -13,53 +13,53 @@ nocolor="\033[0m"
 default_scratchpad_name="${HYPRLAND_SCRATCHPAD_NAME:-scratchpad}"
 
 check() {
-	command -v "$1" 1>/dev/null
+  command -v "$1" 1>/dev/null
 }
 
 ok() {
-	echo -e "[$green  $nocolor] $*"
+  echo -e "[$green  $nocolor] $*"
 }
 
 err() {
-	echo -e "[$red  $nocolor] $*"
+  echo -e "[$red  $nocolor] $*"
 }
 
 optional() {
-	echo -e "[$blue  $nocolor] $*"
+  echo -e "[$blue  $nocolor] $*"
 }
 
 notify() {
-	# shellcheck disable=SC2015
-	check notify-send && {
-		notify-send "$@"
-	} || {
-		echo "$@"
-	}
+  # shellcheck disable=SC2015
+  check notify-send && {
+    notify-send "$@"
+  } || {
+    echo "$@"
+  }
 }
 
 checkUtils() {
-	# shellcheck disable=SC2015
-	check sed && ok "sed" || err "sed"
-	# shellcheck disable=SC2015
-	check jq && ok "jq" || err "jq"
-	# shellcheck disable=SC2015
-	check notify-send && ok "notify-send (Optional)" || optional "notify-send (Optional)"
-	exit
+  # shellcheck disable=SC2015
+  check sed && ok "sed" || err "sed"
+  # shellcheck disable=SC2015
+  check jq && ok "jq" || err "jq"
+  # shellcheck disable=SC2015
+  check notify-send && ok "notify-send (Optional)" || optional "notify-send (Optional)"
+  exit
 }
 
 basicChecks() {
-	check hyprctl || {
-		notify "Seriously mate!!" "Start Hyprland before this script"
-		exit 1
-	}
-	pgrep Hyprland &>/dev/null || {
-		notify "Make Sure Hyprland Session is running."
-		exit 1
-	}
+  check hyprctl || {
+    notify "Seriously mate!!" "Start Hyprland before this script"
+    exit 1
+  }
+  pgrep Hyprland &>/dev/null || {
+    notify "Make Sure Hyprland Session is running."
+    exit 1
+  }
 }
 
 help() {
-	cat <<EOF
+  cat <<EOF
   This is a bash script for quick movement of windows to Scratchpad for Hyprland using hyprctl.
 
   Invoking the command without flag will move the focused window to scratchpad.
@@ -90,91 +90,91 @@ EOF
 }
 
 takes() {
-	hyprctl dispatch workspace "special:$default_scratchpad_name"
-	exit 0
+  hyprctl dispatch workspace "special:$default_scratchpad_name"
+  exit 0
 }
 
 getBack() {
-	_ifs="$IFS"
-	IFS=$'\n'$'\n'
+  _ifs="$IFS"
+  IFS=$'\n'$'\n'
 
-	if pgrep "${_menu_cmd%% *}" >/dev/null; then exit; fi # Menu running already? → exit
+  if pgrep "${_menu_cmd%% *}" >/dev/null; then killall -q "${_menu_cmd%% *}"; fi # Menu running already? → exit
 
-	_current_workspace="$(hyprctl monitors -j | jq '.[] | select(.focused==true)' | jq -j '.activeWorkspace.name')"
+  _current_workspace="$(hyprctl monitors -j | jq '.[] | select(.focused==true)' | jq -j '.activeWorkspace.name')"
 
-	[ -z "$_current_workspace" ] && {
-		notify "Scratchpad" "Some Error Occured while getting current workspace."
-		exit 1
-	}
+  [ -z "$_current_workspace" ] && {
+    notify "Scratchpad" "Some Error Occured while getting current workspace."
+    exit 1
+  }
 
-	readarray -t _clients_on_spad < <(hyprctl clients -j |
-		jq '.[] | select(.workspace.name=="special:'"$default_scratchpad_name"'")' |
-		jq -j '[.class, .title, .address] | @text' |
-		sed -z -e 's/]/]\n/g' \
-			-e 's/["]//g' \
-			-e 's/,/ /g' \
-			-e 's/\[//g' \
-			-e 's/]//g')
+  readarray -t _clients_on_spad < <(hyprctl clients -j |
+    jq '.[] | select(.workspace.name=="special:'"$default_scratchpad_name"'")' |
+    jq -j '[.class, .title, .address] | @text' |
+    sed -z -e 's/]/]\n/g' \
+      -e 's/["]//g' \
+      -e 's/,/ /g' \
+      -e 's/\[//g' \
+      -e 's/]//g')
 
-	[ "${#_clients_on_spad[@]}" -eq 0 ] && {
-		notify "No Clients" "There was no client on $default_scratchpad_name"
-		exit 0
-	}
-	[ "${#_clients_on_spad[@]}" -eq 1 ] && {
-		$_listing || {
-			_selected_client="${_clients_on_spad[0]}"
-		}
-	}
-	[ -z "$_selected_client" ] && _selected_client="$(echo "${_clients_on_spad[*]}" | eval "${_menu_cmd[*]}")"
-	_address="$(echo "$_selected_client" | awk '{print $NF}')"
-	hyprctl dispatch movetoworkspace "$_current_workspace,address:$_address"
-	hyprctl dispatch focuswindow "address:$_address"
-	[ "$(hyprctl activewindow -j | jq '.floating')" = true ] && {
-		hyprctl dispatch bringactivetotop none
-	}
-	IFS="$_ifs"
+  [ "${#_clients_on_spad[@]}" -eq 0 ] && {
+    notify "No Clients" "There was no client on $default_scratchpad_name"
+    exit 0
+  }
+  [ "${#_clients_on_spad[@]}" -eq 1 ] && {
+    $_listing || {
+      _selected_client="${_clients_on_spad[0]}"
+    }
+  }
+  [ -z "$_selected_client" ] && _selected_client="$(echo "${_clients_on_spad[*]}" | eval "${_menu_cmd[*]}")"
+  _address="$(echo "$_selected_client" | awk '{print $NF}')"
+  hyprctl dispatch movetoworkspace "$_current_workspace,address:$_address"
+  hyprctl dispatch focuswindow "address:$_address"
+  [ "$(hyprctl activewindow -j | jq '.floating')" = true ] && {
+    hyprctl dispatch bringactivetotop none
+  }
+  IFS="$_ifs"
 }
 
 send() {
-	hyprctl dispatch movetoworkspacesilent "special:$default_scratchpad_name"
+  hyprctl dispatch movetoworkspacesilent "special:$default_scratchpad_name"
 }
 
 getArgs() {
-	while [ "$#" -gt 0 ]; do
-		case "$1" in
-		-h | --help)
-			help
-			exit 0
-			;;
-		-g)
-			_action="getBack"
-			;;
-		-l)
-			_listing=true
-			;;
-		-t)
-			_action="takes"
-			;;
-		-m)
-			_menu_cmd=("$2")
-			shift
-			;;
-		-c)
-			_action="checkUtils"
-			;;
-		-n)
-			default_scratchpad_name="$2"
-			shift
-			;;
-		*)
-			help
-			echo ""
-			echo "Wrong argument given"
-			exit 1
-			;;
-		esac
-		shift
-	done
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+    -h | --help)
+      help
+      exit 0
+      ;;
+    -g)
+      _action="getBack"
+      ;;
+    -l)
+      _listing=true
+      ;;
+    -t)
+      _action="takes"
+      ;;
+    -m)
+      _menu_cmd=("$2")
+      shift
+      ;;
+    -c)
+      _action="checkUtils"
+      ;;
+    -n)
+      default_scratchpad_name="$2"
+      shift
+      ;;
+    *)
+      help
+      echo ""
+      echo "Wrong argument given"
+      exit 1
+      ;;
+    esac
+    shift
+  done
 }
 
 basicChecks
