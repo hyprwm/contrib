@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-03-18
+
+scratchpad: Fixed -m command. Now it kills the preprocess of menu before starting it.
+
 ### 2024-03-13
 
 scratchpad: allow supplying command flags in any order
