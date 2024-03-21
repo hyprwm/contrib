@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-03-21
+
+grimblast: use fadeLayers to prevent visible borders
+
 ### 2024-03-18
 
 scratchpad: Fixed -m command. Now it kills the preprocess of menu before starting it.
