@@ -135,9 +135,8 @@ notifyError() {
 }
 
 resetFade() {
-  if [[ -n $FADE && -n $FADEOUT ]]; then
-    hyprctl keyword animation "$FADE" >/dev/null
-    hyprctl keyword animation "$FADEOUT" >/dev/null
+  if [[ -n $FADELAYERS ]]; then
+    hyprctl keyword animation "$FADELAYERS" >/dev/null
   fi
 }
 
@@ -218,10 +217,8 @@ elif [ "$SUBJECT" = "area" ]; then
 
   # get fade & fadeOut animation and unset it
   # this removes the black border seen around screenshots
-  FADE="$(hyprctl -j animations | jq -jr '.[0][] | select(.name == "fade") | .name, ",", (if .enabled == true then "1" else "0" end), ",", (.speed|floor), ",", .bezier')"
-  FADEOUT="$(hyprctl -j animations | jq -jr '.[0][] | select(.name == "fadeOut") | .name, ",", (if .enabled == true then "1" else "0" end), ",", (.speed|floor), ",", .bezier')"
-  hyprctl keyword animation 'fade,0,1,default' >/dev/null
-  hyprctl keyword animation 'fadeOut,0,1,default' >/dev/null
+  FADELAYERS="$(hyprctl -j animations | jq -jr '.[0][] | select(.name == "fadeLayers") | .name, ",", (if .enabled == true then "1" else "0" end), ",", (.speed|floor), ",", .bezier')"
+  hyprctl keyword animation 'fadeLayers,0,1,default' >/dev/null
 
   WORKSPACES="$(hyprctl monitors -j | jq -r 'map(.activeWorkspace.id)')"
   WINDOWS="$(hyprctl clients -j | jq -r --argjson workspaces "$WORKSPACES" 'map(select([.workspace.id] | inside($workspaces)))')"
