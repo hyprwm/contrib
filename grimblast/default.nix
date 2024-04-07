@@ -9,6 +9,7 @@
   libnotify,
   slurp,
   wl-clipboard,
+  hyprpicker,
   hyprland ? null,
 }:
 stdenvNoCC.mkDerivation {
@@ -36,6 +37,7 @@ stdenvNoCC.mkDerivation {
         libnotify
         slurp
         wl-clipboard
+        hyprpicker
       ]
       ++ lib.optional (hyprland != null) hyprland)}"
   '';
