@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-04-07
+
+grimblast: add hyprpicker to closure
+
 ### 2024-03-21
 
 grimblast: use fadeLayers to prevent visible borders
