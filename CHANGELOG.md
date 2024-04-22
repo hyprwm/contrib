@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-04-22
+
+scratchpad: add gawk to closure
+
 ### 2024-04-07
 
 grimblast: add hyprpicker to closure

@@ -3,6 +3,7 @@
   stdenvNoCC,
   makeWrapper,
   libnotify,
+  gawk,
   gnused,
   jq,
   procps,
@@ -21,6 +22,7 @@ stdenvNoCC.mkDerivation {
   postInstall = ''
     wrapProgram $out/bin/scratchpad --prefix PATH ':' \
       "${lib.makeBinPath ([
+        gawk
         gnused
         jq
         libnotify
