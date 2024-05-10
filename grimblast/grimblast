@@ -252,6 +252,7 @@ elif [ "$ACTION" = "save" ]; then
     notifyError "Error taking screenshot with grim"
   fi
 elif [ "$ACTION" = "edit" ]; then
+  killHyprpicker
   env_editor_confirm
   if takeScreenshot "$FILE_EDITOR" "$GEOM" "$OUTPUT"; then
     TITLE="Screenshot of $SUBJECT"
