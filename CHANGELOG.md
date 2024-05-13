@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-05-13
+
+hdrop: fix Nix package license
+
 ### 2024-04-22
 
 scratchpad: add gawk to closure
