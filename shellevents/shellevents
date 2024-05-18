@@ -17,7 +17,7 @@
 #
 #   In custom_event_file.sh, add implementations for the events you want to handle.
 #
-#   socat -u UNIX-CONNECT:/tmp/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock \
+#   socat -u UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock \
 #     EXEC:"/path/to/shellevents /path/to/custom_event_file.sh",nofork
 #
 # Reload custom_event_file.sh:
@@ -28,7 +28,7 @@
 
 # load the default (empty) event implementations
 # shellcheck disable=SC1091
-. "$(dirname "$(readlink -mn "$0")")"/shellevents_default.sh
+. "$(dirname "$(realpath "$0")")"/shellevents_default.sh
 
 PFS=$IFS
 
@@ -71,23 +71,42 @@ while true; do
 
     case "$event" in
     "workspace") WORKSPACENAME="$1" event_workspace ;;
+    "workspacev2") WORKSPACEID="$1" WORKSPACENAME="$2" event_workspacev2 ;;
     "focusedmon") MONNAME="$1" WORKSPACENAME="$2" event_focusedmon ;;
     "activewindow") WINDOWCLASS="$1" WINDOWTITLE="$2" event_activewindow ;;
     "activewindowv2") WINDOWADDRESS="$1" event_activewindowv2 ;;
     "fullscreen") ENTER="$1" event_fullscreen ;;
     "monitorremoved") MONITORNAME="$1" event_monitorremoved ;;
     "monitoradded") MONITORNAME="$1" event_monitoradded ;;
+    "monitoraddedv2") MONITORID="$1" MONITORNAME="$2" MONITORDESCRIPTION="$3" event_monitoraddedv2 ;;
     "createworkspace") WORKSPACENAME="$1" event_createworkspace ;;
+    "createworkspacev2") WORKSPACEID="$1" WORKSPACENAME="$2" event_createworkspacev2 ;;
     "destroyworkspace") WORKSPACENAME="$1" event_destroyworkspace ;;
+    "destroyworkspacev2") WORKSPACEID="$1" WORKSPACENAME="$2" event_destroyworkspacev2 ;;
     "moveworkspace") WORKSPACENAME="$1" MONNAME="$2" event_moveworkspace ;;
+    "moveworkspacev2") WORKSPACEID="$1" WORKSPACENAME="$2" MONNAME="$3" event_moveworkspacev2 ;;
+    "renameworkspace") WORKSPACEID="$1" NEWNAME="$2" event_renameworkspace ;;
+    "activespecial") WORKSPACENAME="$1" MONNAME="$2" event_activespecial ;;
     "activelayout") KEYBOARDNAME="$1" LAYOUTNAME="$2" event_activelayout ;;
     "openwindow") WINDOWADDRESS="$1" WORKSPACENAME="$2" WINDOWCLASS="$3" WINDOWTITLE="$4" event_openwindow ;;
     "closewindow") WINDOWADDRESS="$1" event_closewindow ;;
     "movewindow") WINDOWADDRESS="$1" WORKSPACENAME="$2" event_movewindow ;;
+    "movewindowv2") WINDOWADDRESS="$1" WORKSPACEID="$2" WORKSPACENAME="$3" event_movewindowv2 ;;
     "windowtitle") WINDOWADDRESS="$1" event_windowtitle ;;
     "openlayer") NAMESPACE="$1" event_openlayer ;;
     "closelayer") NAMESPACE="$1" event_closelayer ;;
     "submap") SUBMAPNAME="$1" event_submap ;;
+    "changefloatingmode") WINDOWADDRESS="$1" FLOATING="$2" event_changefloatingmode ;;
+    "urgent") WINDOWADDRESS="$1" event_urgent ;;
+    "minimize") WINDOWADDRESS="$1" MINIMIZED="$2" event_minimize ;;
+    "screencast") STATE="$1" OWNER="$2" event_screencast ;;
+    "togglegroup") STATE="$1" WINDOWADDRESSSES=${@:2} event_togglegroup ;;
+    "moveintogroup") WINDOWADDRESS="$1" event_moveintogroup ;;
+    "moveoutofgroup") WINDOWADDRESS="$1" event_moveoutofgroup ;;
+    "ignoregrouplock") STATE="$1" event_ignoregrouplock ;;
+    "lockgroups") STATE="$1" event_lockgroups ;;
+    "configreloaded") event_configreloaded ;;
+    "pin") WINDOWADDRESS="$1" PINSTATE="$2" event_pin ;;
     *) printf >&2 'Unknown event: %s\n' "$event" ;;
     esac
   fi
