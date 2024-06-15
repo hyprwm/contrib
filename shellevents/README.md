@@ -4,7 +4,7 @@ Invoke shell functions in response to Hyprland socket2 events.
 
 ## Description
 
-`shellevents` reads Hyprland events from stdin as documented in [hyprland Wiki](http://wiki.hyprland.org/IPC/#tmphyprhissocket2sock). Please read [Events list](https://wiki.hyprland.org/IPC/#events-list) to see what each event means and see `shellevents_default.sh` for the supported function names.
+`shellevents` reads Hyprland events from stdin as documented in the [Hyprland Wiki](http://wiki.hyprland.org/IPC/#tmphyprhissocket2sock). Please read [Events list](https://wiki.hyprland.org/IPC/#events-list) to understand what each event means. Also, see `shellevents_default.sh` for the supported function names.
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ We'll use `socat` to connect to Hyprland socket2, so make sure you have `socat` 
 socat -u UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock EXEC:"/path/to/shellevents /path/to/notifywindow.sh",nofork
 ```
 
-2. Open your browser of choice with the page reddit.com opened and you should see the notification. It needs to be reddit.com when you open your browser.
+2. Open your browser of choice with reddit.com, and you should see the notification. It needs to be reddit.com when you open your browser.
 
 ## How to use
 
@@ -32,7 +32,7 @@ cp /path/to/shellevents_default.sh /path/to/custom_event_file.sh
 
 2. In `custom_event_file.sh`, add your custom handlers for the events you want to handle.
 
-Note: the comment inside each handler shows the variables that are set when the handler is invoked.
+Note: The comment inside each handler shows the variables that are set when the handler is invoked.
 
 ```bash
 event_openwindow() {
@@ -48,7 +48,7 @@ socat -u UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket
 
 ## Tips
 
-1. If you made changes, reload `custom_event_file.sh`:
+1. If you have made changes, reload `custom_event_file.sh`:
 
 ```bash
 killall shellevents -USR1
