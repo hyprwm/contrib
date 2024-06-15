@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-06-16
+
+shellevents: add README.md
+
 ### 2024-05-13
 
 hdrop: fix Nix package license
