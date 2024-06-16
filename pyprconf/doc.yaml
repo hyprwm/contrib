@@ -1,0 +1,59 @@
+# this file documents the configuration keys for pyprconf
+# and will only result in sadness if used as-is
+pyprconf:
+  bindreload: SUPER+CTRL,C
+  bindunload: SUPER+ALT+CTRL,C
+
+# a section named 'sample'
+sample:
+  # tokens are available for substitution
+  # in most other keys. a special token {@}
+  # is always available and refers to the
+  # name of section.
+  tokens:
+    foo: bar
+    fiz: buz
+  # repeats the section for each element in
+  # the range. makes the token {#} available
+  # for use in the section. a 3-element array
+  # using python range syntax [start, stop (exclusive), step]
+  range: [1,10,1]
+  # binds are set each time the configuration
+  # is loaded, and unbound when the configuration
+  # is unloaded. an object where keys are MOD,Key
+  # and values are the dispatcher,args
+  bind:
+    SUPER,H: togglefloating,
+    SUPERSHIFT,H: pass,
+    SUPERALT,H: pass,
+  # keywords at this level are set each
+  # time the configuration is loaded.
+  # an array of strings
+  keyword:
+  - windowrule float,^({foo})$
+  - windowrulev2 pin,title:^()$
+  - general:col.active_border  0xff000000
+  # an array of event objects
+  events:
+  - event: createworkpace # (required) the event to handle
+    match: ^({@})$ # (required) a regex to match the event data
+    keyword: # (optional) keywords set when the event matches
+    - decorations:dim-active 1
+    - general:col.active_border 0xffffffff
+    dispatch: # (optional) dispatchers used when the event matches
+    - exec {foo}
+    - workspace {@}
+    # gates are used for making additional
+    # conditions on event handlers.
+    # in most uses one event handler
+    # will set a gate, and a different
+    # handler will check the gate and
+    # reset it. gate names are global
+    # and can be used across sections.
+    gate:
+      # set (True) a gate named 'mylatch'
+      set: mylatch
+      # reset (False) a gate named 'mylatch'
+      reset: mylatch
+      # only process the event handler if 'mylatch' is set
+      check: mylatch
