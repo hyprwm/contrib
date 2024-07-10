@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-07-10
+
+grimblast: recognize windows of special workspaces
+
 ### 2024-06-16
 
 shellevents: add README.md
