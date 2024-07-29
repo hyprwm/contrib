@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-08-02
+
+grimblast: changed method to check if another instance is running
+
 ### 2024-07-10
 
 grimblast: recognize windows of special workspaces
@@ -26,7 +30,8 @@ grimblast: use fadeLayers to prevent visible borders
 
 ### 2024-03-18
 
-scratchpad: Fixed -m command. Now it kills the preprocess of menu before starting it.
+scratchpad: Fixed -m command. Now it kills the preprocess of menu before
+starting it.
 
 ### 2024-03-13
 
@@ -34,7 +39,7 @@ scratchpad: allow supplying command flags in any order
 
 ### 2024-03-02
 
-hdrop: 0.4.4 -> 0.5.0
+hdrop: 0.4.4 -> 0.5.0\
 Add --floating and associated options
 
 ### 2024-01-25
@@ -43,14 +48,14 @@ grimblast: fixed border still visible when taking screenshot of an area
 
 ### 2024-01-19
 
-hdrop: -> 0.4.4
+hdrop: -> 0.4.4\
 Fix --class quoting
 
 ### 2024-01-14
 
-hdrop: 0.3.0 -> 0.4.0  
-Add `-c | --class`  
-Improve Documentation
+hdrop: 0.3.0 -> 0.4.0\
+Add `-c | --class`\
+Improve Documentation\
 Refactor
 
 ### 2024-01-11

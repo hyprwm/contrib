@@ -18,6 +18,18 @@
 ## hyprctl equivalents.
 ## https://github.com/swaywm/sway/blob/master/contrib/grimshot
 
+# Check whether another instance is running
+
+
+grimblastInstanceCheck="${XDG_RUNTIME_DIR:-$XDG_CACHE_DIR:-$HOME/.cache}/grimblast.lock"
+if [ -e "$grimblastInstanceCheck" ]; then
+	exit 2
+else
+	touch "$grimblastInstanceCheck"
+fi
+trap "rm -f '$grimblastInstanceCheck'" EXIT
+
+
 getTargetDirectory() {
   test -f "${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs" &&
     . "${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs"

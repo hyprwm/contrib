@@ -103,6 +103,11 @@ bind = SUPER ALT, p, exec, grimblast save output
 bind = SUPER CTRL, p, exec, grimblast save screen
 ```
 
+# EXIT CODES
+
+0 - Normal exit++
+2 - Another instance of grimblast is running
+
 # SEE ALSO
 
 *grim*(1)
