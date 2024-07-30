@@ -7,7 +7,7 @@
 ##  - `hyprpicker`: to freeze the screen when selecting area
 ##  - `wl-copy`: clipboard utility (provided by wl-clipboard)
 ##  - `jq`: json utility to parse hyprctl output
-##  - `notify-send`: to show notifizcations (provided by libnotify)
+##  - `notify-send`: to show notifications (provided by libnotify)
 ## Those are needed to be installed, if unsure, run `grimblast check`
 ##
 ## See `man 1 grimblast` or `grimblast usage` for further details.
@@ -20,8 +20,8 @@
 
 # Check whether another instance is running
 
-grimblastiTempFile="/tmp/tmp.grimblast"
-if [[ $(< $grimblastiTempFile) -eq 1 ]]; then
+grimblastTempFile="/tmp/tmp.grimblast"
+if [[ $(< $grimblastTempFile) -eq 1 ]]; then
     exit 2
 else 
     echo "1" > "$grimblastTempFile"
