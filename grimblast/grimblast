@@ -20,13 +20,14 @@
 
 # Check whether another instance is running
 
-grimblastTempFile="/tmp/tmp.grimblast"
-if [[ $(< $grimblastTempFile) -eq 1 ]]; then
-    exit 2
-else 
-    echo "1" > "$grimblastTempFile"
+
+grimblastInstanceCheck="${XDG_RUNTIME_DIR:-$XDG_CACHE_DIR:-$HOME/.cache}/grimblast.lock"
+if [ -e "$grimblastInstanceCheck" ]; then
+	exit 2
+else
+	touch "$grimblastInstanceCheck"
 fi
-trap "echo '0' > '$grimblastTempFile'" EXIT
+trap "rm -f '$grimblastInstanceCheck'" EXIT
 
 
 getTargetDirectory() {
