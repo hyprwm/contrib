@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-08-02
+
+grimblast: changed method to check if another instance is running
+
 ### 2024-07-29
 
 grimblast: allow only one instance
