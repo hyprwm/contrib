@@ -23,13 +23,13 @@ This Bash script emulates the main features of [tdrop](https://github.com/noctui
 > -c, --class  
 > Set classname of the program to be run. Use this if the classname is different from the name of the [COMMAND] and hdrop does not have a hardcoded replacement.
 >
-> -f, --floating
+> -f, --floating  
 > Spawn as a floating window. Standard is top half, full width, no gap. Can be adjusted with -g, -h, -p and -w.
 >
-> -g, --gap
+> -g, --gap  
 > If using --floating: specify gap to the screen edge in pixels.
 >
-> -h, --height
+> -h, --height  
 > If using --floating: set the height of the window. Enter percentage value without % sign, e.g. '30'.
 >
 > -H, --help  
@@ -38,7 +38,7 @@ This Bash script emulates the main features of [tdrop](https://github.com/noctui
 > -i, --insensitive  
 > Case insensitive partial matching of class names. Can work as a stopgap if a running program is not recognized and a new instance is launched instead. Note: incorrect matches may occur, adding a special handling of the program to hdrop (hardcoded or via `-c, --class`) is preferable.
 >
-> -p, --position
+> -p, --position  
 > If using --floating: set the position of the window. One of: '[t]op' '[b]ottom' '[l]eft' '[r]ight'.
 >
 > -v, --verbose  
@@ -47,7 +47,7 @@ This Bash script emulates the main features of [tdrop](https://github.com/noctui
 > -V, --version  
 > Print version
 >
-> -w, --width
+> -w, --width  
 > If using --floating: set the width of the window. Enter percentage value without % sign, e.g. '30'.
 
 #### Multiple instances:
@@ -75,7 +75,7 @@ If you want to run a program on boot and have it wait in the background until ca
 
 ### Cursor jumps to newly focused windows
 
-Set `no_cursor_warps = true` in `hyprland.conf` section [general](https://wiki.hyprland.org/Configuring/Variables/#general)
+Set `no_warps = true` in `hyprland.conf` section [cursor](https://wiki.hyprland.org/Configuring/Variables/#cursor).
 
 ### Further instances of programs are started instead of hiding/unhiding a running instance
 
@@ -85,9 +85,23 @@ Run `hdrop -v [COMMAND]` _in the terminal_ to see maximum output for troubleshoo
 
 Please report instances of programs with differing class names, so that they can be added to `hdrop`.
 
-### Floating windows don't react to changed arguments
+### Windows freeze when being called up from another workspace
+
+This happens sometimes and will apparently be fixed in hyprland 0.43
+
+### `--floating` windows don't react to changed arguments in hdrop
 
 Close the program (don't just hide it with hdrop). The changed arguments are only applied when the program is restarted.
+
+### `--floating` windows animation is only shown when the window is opened for the first time
+
+This is a known issue and no workaround is known to me.
+
+### `hdrop -b` is not working when used for autostart
+
+If hdrop isn't installed but just added to PATH, then you might have to use this instead:
+
+> exec-once = [workspace special:hdrop silent] hdrop [OPITONS] [COMMAND]
 
 ## Installation
 
@@ -97,11 +111,12 @@ Close the program (don't just hide it with hdrop). The changed arguments are onl
 
 ### Manual
 
-Make sure that `bash` and `jq` are in your PATH.
+Make sure that `bash`, `jq` and `awk` (for using the `--floating` option) are in your PATH.
 
 Download the script, make it executable and add it to your PATH.
 
-Note: `hdrop` will only work in a `Hyprland` session. `exec-once = hdrop -b` might not work with this installation method.
+Note: `hdrop` will only work in a `Hyprland` session.  
+`exec-once = hdrop -b` might not work with this installation method.
 
 ### Makefile
 

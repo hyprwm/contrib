@@ -1,5 +1,14 @@
 # Changelog
 
+### 2024-09-01
+
+hdrop: 
+   - add class replacement for epiphany and godot
+   - refactor 
+   - cleanup
+   - add recognition of `--app-id` for foot
+   - disable error notifications when closing foot
+
 ### 2024-08-02
 
 grimblast: changed method to check if another instance is running
