@@ -68,7 +68,7 @@ print_help() {
 }
 
 print_version() {
-  echo "hdrop version: 0.5.0"
+  echo "hdrop version: 0.5.3"
 }
 
 notify() {
@@ -81,12 +81,9 @@ notify_low() {
   echo "$@"
 }
 
-BACKGROUND=""
-GAP=0
-INSENSITIVE=false
-FLOATING=false
-POSITION="top"
-VERBOSE=false
+partial_match() {
+  CLASS=$(hyprctl clients -j | jq -r ".[] | select((.class |match(\"$1\";\"i\"))) | .class" | head -1)
+}
 
 hdrop_flags() {
   while true; do
@@ -137,6 +134,12 @@ hdrop_flags() {
   done
 }
 
+BACKGROUND=""
+GAP=0
+INSENSITIVE=false
+FLOATING=false
+POSITION="top"
+VERBOSE=false
 HDROP_FLAGS=()
 
 while true; do
@@ -165,12 +168,19 @@ if [[ -n $HDROP_FLAGS ]]; then
 fi
 
 CLASS="$1"
+COMMAND="$1"
 COMMANDLINE="${*:1}"
 ACTIVE_WORKSPACE="$(hyprctl activeworkspace -j | jq -r .id)" || notify "hdrop: Error executing dependencies 'hyprctl' or 'jq'" "Check terminal output of 'hdrop $COMMANDLINE'"
 
 case "$1" in
+epiphany)
+  CLASS="org.gnome.Epiphany"
+  ;;
 foot)
-  OPT=$(getopt --options a: -n hdrop -- "$@")
+  OPT=$(getopt --options a: --longoptions app-id: -n hdrop -- "$@")
+  ;;
+godot4)
+  partial_match "org.godotengine."
   ;;
 logseq)
   CLASS="Logseq"
@@ -182,7 +192,7 @@ tor-browser)
   CLASS="Tor Browser"
   ;;
 *)
-  OPT=$(getopt --longoptions class: -n hdrop -- "$@")
+  OPT=$(getopt --options "" --longoptions class: -n hdrop -- "$@")
   ;;
 esac
 
@@ -191,7 +201,7 @@ if $VERBOSE && [[ $1 -ne $CLASS ]]; then notify_low "hdrop: Using '$CLASS' as ha
 if [[ -n $OPT ]]; then
   eval set -- "$OPT" # remove leading whitespace
   case "$1" in
-  -a | --class)
+  -a | --app-id | --class)
     CLASS="$2"
     if $VERBOSE; then notify_low "hdrop: Extracted '$CLASS' from [COMMAND] for matching"; fi
     ;;
@@ -200,7 +210,7 @@ fi
 
 if $INSENSITIVE && [[ $(hyprctl clients -j | jq -r ".[] | select((.class |test(\"$CLASS\";\"i\")))") ]]; then
   if $VERBOSE; then notify_low "hdrop: --insensitive -> Insensitive (partial) match of class '$CLASS' successful"; fi
-  CLASS=$(hyprctl clients -j | jq -r ".[] | select((.class |match(\"$CLASS\";\"i\"))) | .class" | head -1) || notify "hdrop: Error assigning case insensitive (partial) match to CLASS"
+  partial_match "$CLASS" || notify "hdrop: Error assigning case insensitive (partial) match to CLASS"
   if $VERBOSE; then notify_low "hdrop: --insensitive -> Using class '$CLASS' after insensitive (partial) matching"; fi
 fi
 
@@ -214,6 +224,7 @@ if $FLOATING; then
     ACTIVE_MONITOR_WIDTH=$(($(hyprctl monitors -j | jq -r ".[] | select(.focused==true) | .width") * 100))
     ACTIVE_MONITOR_HEIGHT=$(($(hyprctl monitors -j | jq -r ".[] | select(.focused==true) | .height") * 100))
     ACTIVE_MONITOR_SCALE=$(awk "BEGIN {printf $(hyprctl monitors -j | jq -r ".[] | select(.focused==true) | .scale") * 100}")
+
     ACTIVE_MONITOR_WIDTH_SCALED=$(($ACTIVE_MONITOR_WIDTH / $ACTIVE_MONITOR_SCALE))
     ACTIVE_MONITOR_HEIGHT_SCALED=$(($ACTIVE_MONITOR_HEIGHT / $ACTIVE_MONITOR_SCALE))
   fi
@@ -260,7 +271,13 @@ elif [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .works
   hyprctl dispatch -- movetoworkspacesilent special:hdrop,"^$CLASS$" || notify "hdrop: Error moving '$COMMANDLINE' to workspace 'special:hdrop'"
   if $VERBOSE; then notify_low "hdrop: Matched class '$CLASS' on current workspace and moved it to workspace 'special:hdrop'"; fi
 else
-  # shellcheck disable=SC2086 # quoting COMMANDLINE=foot -a foot_1 doesn't work
-  $BACKGROUND $COMMANDLINE || notify "hdrop: Error executing given command" "$COMMANDLINE"
+  # 'foot' always throws an error when its window is closed. Thus we disable the notification.
+  if [[ $COMMAND == "foot" ]]; then
+    # shellcheck disable=SC2086 # when quoting COMMANDLINE the execution of the command fails
+    $BACKGROUND $COMMANDLINE
+  else
+    # shellcheck disable=SC2086 # when quoting COMMANDLINE the execution of the command fails
+    $BACKGROUND $COMMANDLINE || notify "hdrop: Error executing given command" "$COMMANDLINE"
+  fi
   if $VERBOSE; then notify_low "hdrop: No running program matches class '$CLASS'." "Currently active classes are '$(hyprctl clients -j | jq -r '.[] | select(.mapped==true) | .class' | sort | tr '\n' ' ')'. Executed '$COMMANDLINE' in case it was not running already."; fi
 fi

@@ -66,11 +66,11 @@ Multiple instances of the same program can be run concurrently, if different cla
 # Example bindings in Hyprland config:
 
 ```
-bind = $mainMod, b, exec, hdrop librewolf'  
-bind = $mainMod, x, exec, hdrop kitty --class kitty_1'  
-bind = $mainMod CTRL, x, exec, hdrop kitty --class kitty_2'  
-bind = $mainMod, c, exec, hdrop foot -a foot_1'  
-bind = $mainMod CTRL, c, exec, hdrop foot -a foot_2'
+bind = $mainMod, b, exec, hdrop librewolf  
+bind = $mainMod, x, exec, hdrop kitty --class kitty_1  
+bind = $mainMod CTRL, x, exec, hdrop kitty --class kitty_2  
+bind = $mainMod, c, exec, hdrop foot -a foot_1  
+bind = $mainMod CTRL, c, exec, hdrop foot -a foot_2
 ```
 
 Note: defining a class name is only necessary when running several instances of the same program.
