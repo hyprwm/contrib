@@ -13,7 +13,7 @@
 }:
 stdenvNoCC.mkDerivation {
   pname = "hdrop";
-  version = "0.5.3";
+  version = "0.6.0";
 
   src = ./.;
 

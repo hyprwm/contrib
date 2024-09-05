@@ -22,6 +22,9 @@ hdrop - run, show and hide programs on Hyprland
 *-f, --floating*
 	Spawn as a floating window. Standard is top half, full width, no gap. Can be adjusted with -g, -h, -p and -w.
 
+*-F, --focus*
+	Changes the default behaviour: focus the specified program's window and switch to its present workspace if necessary. Do not hide it, if it's already on the current workspace."
+
 *-g, --gap*
 	If using --floating: specify gap to the screen edge in pixels.
 
