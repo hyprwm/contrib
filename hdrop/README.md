@@ -26,6 +26,9 @@ This Bash script emulates the main features of [tdrop](https://github.com/noctui
 > -f, --floating  
 > Spawn as a floating window. Standard is top half, full width, no gap. Can be adjusted with -g, -h, -p and -w.
 >
+> -F, --focus  
+> Changes the default behaviour: focus the specified program's window and switch to its present workspace if necessary. Do not hide it, if it's already on the current workspace."
+>
 > -g, --gap  
 > If using --floating: specify gap to the screen edge in pixels.
 >
@@ -54,7 +57,7 @@ This Bash script emulates the main features of [tdrop](https://github.com/noctui
 
 Multiple instances of the same program can be run concurrently, if different class names are assigned to each instance. Presently, there is support for the following flags in the [COMMAND] string:
 
-> `-a` ([foot](https://codeberg.org/dnkl/foot/) terminal emulator)  
+> `-a` | `--app-id` ([foot](https://codeberg.org/dnkl/foot/) terminal emulator)  
 > `--class` (all other programs)
 
 #### Example bindings in Hyprland config:
@@ -101,7 +104,7 @@ This is a known issue and no workaround is known to me.
 
 If hdrop isn't installed but just added to PATH, then you might have to use this instead:
 
-> exec-once = [workspace special:hdrop silent] hdrop [OPITONS] [COMMAND]
+> exec-once = [workspace special:hdrop silent] hdrop [OPTIONS] [COMMAND]
 
 ## Installation
 

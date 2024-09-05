@@ -25,6 +25,11 @@ print_help() {
   echo "          Standard is top half, full width, no gap."
   echo "          Can be adjusted with -g, -h, -p and -w."
   echo ""
+  echo "  -F, --focus"
+  echo "          Changes the default behaviour: focus the specified program's"
+  echo "          window and switch to its present workspace if necessary."
+  echo "          Do not hide it, if it's already on the current workspace."
+  echo ""
   echo "  -g, --gap"
   echo "          If using --floating: specify gap to the screen edge in pixels."
   echo ""
@@ -68,7 +73,7 @@ print_help() {
 }
 
 print_version() {
-  echo "hdrop version: 0.5.3"
+  echo "hdrop version: 0.6.0"
 }
 
 notify() {
@@ -97,6 +102,9 @@ hdrop_flags() {
       ;;
     -f | --floating)
       FLOATING=true
+      ;;
+    -F | --focus)
+      FOCUS=true
       ;;
     -g | --gap)
       shift
@@ -135,6 +143,7 @@ hdrop_flags() {
 }
 
 BACKGROUND=""
+FOCUS=false
 GAP=0
 INSENSITIVE=false
 FLOATING=false
@@ -164,7 +173,7 @@ done
 # shellcheck disable=SC2128 # erroneous warning
 if [[ -n $HDROP_FLAGS ]]; then
   # shellcheck disable=SC2046 # avoids having to run 'eval set -- "$HDROP_FLAGS"' to remove leading whitespace
-  hdrop_flags $(getopt -u --options bc:fg:h:Hip:vVw: --longoptions background,class:,floating,gap:,height:,help,insensitive,position:,verbose,version,width: -n hdrop -- "${HDROP_FLAGS[@]}")
+  hdrop_flags $(getopt -u --options bc:fFg:h:Hip:vVw: --longoptions background,class:,floating,focus,gap:,height:,help,insensitive,position:,verbose,version,width: -n hdrop -- "${HDROP_FLAGS[@]}")
 fi
 
 CLASS="$1"
@@ -263,13 +272,19 @@ if $FLOATING; then
 fi
 
 if [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id!=$ACTIVE_WORKSPACE)") ]]; then
-  # shellcheck disable=SC2140 # erroneous warning
-  hyprctl dispatch -- movetoworkspacesilent "$ACTIVE_WORKSPACE","^$CLASS$" || notify "hdrop: Error moving '$COMMANDLINE' to current workspace"
+  if [[ $FOCUS == false ]]; then
+    # shellcheck disable=SC2140 # erroneous warning
+    hyprctl dispatch -- movetoworkspacesilent "$ACTIVE_WORKSPACE","^$CLASS$" || notify "hdrop: Error moving '$COMMANDLINE' to current workspace"
+    if $VERBOSE; then notify_low "hdrop: Matched class '$CLASS' on another workspace and moved it to current workspace"; fi
+  fi
   hyprctl dispatch -- focuswindow "^$CLASS$" || notify "hdrop: Error focusing '$COMMANDLINE' on current workspace"
-  if $VERBOSE; then notify_low "hdrop: Matched class '$CLASS' on another workspace and moved it to current workspace"; fi
 elif [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id==$ACTIVE_WORKSPACE)") ]]; then
-  hyprctl dispatch -- movetoworkspacesilent special:hdrop,"^$CLASS$" || notify "hdrop: Error moving '$COMMANDLINE' to workspace 'special:hdrop'"
-  if $VERBOSE; then notify_low "hdrop: Matched class '$CLASS' on current workspace and moved it to workspace 'special:hdrop'"; fi
+  if [[ $FOCUS == false ]]; then
+    hyprctl dispatch -- movetoworkspacesilent special:hdrop,"^$CLASS$" || notify "hdrop: Error moving '$COMMANDLINE' to workspace 'special:hdrop'"
+    if $VERBOSE; then notify_low "hdrop: Matched class '$CLASS' on current workspace and moved it to workspace 'special:hdrop'"; fi
+  else
+    hyprctl dispatch -- focuswindow "^$CLASS$" || notify "hdrop: Error focusing '$COMMANDLINE' on current workspace"
+  fi
 else
   # 'foot' always throws an error when its window is closed. Thus we disable the notification.
   if [[ $COMMAND == "foot" ]]; then

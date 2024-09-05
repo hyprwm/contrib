@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-09-05
+
+hdrop: add `--focus` option
+
 ### 2024-09-01
 
 hdrop: 
