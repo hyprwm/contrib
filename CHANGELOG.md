@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-10-17
+
+shellevents: support windowtitlev2 event
+
 ### 2024-09-05
 
 hdrop: add `--focus` option
