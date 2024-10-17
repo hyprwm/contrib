@@ -100,6 +100,10 @@ event_windowtitle() {
   : # WINDOWADDRESS
 }
 
+event_windowtitlev2() {
+  : # WINDOWADDRESS WINDOWTITLE
+}
+
 event_openlayer() {
   : # NAMESPACE
 }
