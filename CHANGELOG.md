@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-11-04
+
+grimblast: use layerrules instead of modifying animations
+
 ### 2024-10-17
 
 shellevents: support windowtitlev2 event
