@@ -1,5 +1,9 @@
 # Changelog
 
+### 2024-12-01
+
+grimblast: fix window selection on fullscreen
+
 ### 2024-11-04
 
 grimblast: use layerrules instead of modifying animations
