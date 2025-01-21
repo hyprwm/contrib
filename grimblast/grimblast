@@ -50,6 +50,7 @@ env_editor_confirm() {
 }
 
 NOTIFY=no
+OPENFILE_NOTIFICATION=no
 CURSOR=
 FREEZE=
 WAIT=no
@@ -62,6 +63,10 @@ while [ $# -gt 0 ]; do
   case $key in
   -n | --notify)
     NOTIFY=yes
+    shift # past argument
+    ;;
+  -o | --openfile)
+    OPENFILE_NOTIFICATION=yes
     shift # past argument
     ;;
   -c | --cursor)
@@ -104,7 +109,7 @@ FILE_EDITOR=${3:-$(tmp_editor_directory)/$(date -Ins).png}
 
 if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "edit" ] && [ "$ACTION" != "copysave" ] && [ "$ACTION" != "check" ]; then
   echo "Usage:"
-  echo "  grimblast [--notify] [--cursor] [--freeze] [--wait N] [--scale <scale>] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
+  echo "  grimblast [--notify] [--openfile] [--cursor] [--freeze] [--wait N] [--scale <scale>] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
   echo "  grimblast check"
   echo "  grimblast usage"
   echo ""
@@ -132,6 +137,18 @@ notifyOk() {
   [ "$NOTIFY" = "no" ] && return
 
   notify "$@"
+}
+
+notifyOpen() {
+  if [ "$OPENFILE_NOTIFICATION" = "no" ]; then
+    notifyOk
+  else
+    outt=$(notify-send -A "default=open_folder" -a grimblast "$@")
+    if [ "$outt" == "default" ]; then
+      # this does not work for filenames with commas in them
+      dbus-send --session --print-reply --dest=org.freedesktop.FileManager1 --type=method_call /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:"$4" string:""
+    fi
+  fi
 }
 
 notifyError() {
@@ -248,7 +265,8 @@ elif [ "$ACTION" = "save" ]; then
   if takeScreenshot "$FILE" "$GEOM" "$OUTPUT"; then
     TITLE="Screenshot of $SUBJECT"
     MESSAGE=$(basename "$FILE")
-    notifyOk "$TITLE" "$MESSAGE" -i "$FILE"
+    killHyprpicker
+    notifyOpen "$TITLE" "$MESSAGE" -i "$FILE"
     echo "$FILE"
   else
     notifyError "Error taking screenshot with grim"
