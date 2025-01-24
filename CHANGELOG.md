@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-01-24
+
+grimblast: allow decimals for --wait
+
 ### 2024-12-01
 
 grimblast: fix window selection on fullscreen

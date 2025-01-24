@@ -22,9 +22,10 @@ grimblast - a helper for screenshots within hyprland
 	Freezes the screen before area selection.
 
 *--wait N*
-	Wait for N seconds before taking a screenshot. Waits after any
-	manual selection is made. Recommended to combine with --notify in
-	order to know when the screenshot has been taken.
+	Wait for N seconds before taking a screenshot. Decimal values
+	are also supported. Waits after any manual selection is made.
+	Recommended to combine with --notify in order to know
+	when the screenshot has been taken.
 
 *--scale <scale>*
 	Passes the `-s` argument to `grim`.
