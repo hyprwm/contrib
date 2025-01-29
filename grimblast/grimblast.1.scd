@@ -15,6 +15,10 @@ grimblast - a helper for screenshots within hyprland
 *--notify*
 	Show notifications to the user that a screenshot has been taken.
 
+*--openfile*
+	Uses dbus to display the folder containing the file when interacting with the
+	notification, only works with --notify
+
 *--cursor*
 	Include cursors in the screenshot.
 
