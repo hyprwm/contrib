@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-02-10
+
+grimblast: fix --notify not showing
+
 ### 2025-01-24
 
 grimblast: allow decimals for --wait
