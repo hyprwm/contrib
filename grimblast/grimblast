@@ -234,6 +234,10 @@ elif [ "$SUBJECT" = "output" ]; then
   OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true)' | jq -r '.name')
   WHAT="$OUTPUT"
 elif [ "$SUBJECT" = "area" ]; then
+  if [ "$CURSOR" = "yes" ]; then
+    die "Error: '--cursor' cannot be used with subject 'area'"
+  fi
+
   if [ "$FREEZE" = "yes" ] && [ "$(command -v "hyprpicker")" ] >/dev/null 2>&1; then
     hyprpicker -r -z &
     sleep 0.2

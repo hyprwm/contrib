@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-02-13
+
+grimblast: disallow using --cursor with `area` selection
+
 ### 2025-02-10
 
 grimblast: fix --notify not showing
