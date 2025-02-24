@@ -177,7 +177,7 @@ check() {
 
 moveCursorPosition() {
   initialCursorPosition=$(hyprctl cursorpos)
-  hyprctl dispatch movecursor 0 1439 >/dev/null
+  hyprctl dispatch movecursor 0 0 >/dev/null
 }
 
 restoreCursorPosition() {
