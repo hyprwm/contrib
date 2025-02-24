@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-02-24
+
+grimblast: try hiding the grim cursor before taking a screenshot
+
 ### 2025-02-13
 
 grimblast: disallow using --cursor with `area` selection

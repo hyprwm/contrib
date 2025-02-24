@@ -189,16 +189,25 @@ check() {
   echo "   $COMMAND: $RESULT"
 }
 
+moveCursorPosition() {
+  initialCursorPosition=$(hyprctl cursorpos)
+  hyprctl dispatch movecursor 0 1439 >/dev/null
+}
+
+restoreCursorPosition() {
+  hyprctl dispatch movecursor ${initialCursorPosition//,} >/dev/null
+}
+  
 takeScreenshot() {
   FILE=$1
   GEOM=$2
   OUTPUT=$3
   if [ -n "$OUTPUT" ]; then
-    grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -o "$OUTPUT" "$FILE" || die "Unable to invoke grim"
+    moveCursorPosition && grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -o "$OUTPUT" "$FILE" && restoreCursorPosition || die "Unable to invoke grim"
   elif [ -z "$GEOM" ]; then
-    grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} "$FILE" || die "Unable to invoke grim"
+    moveCursorPosition && grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} "$FILE" && restoreCursorPosition || die "Unable to invoke grim"
   else
-    grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -g "$GEOM" "$FILE" || die "Unable to invoke grim"
+    moveCursorPosition && grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -g "$GEOM" "$FILE" && restoreCursorPosition || die "Unable to invoke grim"
   fi
 }
 
