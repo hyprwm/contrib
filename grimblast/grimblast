@@ -177,7 +177,8 @@ check() {
 
 moveCursorPosition() {
   initialCursorPosition=$(hyprctl cursorpos)
-  hyprctl dispatch movecursor 0 0 >/dev/null
+  activeMonitorHeight=$(hyprctl -j monitors | jq -r '.[] | .height')
+  hyprctl dispatch movecursor 0 $activeMonitorsHeight >/dev/null
 }
 
 restoreCursorPosition() {
