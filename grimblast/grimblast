@@ -177,14 +177,18 @@ check() {
 
 moveCursorPosition() {
   initialCursorPosition=$(hyprctl cursorpos)
-  activeMonitorHeight=$(hyprctl -j monitors | jq -r '.[] | select(.focused == true) | .height')
-  hyprctl dispatch movecursor 0 $activeMonitorHeight >/dev/null
+  virtualDisplayName="grimblastVD"
+  focusedMonitorName=$(hyprctl -j monitors | jq -r '.[] | select( .focused == true ) | .name')
+
+  hyprctl output create headless $virtualDisplayName >/dev/null
+  hyprctl dispatch focusmonitor $virtualDisplayName >/dev/null
 }
 
 restoreCursorPosition() {
+  hyprctl dispatch focusmonitor $focusedMonitorName >/dev/null
+  hyprctl output remove $virtualDisplayName >/dev/null
   hyprctl dispatch movecursor ${initialCursorPosition//,} >/dev/null
 }
-
 
 takeScreenshot() {
   FILE=$1
