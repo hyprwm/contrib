@@ -1,5 +1,15 @@
 # Changelog
 
+### 2025-03-01
+
+hdrop: 0.6.0 -> 0.7.6\
+Fix for new syntax of `hyprctl dispatch` from hyprland 0.46.2 onwards\
+Limit `--online` to 20sec\
+Fix `--online` for cases in which it is called multiple times spaced apart in time\
+Fix manpage\
+Make `--online` behaviour consistent when there is no network connection at all and when there is just no internet connection\
+Fix behaviour of `--floating` on multi-monitor setups with differing resolutions
+
 ### 2025-02-13
 
 grimblast: disallow using --cursor with `area` selection

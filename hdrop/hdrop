@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# shellcheck disable=SC2004 # $ sign needed for the caclculations to take place
+# shellcheck disable=SC2004 # $ sign needed for the calculations to take place
 
 print_help() {
   echo ""
@@ -45,6 +45,10 @@ print_help() {
   echo "          You can try this if a running program is not recognized and"
   echo "          a new instance is launched instead."
   echo ""
+  echo "  -o, --online"
+  echo "          Delay initial launch for up to 20 seconds"
+  echo "          until internet connectivity is established."
+  echo ""
   echo "  -p, --position"
   echo "          If using --floating: set the position of the window."
   echo "          One of: '[t]op' '[b]ottom' '[l]eft' '[r]ight'."
@@ -73,7 +77,7 @@ print_help() {
 }
 
 print_version() {
-  echo "hdrop version: 0.6.0"
+  echo "hdrop version: 0.7.6"
 }
 
 notify() {
@@ -88,6 +92,15 @@ notify_low() {
 
 partial_match() {
   CLASS=$(hyprctl clients -j | jq -r ".[] | select((.class |match(\"$1\";\"i\"))) | .class" | head -1)
+}
+
+wait_online() {
+  wait_online=0
+  while [[ $wait_online -lt 200 ]]; do
+    ping -qc 1 github.com && break
+    sleep 0.1
+    $wait_online++
+  done
 }
 
 hdrop_flags() {
@@ -121,6 +134,9 @@ hdrop_flags() {
     -i | --insensitive)
       INSENSITIVE=true
       ;;
+    -o | --online)
+      ONLINE=true
+      ;;
     -p | --position)
       shift
       POSITION="$1"
@@ -146,6 +162,7 @@ BACKGROUND=""
 FOCUS=false
 GAP=0
 INSENSITIVE=false
+ONLINE=false
 FLOATING=false
 POSITION="top"
 VERBOSE=false
@@ -205,7 +222,7 @@ tor-browser)
   ;;
 esac
 
-if $VERBOSE && [[ $1 -ne $CLASS ]]; then notify_low "hdrop: Using '$CLASS' as hardcoded classname of '$1' for matching"; fi
+if $VERBOSE && [[ $1 != "$CLASS" ]]; then notify_low "hdrop: Using '$CLASS' as hardcoded classname of '$1' for matching"; fi
 
 if [[ -n $OPT ]]; then
   eval set -- "$OPT" # remove leading whitespace
@@ -217,7 +234,7 @@ if [[ -n $OPT ]]; then
   esac
 fi
 
-if $INSENSITIVE && [[ $(hyprctl clients -j | jq -r ".[] | select((.class |test(\"$CLASS\";\"i\")))") ]]; then
+if $INSENSITIVE && [[ -n $(hyprctl clients -j | jq -r ".[] | select((.class |test(\"$CLASS\";\"i\")))") ]]; then
   if $VERBOSE; then notify_low "hdrop: --insensitive -> Insensitive (partial) match of class '$CLASS' successful"; fi
   partial_match "$CLASS" || notify "hdrop: Error assigning case insensitive (partial) match to CLASS"
   if $VERBOSE; then notify_low "hdrop: --insensitive -> Using class '$CLASS' after insensitive (partial) matching"; fi
@@ -268,24 +285,27 @@ if $FLOATING; then
     ;;
   esac
 
-  hyprctl --batch "keyword windowrule float,^$CLASS$ ; keyword windowrule move $POSITION_xy,^$CLASS$ ; keyword windowrule size $WIDTH_xy% $HEIGHT_xy%,^$CLASS$"
+  hyprctl --batch "keyword windowrule float,^$CLASS$ ; keyword windowrule move $POSITION_xy,^$CLASS$"
 fi
 
-if [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id!=$ACTIVE_WORKSPACE)") ]]; then
+if [[ -n $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id!=$ACTIVE_WORKSPACE)") ]]; then
   if [[ $FOCUS == false ]]; then
     # shellcheck disable=SC2140 # erroneous warning
-    hyprctl dispatch -- movetoworkspacesilent "$ACTIVE_WORKSPACE","^$CLASS$" || notify "hdrop: Error moving '$COMMANDLINE' to current workspace"
+    hyprctl dispatch -- movetoworkspacesilent "$ACTIVE_WORKSPACE","class:^$CLASS$" || notify "hdrop: Error moving '$COMMANDLINE' to current workspace"
+    if [[ $FLOATING ]]; then hyprctl dispatch -- resizewindowpixel exact "$WIDTH_xy% $HEIGHT_xy%", "class:^$CLASS$" || notify "hdrop: Error resizing window for active monitor"; fi
     if $VERBOSE; then notify_low "hdrop: Matched class '$CLASS' on another workspace and moved it to current workspace"; fi
   fi
-  hyprctl dispatch -- focuswindow "^$CLASS$" || notify "hdrop: Error focusing '$COMMANDLINE' on current workspace"
-elif [[ $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id==$ACTIVE_WORKSPACE)") ]]; then
+  hyprctl dispatch -- focuswindow "class:^$CLASS$" || notify "hdrop: Error focusing '$COMMANDLINE' on current workspace"
+elif [[ -n $(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\" and .workspace.id==$ACTIVE_WORKSPACE)") ]]; then
   if [[ $FOCUS == false ]]; then
-    hyprctl dispatch -- movetoworkspacesilent special:hdrop,"^$CLASS$" || notify "hdrop: Error moving '$COMMANDLINE' to workspace 'special:hdrop'"
+    hyprctl dispatch -- movetoworkspacesilent special:hdrop,"class:^$CLASS$" || notify "hdrop: Error moving '$COMMANDLINE' to workspace 'special:hdrop'"
+    if [[ $FLOATING ]]; then hyprctl dispatch -- resizewindowpixel exact "$WIDTH_xy% $HEIGHT_xy%", "class:^$CLASS$" || notify "hdrop: Error resizing window for active monitor"; fi
     if $VERBOSE; then notify_low "hdrop: Matched class '$CLASS' on current workspace and moved it to workspace 'special:hdrop'"; fi
   else
-    hyprctl dispatch -- focuswindow "^$CLASS$" || notify "hdrop: Error focusing '$COMMANDLINE' on current workspace"
+    hyprctl dispatch -- focuswindow "class:^$CLASS$" || notify "hdrop: Error focusing '$COMMANDLINE' on current workspace"
   fi
 else
+  if $ONLINE; then wait_online; fi
   # 'foot' always throws an error when its window is closed. Thus we disable the notification.
   if [[ $COMMAND == "foot" ]]; then
     # shellcheck disable=SC2086 # when quoting COMMANDLINE the execution of the command fails
