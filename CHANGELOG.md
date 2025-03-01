@@ -1,8 +1,8 @@
 # Changelog
 
-### 2025-02-24
+### 2025-03-01
 
-grimblast: try hiding the grim cursor before taking a screenshot
+grimblast: hide the grim cursor before taking a screenshot
 
 ### 2024-08-02
 
