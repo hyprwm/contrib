@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-03-01
+
+grimblast: hide the grim cursor before taking a screenshot
+
 ### 2024-08-02
 
 grimblast: changed method to check if another instance is running
