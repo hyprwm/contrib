@@ -1,10 +1,13 @@
 # hdrop
 
-This Bash script emulates the main features of [tdrop](https://github.com/noctuid/tdrop) in Hyprland:
+This Bash script emulates the main features of [tdrop](https://github.com/noctuid/tdrop) in [Hyprland](https://github.com/hyprwm/Hyprland):
 
 - if the specified program is not running: launch it and bring it to the foreground.
 - if the specified program is already running on another workspace: bring it to the current workspace and focus it.
 - if the specified program is already on the current workspace: move it to workspace 'special:hdrop', thereby hiding it until called up again by hdrop.
+
+> \[!NOTE]
+> I'm no longer using hyprland myself so i rely on user reports to repair breakage introduced by new hyprland versions.
 
 #### Usage:
 
@@ -41,6 +44,9 @@ This Bash script emulates the main features of [tdrop](https://github.com/noctui
 > -i, --insensitive  
 > Case insensitive partial matching of class names. Can work as a stopgap if a running program is not recognized and a new instance is launched instead. Note: incorrect matches may occur, adding a special handling of the program to hdrop (hardcoded or via `-c, --class`) is preferable.
 >
+> -o, --online  
+> Delay initial launch for up to 20 seconds until internet connectivity is established.
+>
 > -p, --position  
 > If using --floating: set the position of the window. One of: '[t]op' '[b]ottom' '[l]eft' '[r]ight'.
 >
@@ -68,7 +74,8 @@ Multiple instances of the same program can be run concurrently, if different cla
 > bind = $mainMod, c, exec, hdrop foot -a foot_1  
 > bind = $mainMod CTRL, c, exec, hdrop foot -a foot_2
 
-Note: defining a class name is only necessary when running several instances of the same program.
+> \[!NOTE]
+> Defining a class name is only necessary when running several instances of the same program.
 
 If you want to run a program on boot and have it wait in the background until called up by hdrop you can use this:
 
@@ -92,7 +99,7 @@ Please report instances of programs with differing class names, so that they can
 
 This happens sometimes and will apparently be fixed in hyprland 0.43
 
-### `--floating` windows don't react to changed arguments in hdrop
+### `--floating` windows don't react to changed position arguments in hdrop
 
 Close the program (don't just hide it with hdrop). The changed arguments are only applied when the program is restarted.
 
@@ -128,3 +135,6 @@ Use the provided Makefile.
 ## See also
 
 `hdrop` is part of [hyprwm/contrib](https://github.com/hyprwm/contrib), which is a collection of useful scripts for `Hyprland`.
+
+[ndrop](https://github.com/schweber/ndrop) is the equivalent for [niri](https://github.com/YaLTeR/niri).
+
