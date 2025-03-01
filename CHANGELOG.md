@@ -2,6 +2,10 @@
 
 ### 2025-03-01
 
+grimblast: hide the grim cursor before taking a screenshot
+
+### 2025-03-01
+
 hdrop: 0.6.0 -> 0.7.6\
 Fix for new syntax of `hyprctl dispatch` from hyprland 0.46.2 onwards\
 Limit `--online` to 20sec\
