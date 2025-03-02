@@ -214,7 +214,6 @@ takeScreenshot() {
     grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} "$FILE" || die "Unable to invoke grim"
   else
     moveCursorPosition && grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -g "$GEOM" "$FILE" && restoreCursorPosition || die "Unable to invoke grim"
-    resetFade
   fi
 }
 
