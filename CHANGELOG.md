@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-03-03
+
+grimblast: add environment var `GRIMBLAST_HIDE_CURSOR` to avoid high CPU loads on some machines
+
 ### 2025-03-01
 
 grimblast: hide the grim cursor before taking a screenshot
