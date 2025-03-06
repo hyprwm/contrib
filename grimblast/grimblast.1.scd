@@ -79,6 +79,8 @@ _area_
 	and captures that.
 	Slurp can be customized by setting its arguments in the *SLURP_ARGS*
 	environment variable.
+	If you experience high cpu loads when taking a screenshot with this target,
+	you can set the *GRIMBLAST_HIDE_CURSOR* environment variable to **0**.
 
 _output_
 	Captures the currently active output.
@@ -101,6 +103,9 @@ An example usage pattern is to add these bindings to your hyprland config:
 
 # Optionally, customize slurp's appearance
 env = SLURP_ARGS, -d -b -B F050F022 -b 10101022 -c ff00ff
+
+# Can fix high cpu loads on some machines
+env = GRIMBLAST_HIDE_CURSOR, 0
 
 bind = SUPER, p, exec, grimblast save active
 bind = SUPER SHIFT, p, exec, grimblast save area

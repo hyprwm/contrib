@@ -209,11 +209,15 @@ takeScreenshot() {
   GEOM=$2
   OUTPUT=$3
   if [ -n "$OUTPUT" ]; then
-    moveCursorPosition && grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -o "$OUTPUT" "$FILE" && restoreCursorPosition || die "Unable to invoke grim"
+    grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -o "$OUTPUT" "$FILE" || die "Unable to invoke grim"
   elif [ -z "$GEOM" ]; then
     grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} "$FILE" || die "Unable to invoke grim"
   else
-    moveCursorPosition && grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -g "$GEOM" "$FILE" && restoreCursorPosition || die "Unable to invoke grim"
+    if [ "$SUBJECT" != "area" ] || [ "$GRIMBLAST_HIDE_CURSOR" = 0 ]; then
+      grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -g "$GEOM" "$FILE" || die "Unable to invoke grim"
+    else
+      moveCursorPosition && grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -g "$GEOM" "$FILE" && restoreCursorPosition || die "Unable to invoke grim"
+    fi
   fi
 }
 
