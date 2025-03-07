@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-03-10
+
+grimblast: Fix erroneous error notification caused by bash syntax error
+
 ### 2025-03-08
 
 grimblast: add check for HYPRLAND_INSANCE_SIGNATURE to avoid confusing errors when the tool is ran in other WMs
@@ -56,9 +60,9 @@ hdrop: add `--focus` option
 
 ### 2024-09-01
 
-hdrop: 
+hdrop:
    - add class replacement for epiphany and godot
-   - refactor 
+   - refactor
    - cleanup
    - add recognition of `--app-id` for foot
    - disable error notifications when closing foot
