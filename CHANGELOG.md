@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-03-07
+
+grimblast: Fix erroneous error notification caused by bash syntax error
+
 ### 2025-03-03
 
 grimblast: add environment var `GRIMBLAST_HIDE_CURSOR` to avoid high CPU loads on some machines
@@ -52,9 +56,9 @@ hdrop: add `--focus` option
 
 ### 2024-09-01
 
-hdrop: 
+hdrop:
    - add class replacement for epiphany and godot
-   - refactor 
+   - refactor
    - cleanup
    - add recognition of `--app-id` for foot
    - disable error notifications when closing foot

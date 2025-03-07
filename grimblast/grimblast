@@ -26,7 +26,7 @@ if [ -e "$grimblastInstanceCheck" ]; then
 else
   touch "$grimblastInstanceCheck"
 fi
-trap "rm -f '$grimblastInstanceCheck'" EXIT
+trap 'rm -f "$grimblastInstanceCheck"' EXIT
 
 getTargetDirectory() {
   test -f "${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs" &&
@@ -55,7 +55,6 @@ CURSOR=
 FREEZE=
 WAIT=no
 SCALE=
-HYPRPICKER_PID=-1
 
 while [ $# -gt 0 ]; do
   key="$1"
@@ -167,9 +166,9 @@ notifyError() {
 }
 
 killHyprpicker() {
-  if [ ! $HYPRPICKER_PID -eq -1 ]; then
-    kill $HYPRPICKER_PID
-  fi
+   if pidof hyprpicker >/dev/null; then
+      pkill hyprpicker
+   fi
 }
 
 die() {
@@ -209,14 +208,20 @@ takeScreenshot() {
   GEOM=$2
   OUTPUT=$3
   if [ -n "$OUTPUT" ]; then
-    grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -o "$OUTPUT" "$FILE" || die "Unable to invoke grim"
+    moveCursorPosition
+    if grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -o "$OUTPUT" "$FILE"; then
+      restoreCursorPosition
+    else
+      die "Unable to invoke grim"
+    fi
   elif [ -z "$GEOM" ]; then
     grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} "$FILE" || die "Unable to invoke grim"
   else
-    if [ "$SUBJECT" != "area" ] || [ "$GRIMBLAST_HIDE_CURSOR" = 0 ]; then
-      grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -g "$GEOM" "$FILE" || die "Unable to invoke grim"
+    moveCursorPosition
+    if grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -g "$GEOM" "$FILE"; then
+      restoreCursorPosition
     else
-      moveCursorPosition && grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -g "$GEOM" "$FILE" && restoreCursorPosition || die "Unable to invoke grim"
+      die "Unable to invoke grim"
     fi
   fi
 }
@@ -259,8 +264,6 @@ elif [ "$SUBJECT" = "area" ]; then
 
   if [ "$FREEZE" = "yes" ] && [ "$(command -v "hyprpicker")" ] >/dev/null 2>&1; then
     hyprpicker -r -z &
-    sleep 0.2
-    HYPRPICKER_PID=$!
   fi
 
   # disable animation for layer namespace "selection" (slurp)
