@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-03-08
+
+grimblast: add check for HYPRLAND_INSANCE_SIGNATURE to avoid confusing errors when the tool is ran in other WMs
+
 ### 2025-03-03
 
 grimblast: add environment var `GRIMBLAST_HIDE_CURSOR` to avoid high CPU loads on some machines

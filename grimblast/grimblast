@@ -227,6 +227,11 @@ wait() {
   fi
 }
 
+if [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; then
+  echo "Error: HYPRLAND_INSTANCE_SIGNATURE not set! (is hyprland running?)"
+  exit 1
+fi
+
 if [ "$ACTION" = "check" ]; then
   echo "Checking if required tools are installed. If something is missing, install it to your system and make it available in PATH..."
   check grim
