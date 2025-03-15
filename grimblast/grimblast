@@ -210,12 +210,7 @@ takeScreenshot() {
   GEOM=$2
   OUTPUT=$3
   if [ -n "$OUTPUT" ]; then
-    moveCursorPosition
-    if grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -o "$OUTPUT" "$FILE"; then
-      restoreCursorPosition
-    else
-      die "Unable to invoke grim"
-    fi
+    grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -o "$OUTPUT" "$FILE" || die "Unable to invoke grim"
   elif [ -z "$GEOM" ]; then
     grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} "$FILE" || die "Unable to invoke grim"
   else
@@ -262,7 +257,7 @@ elif [ "$SUBJECT" = "screen" ]; then
 elif [ "$SUBJECT" = "output" ]; then
   wait
   GEOM=""
-  OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true)' | jq -r '.name')
+  OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .name')
   WHAT="$OUTPUT"
 elif [ "$SUBJECT" = "area" ]; then
   if [ "$CURSOR" = "yes" ]; then
