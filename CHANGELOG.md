@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-03-15
+
+grimblast: remove moveCursorPosition and restoreCursorPosition for OUTPUT and duplicate jq command
+
 ### 2025-03-10
 
 grimblast: Fix erroneous error notification caused by bash syntax error
