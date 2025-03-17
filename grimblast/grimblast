@@ -194,15 +194,12 @@ moveCursorPosition() {
   virtualDisplayName="grimblastVD"
   focusedMonitorName=$(hyprctl -j monitors | jq -r '.[] | select( .focused == true ) | .name')
 
-  hyprctl output create headless "$virtualDisplayName" >/dev/null
-  hyprctl dispatch focusmonitor "$virtualDisplayName" >/dev/null
+  hyprctl --batch "output create headless $virtualDisplayName; dispatch focusmonitor $virtualDisplayName" >/dev/null
 }
 
 restoreCursorPosition() {
   [ "$GRIMBLAST_HIDE_CURSOR" ] && return 0
-  hyprctl dispatch focusmonitor "$focusedMonitorName" >/dev/null
-  hyprctl output remove "$virtualDisplayName" >/dev/null
-  hyprctl dispatch movecursor "${initialCursorPosition//,/}" >/dev/null
+  hyprctl --batch "dispatch focusmonitor $focusedMonitorName; output remove $virtualDisplayName; dispatch movecursor ${initialCursorPosition//,/}" >/dev/null
 }
 
 takeScreenshot() {

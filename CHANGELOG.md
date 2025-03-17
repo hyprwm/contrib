@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-03-16
+
+grimblast: use '--batch' for 'hyprctl' to limit the number of control calls
+
 ### 2025-03-15
 
 grimblast: remove moveCursorPosition and restoreCursorPosition for OUTPUT and duplicate jq command
