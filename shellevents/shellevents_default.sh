@@ -124,7 +124,7 @@ event_urgent() {
   : # WINDOWADDRESS
 }
 
-event_minimize() {
+event_minimized() {
   : # WINDOWADDRESS MINIMIZED
 }
 

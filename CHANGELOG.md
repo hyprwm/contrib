@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-03-31
+
+shellevents: support minimized event
+
 ### 2025-03-16
 
 grimblast: use '--batch' for 'hyprctl' to limit the number of control calls

@@ -80,7 +80,7 @@ while true; do
     "submap") SUBMAPNAME="$1" event_submap ;;
     "changefloatingmode") WINDOWADDRESS="$1" FLOATING="$2" event_changefloatingmode ;;
     "urgent") WINDOWADDRESS="$1" event_urgent ;;
-    "minimize") WINDOWADDRESS="$1" MINIMIZED="$2" event_minimize ;;
+    "minimized") WINDOWADDRESS="$1" MINIMIZED="$2" event_minimized ;;
     "screencast") STATE="$1" OWNER="$2" event_screencast ;;
     "togglegroup") STATE="$1" WINDOWADDRESSSES=${@:2} event_togglegroup ;;
     "moveintogroup") WINDOWADDRESS="$1" event_moveintogroup ;;
