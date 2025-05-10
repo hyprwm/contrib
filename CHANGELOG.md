@@ -1,5 +1,10 @@
 # Changelog
 
+### 2025-05-10
+
+hdrop: 0.7.6 -> 0.7.7\
+Fix --floating for hyprland => 0.48.0
+
 ### 2025-03-31
 
 shellevents: support minimized event
