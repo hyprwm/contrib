@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-05-16
+
+grimblast: fix file URI when using --openfile
+
 ### 2025-05-10
 
 hdrop: 0.7.6 -> 0.7.7\
