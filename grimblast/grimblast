@@ -263,6 +263,7 @@ elif [ "$SUBJECT" = "area" ]; then
 
   if [ "$FREEZE" = "yes" ] && [ "$(command -v "hyprpicker")" ] >/dev/null 2>&1; then
     hyprpicker -r -z &
+    sleep 0.2
   fi
 
   # disable animation for layer namespace "selection" (slurp)
