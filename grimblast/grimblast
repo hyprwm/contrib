@@ -56,50 +56,63 @@ FREEZE=
 WAIT=no
 SCALE=
 
-while [ $# -gt 0 ]; do
-  key="$1"
+# Store positional arguments
+pos=()
 
-  case $key in
+while [[ $# -gt 0 ]]; do
+  case $1 in
   -n | --notify)
     NOTIFY=yes
-    shift # past argument
+    shift
     ;;
   -o | --openfile)
     OPENFILE_NOTIFICATION=yes
-    shift # past argument
+    shift
     ;;
   -c | --cursor)
     CURSOR=yes
-    shift # past argument
+    shift
     ;;
   -f | --freeze)
     FREEZE=yes
-    shift # past argument
+    shift
     ;;
   -w | --wait)
-    shift
-    WAIT=$1
-    if [[ ! "$WAIT" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-      echo "Invalid value for wait '$WAIT'" >&2
+    if [[ -n "${2-}" && "$2" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+      WAIT=$2
+      shift 2
+    else
+      echo "Invalid or missing value for --wait" >&2
       exit 3
     fi
     shift
     ;;
   -s | --scale)
-    shift # past argument
-    if [ $# -gt 0 ]; then
-      SCALE="$1" # assign the next argument to SCALE
-      shift      # past argument
+    if [[ -n "${2-}" && "$2" =~ ^[1-9][0-9]*(\.[0-9]+)?$ ]]; then
+      SCALE=$2 # assign the next argument to SCALE
+      shift 2
     else
-      echo "Error: Missing argument for --scale option."
+      echo "Invalid or missing argument for --scale" >&2
       exit 1
     fi
     ;;
-  *)      # unknown option
-    break # done with parsing --flags
+  --)
+    shift
+    pos+=("$@")
+    break
+    ;;
+  -*)
+    echo "Unknown option: $1" >&2
+    exit 1
+    ;;
+  *)
+    pos+=("$1")
+    shift
     ;;
   esac
 done
+
+set -- "${pos[@]:-}"
 
 ACTION=${1:-usage}
 SUBJECT=${2:-screen}
