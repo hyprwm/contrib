@@ -4,6 +4,8 @@
 
 grimblast: nuke cursor repositioning
 
+grimblast: rework options and arguments parsing Now allows arguments and options to be mixed.
+
 ### 2025-05-16
 
 grimblast: fix file URI when using --openfile
