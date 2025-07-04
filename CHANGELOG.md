@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-07-05
+
+grimblast: nuke cursor repositioning
+
 ### 2025-05-16
 
 grimblast: fix file URI when using --openfile

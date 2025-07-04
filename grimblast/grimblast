@@ -188,20 +188,6 @@ check() {
   echo "   $COMMAND: $RESULT"
 }
 
-moveCursorPosition() {
-  [ "$GRIMBLAST_HIDE_CURSOR" ] && return 0
-  initialCursorPosition=$(hyprctl cursorpos)
-  virtualDisplayName="grimblastVD"
-  focusedMonitorName=$(hyprctl -j monitors | jq -r '.[] | select( .focused == true ) | .name')
-
-  hyprctl --batch "output create headless $virtualDisplayName; dispatch focusmonitor $virtualDisplayName" >/dev/null
-}
-
-restoreCursorPosition() {
-  [ "$GRIMBLAST_HIDE_CURSOR" ] && return 0
-  hyprctl --batch "dispatch focusmonitor $focusedMonitorName; output remove $virtualDisplayName; dispatch movecursor ${initialCursorPosition//,/}" >/dev/null
-}
-
 takeScreenshot() {
   FILE=$1
   GEOM=$2
@@ -211,10 +197,7 @@ takeScreenshot() {
   elif [ -z "$GEOM" ]; then
     grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} "$FILE" || die "Unable to invoke grim"
   else
-    moveCursorPosition
-    if grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -g "$GEOM" "$FILE"; then
-      restoreCursorPosition
-    else
+    if ! grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -g "$GEOM" "$FILE"; then
       die "Unable to invoke grim"
     fi
   fi
