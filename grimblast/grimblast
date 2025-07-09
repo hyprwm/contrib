@@ -101,6 +101,11 @@ while [[ $# -gt 0 ]]; do
     pos+=("$@")
     break
     ;;
+  -)
+    pos+=("$1")
+    shift
+    break
+    ;;
   -*)
     echo "Unknown option: $1" >&2
     exit 1
