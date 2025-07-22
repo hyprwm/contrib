@@ -319,11 +319,12 @@ else
   if [ "$ACTION" = "copysave" ]; then
     if [ "$FILE" = "-" ]; then
         takeScreenshot - "$GEOM" "$OUTPUT" | tee >(wl-copy --type image/png) || die "Clipboard error"
+        notifyOk "$WHAT copied to buffer and piped to stdout"
     else
         takeScreenshot - "$GEOM" "$OUTPUT" | tee "$FILE" | wl-copy --type image/png || die "Clipboard error"
+        notifyOk "$WHAT copied to buffer and saved to $FILE" -i "$FILE"
         echo "$FILE"
     fi
-    notifyOk "$WHAT copied to buffer and saved to $FILE" -i "$FILE"
   else
     notifyError "Error taking screenshot with grim"
   fi
