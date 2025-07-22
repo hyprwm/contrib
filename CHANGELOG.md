@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-07-22
+
+grimblast: fix stdout output for the copysave action
+
 ### 2025-07-05
 
 grimblast: nuke cursor repositioning

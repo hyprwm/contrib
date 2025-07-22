@@ -317,9 +317,13 @@ elif [ "$ACTION" = "edit" ]; then
   fi
 else
   if [ "$ACTION" = "copysave" ]; then
-    takeScreenshot - "$GEOM" "$OUTPUT" | tee "$FILE" | wl-copy --type image/png || die "Clipboard error"
+    if [ "$FILE" = "-" ]; then
+        takeScreenshot - "$GEOM" "$OUTPUT" | tee >(wl-copy --type image/png) || die "Clipboard error"
+    else
+        takeScreenshot - "$GEOM" "$OUTPUT" | tee "$FILE" | wl-copy --type image/png || die "Clipboard error"
+        echo "$FILE"
+    fi
     notifyOk "$WHAT copied to buffer and saved to $FILE" -i "$FILE"
-    echo "$FILE"
   else
     notifyError "Error taking screenshot with grim"
   fi
