@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-08-17
+
+try_swap_workspace: fix get_mon when hyprctl changes order
+
 ### 2025-07-22
 
 grimblast: fix stdout output for the copysave action

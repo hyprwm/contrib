@@ -18,316 +18,346 @@
 ## hyprctl equivalents.
 ## https://github.com/swaywm/sway/blob/master/contrib/grimshot
 
+NAME="$(basename "$0")"
+
 # Check whether another instance is running
+GRIMBLASTLOCK="${XDG_RUNTIME_DIR:-${XDG_CACHE_DIR:-$HOME/.cache}}/grimblast.lock"
 
-grimblastInstanceCheck="${XDG_RUNTIME_DIR:-$XDG_CACHE_DIR:-$HOME/.cache}/grimblast.lock"
-if [ -e "$grimblastInstanceCheck" ]; then
-  exit 2
-else
-  touch "$grimblastInstanceCheck"
-fi
-trap 'rm -f "$grimblastInstanceCheck"' EXIT
-
-getTargetDirectory() {
-  test -f "${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs" &&
-    . "${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs"
-
-  echo "${XDG_SCREENSHOTS_DIR:-${XDG_PICTURES_DIR:-$HOME}}"
+killhyprpicker() {
+    pidof -q hyprpicker && pkill hyprpicker
 }
 
-tmp_editor_directory() {
-  echo "/tmp"
+cleanup() {
+    rm -f "$GRIMBLASTLOCK"
+    killhyprpicker
 }
 
-#Detect if $GRIMBLAST_EDITOR env exist
-env_editor_confirm() {
-  if [ -n "$GRIMBLAST_EDITOR" ]; then
-    echo "GRIMBLAST_EDITOR is set. Continuing..."
-  else
-    echo "GRIMBLAST_EDITOR is not set. Defaulting to gimp"
-    GRIMBLAST_EDITOR=gimp
-  fi
-}
+# Entry point
+trap cleanup EXIT
+[[ -e $GRIMBLASTLOCK ]] && exit 2
+touch "$GRIMBLASTLOCK"
 
-NOTIFY=no
-OPENFILE_NOTIFICATION=no
-CURSOR=
-FREEZE=
-WAIT=no
-SCALE=
-
-# Store positional arguments
-pos=()
-
-while [[ $# -gt 0 ]]; do
-  case $1 in
-  -n | --notify)
-    NOTIFY=yes
-    shift
-    ;;
-  -o | --openfile)
-    OPENFILE_NOTIFICATION=yes
-    shift
-    ;;
-  -c | --cursor)
-    CURSOR=yes
-    shift
-    ;;
-  -f | --freeze)
-    FREEZE=yes
-    shift
-    ;;
-  -w | --wait)
-    if [[ -n "${2-}" && "$2" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-      WAIT=$2
-      shift 2
-    else
-      echo "Invalid or missing value for --wait" >&2
-      exit 3
-    fi
-    ;;
-  -s | --scale)
-    if [[ -n "${2-}" && "$2" =~ ^[1-9][0-9]*(\.[0-9]+)?$ ]]; then
-      SCALE=$2 # assign the next argument to SCALE
-      shift 2
-    else
-      echo "Invalid or missing argument for --scale" >&2
-      exit 1
-    fi
-    ;;
-  --)
-    shift
-    pos+=("$@")
-    break
-    ;;
-  -)
-    pos+=("$1")
-    shift
-    break
-    ;;
-  -*)
-    echo "Unknown option: $1" >&2
+[[ $HYPRLAND_INSTANCE_SIGNATURE ]] || {
+    echo "Error: HYPRLAND_INSTANCE_SIGNATURE not set! (is hyprland running?)" >&2
     exit 1
-    ;;
-  *)
-    pos+=("$1")
-    shift
-    ;;
-  esac
-done
+}
 
-set -- "${pos[@]:-}"
+# Globlas
+# General settings
+[[ ${DEFAULT_TARGET_DIR} ]] || {
+    USER_DIRS="${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs"
+    [[ -f $USER_DIRS ]] && source "$USER_DIRS"
+    DEFAULT_TARGET_DIR="${XDG_SCREENSHOTS_DIR:-${XDG_PICTURES_DIR:-$HOME}}"
+}
+: "${DEFAULT_TMP_EDITOR_DIR:=/tmp}" "${GRIMBLAST_EDITOR:=gimp}" "${DATE_FORMAT:=%Y%m%d_%H%M%S}"
 
-ACTION=${1:-usage}
-SUBJECT=${2:-screen}
-FILE=${3:-$(getTargetDirectory)/$(date -Ins).png}
-FILE_EDITOR=${3:-$(tmp_editor_directory)/$(date -Ins).png}
+# Screenshot variables. In addition to these, there's:
+#   SCALE
+#
+# These have an effect depending on whether they're set
+#   CURSOR
+#   FREEZE
+NOTIFY=false
+SHOW_FILE_NOTIFY=false
+WAIT=0
 
-if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "edit" ] && [ "$ACTION" != "copysave" ] && [ "$ACTION" != "check" ]; then
-  echo "Usage:"
-  echo "  grimblast [--notify] [--openfile] [--cursor] [--freeze] [--wait N] [--scale <scale>] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
-  echo "  grimblast check"
-  echo "  grimblast usage"
-  echo ""
-  echo "Commands:"
-  echo "  copy: Copy the screenshot data into the clipboard."
-  echo "  save: Save the screenshot to a regular file or '-' to pipe to STDOUT."
-  echo "  copysave: Combine the previous 2 options."
-  echo "  edit: Open screenshot in the image editor of your choice (default is gimp). See man page for info."
-  echo "  check: Verify if required tools are installed and exit."
-  echo "  usage: Show this message and exit."
-  echo ""
-  echo "Targets:"
-  echo "  active: Currently active window."
-  echo "  screen: All visible outputs."
-  echo "  output: Currently active output."
-  echo "  area: Manually select a region or window."
-  exit
-fi
-
+# Notification functions
 notify() {
-  notify-send -t 3000 -a grimblast "$@"
+    notify-send -t 3000 -a grimblast "$@"
 }
 
-notifyOk() {
-  [ "$NOTIFY" = "no" ] && return
-
-  notify "$@"
-}
-
-notifyOpen() {
-  if [ "$OPENFILE_NOTIFICATION" = "no" ]; then
-    notifyOk "$@"
-  else
-    outt=$(notifyOk -A "default=open_folder" "$@")
-    if [ "$outt" == "default" ]; then
-      # this does not work for filenames with commas in them
-      if dbus-send --session --print-reply --dest=org.freedesktop.FileManager1 --type=method_call /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:"file://$4" string:""; then
-        :
-      else
-        notify-send -t 3000 -a grimblast "Error displaying folder with dbus-send"
-        echo "Displayed: Error displaying folder with dbus-send"
-      fi
+notify::ok() {
+    if $NOTIFY; then
+        notify "$@"
     fi
-  fi
 }
 
-notifyError() {
-  if [ $NOTIFY = "yes" ]; then
-    TITLE=${2:-"Screenshot"}
-    MESSAGE=${1:-"Error taking screenshot with grim"}
-    notify -u critical "$TITLE" "$MESSAGE"
-  else
-    echo "$1"
-  fi
-}
-
-killHyprpicker() {
-  if pidof hyprpicker >/dev/null; then
-    pkill hyprpicker
-  fi
+notify::error() {
+    if $NOTIFY; then
+        TITLE=${2:-"Screenshot"}
+        MESSAGE=${1:-"Error taking screenshot with grim"}
+        notify -u critical "$TITLE" "$MESSAGE"
+    fi
+    echo "$1" >&2
 }
 
 die() {
-  killHyprpicker
-  MSG=${1:-Bye}
-  notifyError "Error: $MSG"
-  exit 2
+    killhyprpicker
+    local msg OPTIND option
+    while getopts 'h' option; do
+        case "$option" in
+            h) usage >&2 ;;
+            ?) echo "die: Usage: die [-h] MESSAGE" >&2 ;;
+        esac
+    done
+    shift $((OPTIND - 1))
+    msg=${1:-Bye}
+    notify::error "Error: $msg"
+    exit 2
+}
+
+notify::showparentdir() {
+    $SHOW_FILE_NOTIFY || {
+        notify::ok "$@"
+        return
+    }
+    if [[ $(notify::ok -A 'Show file="Show file"' "$@") == "Show file" ]]; then
+        # this does not work for filenames with commas in them
+        dbus-send --session --print-reply --dest=org.freedesktop.FileManager1 --type=method_call /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:"file://$4" string:"" || die "Could not display parent directory with dbus-send"
+    fi
+}
+
+# Miscellaneous functions
+grimblast::wait() {
+    [[ $WAIT == 0 ]] || sleep "$WAIT"
+}
+
+freezescreen() {
+    hyprpicker -rz &
+    sleep 0.2
+}
+
+grimblast::check() {
+    local cmd result OPTIND option status quiet=false
+    while getopts 'q' option; do
+        case "$option" in
+            q) quiet=true ;;
+            ?) echo 'check: Usage: check [-q] COMMAND' >&2 ;;
+        esac
+    done
+    shift $((OPTIND - 1))
+    cmd=$1
+    command -v "$cmd" >/dev/null 2>&1
+    status=$?
+    if ((status == 0)); then
+        result="OK"
+    else
+        result="NOT FOUND"
+    fi
+    $quiet || echo "   $cmd: $result"
+    return $status
+}
+
+screenshot() {
+    local file="$1" geom="$2" output="$3"
+    xargs --verbose grim <<<"${CURSOR:+-c} ${SCALE:+-s \"$SCALE\"} ${output:+-o \"$output\"} ${geom:+-g \"$geom\"} \"$file\""
+}
+
+# Special actions. Because allow the script to exit early.
+usage() {
+    cat <<EOF
+Usage:
+  grimblast [--notify] [--openparentdir] [--cursor] [--freeze] [--wait N] [--scale <scale>] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]
+  grimblast check
+  grimblast usage
+
+Commands:
+  copy: Copy the screenshot data into the clipboard.
+  save: Save the screenshot to a regular file or '-' to pipe to STDOUT.
+  copysave: Combine the previous 2 options.
+  edit: Open screenshot in the image editor of your choice (default is gimp). See man page for info.
+  check: Verify if required tools are installed and exit.
+  usage: Show this message and exit.
+
+Targets:
+  active: Currently active window.
+  screen: All visible outputs.
+  output: Currently active output.
+  area: Manually select a region or window.
+EOF
 }
 
 check() {
-  COMMAND=$1
-  if command -v "$COMMAND" >/dev/null 2>&1; then
-    RESULT="OK"
-  else
-    RESULT="NOT FOUND"
-  fi
-  echo "   $COMMAND: $RESULT"
+    echo "Checking if required tools are installed. If something is missing, install it to your system and make it available in PATH..."
+    for tool in grim slurp hyprctl hyprpicker wl-copy jq notify-send; do
+        grimblast::check "$tool"
+    done
+    exit
 }
 
-takeScreenshot() {
-  FILE=$1
-  GEOM=$2
-  OUTPUT=$3
-  if [ -n "$OUTPUT" ]; then
-    grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -o "$OUTPUT" "$FILE" || die "Unable to invoke grim"
-  elif [ -z "$GEOM" ]; then
-    grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} "$FILE" || die "Unable to invoke grim"
-  else
-    if ! grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -g "$GEOM" "$FILE"; then
-      die "Unable to invoke grim"
+# Target functions. These calculate global variables depending on the target.
+# Specifically: GEOM, WHAT and OUTPUT. Not all would be set by all targets.
+# These would later be used by the action functions.
+active() {
+    local focused app_id
+    grimblast::wait
+    focused="$(hyprctl activewindow -j)" app_id=$(jq -r '.class' <<<"$focused")
+    GEOM="$(jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' <<<"$focused")"
+    WHAT="$app_id window"
+}
+
+screen() {
+    grimblast::wait
+    GEOM=""
+    WHAT="Screen"
+}
+
+output() {
+    grimblast::wait
+    GEOM=""
+    OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .name')
+    WHAT="$OUTPUT"
+}
+
+area() {
+    local fullscreen_workspaces workspaces windows
+    grimblast::wait
+    [[ $CURSOR ]] && die "'-c|--cursor' cannot be used with TARGET 'area'"
+
+    if [[ $FREEZE ]] && grimblast::check -q hyprpicker; then
+        freezescreen
     fi
-  fi
+
+    # disable animation for layer namespace "selection" (slurp)
+    # this removes the black border seen around screenshots
+    hyprctl keyword layerrule "noanim,selection" >/dev/null
+
+    fullscreen_workspaces="$(hyprctl workspaces -j | jq -r 'map(select(.hasfullscreen) | .id)')"
+    workspaces="$(hyprctl monitors -j | jq -r '[(foreach .[] as $monitor (0; if $monitor.specialWorkspace.name == "" then $monitor.activeWorkspace else $monitor.specialWorkspace end)).id]')"
+    windows="$(hyprctl clients -j | jq -r --argjson workspaces "$workspaces" --argjson fullscreenWorkspaces "$fullscreen_workspaces" 'map((select(([.workspace.id] | inside($workspaces)) and ([.workspace.id] | inside($fullscreenWorkspaces) | not) or .fullscreen > 0)))')"
+    # convert SLURP_ARGS to a bash array
+    IFS=' ' read -ra SLURP_ARGS <<<"$SLURP_ARGS"
+    # shellcheck disable=2086 # if we don't split, spaces mess up slurp
+    GEOM="$(jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' <<<"$windows" | slurp "${SLURP_ARGS[@]}")"
+
+    # Check if user exited slurp without selecting the area
+    [[ $GEOM ]] || {
+        killhyprpicker
+        exit 1
+    }
+    WHAT="Area"
 }
 
-wait() {
-  if [ "$WAIT" != "no" ]; then
-    sleep "$WAIT"
-  fi
+# Action functions.
+# These take the global variables from the target functions and take the screenshot.
+copy() {
+    screenshot - "$GEOM" "$OUTPUT" | wl-copy --type image/png || die "Clipboard error"
+    notify::ok "$WHAT copied to buffer"
 }
 
-if [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; then
-  echo "Error: HYPRLAND_INSTANCE_SIGNATURE not set! (is hyprland running?)"
-  exit 1
-fi
+save() {
+    local file title message
+    file="${1:-$DEFAULT_TARGET_DIR/$(date +"$DATE_FORMAT").png}"
+    screenshot "$file" "$GEOM" "$OUTPUT" || die "Could not take screenshot with grim"
+    title="Screenshot of $WHAT" message="$(basename "$file")"
+    killhyprpicker
+    notify::showparentdir "$title" "$message" -i "$file"
+    echo "$file"
+}
 
-if [ "$ACTION" = "check" ]; then
-  echo "Checking if required tools are installed. If something is missing, install it to your system and make it available in PATH..."
-  check grim
-  check slurp
-  check hyprctl
-  check hyprpicker
-  check wl-copy
-  check jq
-  check notify-send
-  exit
-elif [ "$SUBJECT" = "active" ]; then
-  wait
-  FOCUSED=$(hyprctl activewindow -j)
-  GEOM=$(echo "$FOCUSED" | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')
-  APP_ID=$(echo "$FOCUSED" | jq -r '.class')
-  WHAT="$APP_ID window"
-elif [ "$SUBJECT" = "screen" ]; then
-  wait
-  GEOM=""
-  WHAT="Screen"
-elif [ "$SUBJECT" = "output" ]; then
-  wait
-  GEOM=""
-  OUTPUT=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .name')
-  WHAT="$OUTPUT"
-elif [ "$SUBJECT" = "area" ]; then
-  if [ "$CURSOR" = "yes" ]; then
-    die "Error: '--cursor' cannot be used with subject 'area'"
-  fi
+edit() {
+    grimblast::check -q "$GRIMBLAST_EDITOR" || die "$GRIMBLAST_EDITOR is not installed"
+    local file title message
+    file="${1:-$DEFAULT_TMP_EDITOR_DIR/$(date +"$DATE_FORMAT").png}"
+    screenshot "$file" "$GEOM" "$OUTPUT" || die "Could not take screenshot"
+    title="Screenshot of $WHAT" message="Open screenshot in image editor"
+    notify::ok "$title" "$message" -i "$file"
+    $GRIMBLAST_EDITOR "$file"
+    echo "$file"
+}
 
-  if [ "$FREEZE" = "yes" ] && [ "$(command -v "hyprpicker")" ] >/dev/null 2>&1; then
-    hyprpicker -r -z &
-    sleep 0.2
-  fi
-
-  # disable animation for layer namespace "selection" (slurp)
-  # this removes the black border seen around screenshots
-  hyprctl keyword layerrule "noanim,selection" >/dev/null
-
-  FULLSCREEN_WORKSPACES="$(hyprctl workspaces -j | jq -r 'map(select(.hasfullscreen) | .id)')"
-  WORKSPACES="$(hyprctl monitors -j | jq -r '[(foreach .[] as $monitor (0; if $monitor.specialWorkspace.name == "" then $monitor.activeWorkspace else $monitor.specialWorkspace end)).id]')"
-  WINDOWS="$(hyprctl clients -j | jq -r --argjson workspaces "$WORKSPACES" --argjson fullscreenWorkspaces "$FULLSCREEN_WORKSPACES" 'map((select(([.workspace.id] | inside($workspaces)) and ([.workspace.id] | inside($fullscreenWorkspaces) | not) or .fullscreen > 0)))')"
-  # convert SLURP_ARGS to a bash array
-  IFS=' ' read -r -a _slurp_args <<<"$SLURP_ARGS"
-  # shellcheck disable=2086 # if we don't split, spaces mess up slurp
-  GEOM=$(echo "$WINDOWS" | jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | slurp "${_slurp_args[@]}")
-
-  # Check if user exited slurp without selecting the area
-  if [ -z "$GEOM" ]; then
-    killHyprpicker
-    exit 1
-  fi
-  WHAT="Area"
-  wait
-elif [ "$SUBJECT" = "window" ]; then
-  die "Subject 'window' is now included in 'area'"
-else
-  die "Unknown subject to take a screen shot from" "$SUBJECT"
-fi
-
-if [ "$ACTION" = "copy" ]; then
-  takeScreenshot - "$GEOM" "$OUTPUT" | wl-copy --type image/png || die "Clipboard error"
-  notifyOk "$WHAT copied to buffer"
-elif [ "$ACTION" = "save" ]; then
-  if takeScreenshot "$FILE" "$GEOM" "$OUTPUT"; then
-    TITLE="Screenshot of $SUBJECT"
-    MESSAGE=$(basename "$FILE")
-    killHyprpicker
-    notifyOpen "$TITLE" "$MESSAGE" -i "$FILE"
-    echo "$FILE"
-  else
-    notifyError "Error taking screenshot with grim"
-  fi
-elif [ "$ACTION" = "edit" ]; then
-  env_editor_confirm
-  if takeScreenshot "$FILE_EDITOR" "$GEOM" "$OUTPUT"; then
-    TITLE="Screenshot of $SUBJECT"
-    MESSAGE="Open screenshot in image editor"
-    notifyOk "$TITLE" "$MESSAGE" -i "$FILE_EDITOR"
-    $GRIMBLAST_EDITOR "$FILE_EDITOR"
-    echo "$FILE_EDITOR"
-  else
-    notifyError "Error taking screenshot"
-  fi
-else
-  if [ "$ACTION" = "copysave" ]; then
-    if [ "$FILE" = "-" ]; then
-        takeScreenshot - "$GEOM" "$OUTPUT" | tee >(wl-copy --type image/png) || die "Clipboard error"
-        notifyOk "$WHAT copied to buffer and piped to stdout"
+copysave() {
+    local file
+    file="${1:-$DEFAULT_TARGET_DIR/$(date +"$DATE_FORMAT").png}"
+    if [ "$file" = "-" ]; then
+        screenshot - "$GEOM" "$OUTPUT" | tee >(wl-copy --type image/png) || die "Clipboard error"
+        notify::ok "$WHAT copied to buffer and piped to stdout"
     else
-        takeScreenshot - "$GEOM" "$OUTPUT" | tee "$FILE" | wl-copy --type image/png || die "Clipboard error"
-        notifyOk "$WHAT copied to buffer and saved to $FILE" -i "$FILE"
-        echo "$FILE"
+        screenshot - "$GEOM" "$OUTPUT" | tee "$file" | wl-copy --type image/png || die "Clipboard error"
+        notify::ok "$WHAT copied to buffer and saved to $file" -i "$file"
+        echo "$file"
     fi
-  else
-    notifyError "Error taking screenshot with grim"
-  fi
-fi
+}
 
-killHyprpicker
+parse-action() {
+    local action="$1" file="$2"
+    case "$action" in
+        copy) copy ;;
+        save) save "$file" ;;
+        edit) edit "$file" ;;
+        copysave) copysave "$file" ;;
+        *) die -h "Unknown action $action" ;;
+    esac
+}
+
+parse-target() {
+    case "$1" in
+        active) active ;;
+        screen) screen ;;
+        output) output ;;
+        area) area ;;
+        window) die "$(echo -e "Target 'window' is now included in 'area'.\nSimply run with 'area' and single click over the window you want.")" ;;
+        *) die -h "Unknown target to take a screen shot from $1" ;;
+    esac
+}
+
+# TODO: make a script to create the tests.
+# Save the options in arrays. Then use loops to have all the iterations.
+# Have the script generate a csv file showing which tests passes and which failed. Have it save the ones that failed in a text file.
+main() {
+    local parsed_args
+
+    parsed_args="$(getopt --name "$NAME" --options 'nocfw:s:' --longoptions 'notify,openparentdir,cursor,freeze,wait:,scale:' -- "$@")" || {
+        echo "$NAME: ERROR: failed to parse arguments" >&2
+        exit 1
+    }
+    eval "set -- $parsed_args"
+
+    while true; do
+        case $1 in
+            -n | --notify)
+                NOTIFY=true
+                shift
+                ;;
+            -o | --openparentdir)
+                SHOW_FILE_NOTIFY=true
+                shift
+                ;;
+            -c | --cursor)
+                CURSOR=1
+                shift
+                ;;
+            -f | --freeze)
+                FREEZE=1
+                shift
+                ;;
+            -w | --wait)
+                [[ $2 =~ ^[0-9]+(\.[0-9]+)?$ ]] || {
+                    echo "$NAME: ERROR: Invalid value for '-w|--wait'" >&2
+                    exit 1
+                }
+                WAIT=$2
+                shift 2
+                ;;
+            -s | --scale)
+                [[ "$2" =~ ^[1-9][0-9]*(\.[0-9]+)?$ ]] || {
+                    echo "$NAME: ERROR: Invalid or missing argument for '-s|--scale'" >&2
+                    exit 1
+                }
+                SCALE=$2
+                shift 2
+                ;;
+            --)
+                shift
+                break
+                ;;
+            *)
+                echo "$NAME: ERROR: Invalid option: $1" >&2
+                usage >&2
+                exit 1
+                ;;
+        esac
+    done
+
+    ACTION="${1:-usage}"
+    if [[ $1 =~ ^(usage|check)$ ]]; then
+        "$1"
+        exit
+    fi
+    shift
+    parse-target "${1:-screen}"
+    shift
+    parse-action "$ACTION" "$@"
+}
+
+main "$@"
