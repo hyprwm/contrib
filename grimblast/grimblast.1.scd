@@ -34,6 +34,9 @@ grimblast - a helper for screenshots within hyprland
 *--scale <scale>*
 	Passes the `-s` argument to `grim`.
 
+*--filetype <type>*
+	Passes the `-t` argument to `grim`.
+
 *save*
 	Save the screenshot into a regular file. Grimblast will write image
 	files to *XDG_SCREENSHOTS_DIR* if this is set (or defined
@@ -43,7 +46,7 @@ grimblast - a helper for screenshots within hyprland
 *copy*
 	Copy the screenshot data (as image/png) into the clipboard.
 
-*copysave* 
+*copysave*
 	Combine the previous 2 options.
 
 *edit*

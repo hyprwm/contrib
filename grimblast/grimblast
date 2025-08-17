@@ -54,6 +54,7 @@ OPENFILE_NOTIFICATION=no
 CURSOR=
 FREEZE=
 WAIT=no
+FILETYPE=png
 SCALE=
 
 # Store positional arguments
@@ -95,6 +96,15 @@ while [[ $# -gt 0 ]]; do
       exit 1
     fi
     ;;
+  -t | --filetype)
+    if [[ -n "${2-}" && "$2" =~ ^(png|ppm|jpeg)$ ]]; then
+      FILETYPE=$2 # assign the next argument to FILETYPE
+      shift 2
+    else
+      echo "Invalid or missing argument for --filetype" >&2
+      exit 1
+    fi
+    ;;
   --)
     shift
     pos+=("$@")
@@ -120,12 +130,12 @@ set -- "${pos[@]:-}"
 
 ACTION=${1:-usage}
 SUBJECT=${2:-screen}
-FILE=${3:-$(getTargetDirectory)/$(date -Ins).png}
-FILE_EDITOR=${3:-$(tmp_editor_directory)/$(date -Ins).png}
+FILE=${3:-$(getTargetDirectory)/$(date -Ins).$FILETYPE}
+FILE_EDITOR=${3:-$(tmp_editor_directory)/$(date -Ins).$FILETYPE}
 
 if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "edit" ] && [ "$ACTION" != "copysave" ] && [ "$ACTION" != "check" ]; then
   echo "Usage:"
-  echo "  grimblast [--notify] [--openfile] [--cursor] [--freeze] [--wait N] [--scale <scale>] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
+  echo "  grimblast [--notify] [--openfile] [--cursor] [--freeze] [--wait N] [--scale <scale>] [--filetype <type>] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
   echo "  grimblast check"
   echo "  grimblast usage"
   echo ""
@@ -210,11 +220,11 @@ takeScreenshot() {
   GEOM=$2
   OUTPUT=$3
   if [ -n "$OUTPUT" ]; then
-    grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -o "$OUTPUT" "$FILE" || die "Unable to invoke grim"
+    grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -t "$FILETYPE" -o "$OUTPUT" "$FILE" || die "Unable to invoke grim"
   elif [ -z "$GEOM" ]; then
-    grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} "$FILE" || die "Unable to invoke grim"
+    grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -t "$FILETYPE" "$FILE" || die "Unable to invoke grim"
   else
-    if ! grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -g "$GEOM" "$FILE"; then
+    if ! grim ${CURSOR:+-c} ${SCALE:+-s "$SCALE"} -t "$FILETYPE" -g "$GEOM" "$FILE"; then
       die "Unable to invoke grim"
     fi
   fi
@@ -292,7 +302,7 @@ else
 fi
 
 if [ "$ACTION" = "copy" ]; then
-  takeScreenshot - "$GEOM" "$OUTPUT" | wl-copy --type image/png || die "Clipboard error"
+  takeScreenshot - "$GEOM" "$OUTPUT" | wl-copy --type image/"$FILETYPE" || die "Clipboard error"
   notifyOk "$WHAT copied to buffer"
 elif [ "$ACTION" = "save" ]; then
   if takeScreenshot "$FILE" "$GEOM" "$OUTPUT"; then
@@ -318,12 +328,12 @@ elif [ "$ACTION" = "edit" ]; then
 else
   if [ "$ACTION" = "copysave" ]; then
     if [ "$FILE" = "-" ]; then
-        takeScreenshot - "$GEOM" "$OUTPUT" | tee >(wl-copy --type image/png) || die "Clipboard error"
-        notifyOk "$WHAT copied to buffer and piped to stdout"
+      takeScreenshot - "$GEOM" "$OUTPUT" | tee >(wl-copy --type image/"$FILETYPE") || die "Clipboard error"
+      notifyOk "$WHAT copied to buffer and piped to stdout"
     else
-        takeScreenshot - "$GEOM" "$OUTPUT" | tee "$FILE" | wl-copy --type image/png || die "Clipboard error"
-        notifyOk "$WHAT copied to buffer and saved to $FILE" -i "$FILE"
-        echo "$FILE"
+      takeScreenshot - "$GEOM" "$OUTPUT" | tee "$FILE" | wl-copy --type image/"$FILETYPE" || die "Clipboard error"
+      notifyOk "$WHAT copied to buffer and saved to $FILE" -i "$FILE"
+      echo "$FILE"
     fi
   else
     notifyError "Error taking screenshot with grim"

@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-08-17
+
+grimblast: add `-t` flag
+
 ### 2025-07-22
 
 grimblast: fix stdout output for the copysave action
