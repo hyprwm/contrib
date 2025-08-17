@@ -97,20 +97,16 @@ getArgs() {
 }
 
 
-#variables
-mon_wrkspcs=()
-
 get_active_mon() {
-  echo $(($(hyprctl monitors | grep 'focused' | grep -n 'yes' | cut -c1)-1))
+  echo $(hyprctl monitors -j | jq '.[] | select(.focused==true) | .id')
 }
 
-get_workspaces_array() {
-  local workspaces
-  workspaces=$(hyprctl monitors | grep 'active workspace' | cut -f3 -d' ')
-  SAVEIFS=$IFS
-  IFS=$'\n'
-  mon_wrkspcs=($workspaces)
-  IFS=$SAVEIFS
+# first argument: workspace to switch to active monitor
+get_currently_active_on_mon() {
+  local target_wrkspc=$1
+  hyprctl monitors -j \
+  | jq --argjson target "$target_wrkspc" \
+  '.[] | select(.activeWorkspace.id==$target) | .id'
 }
 
 # first argument: workspace to switch to
@@ -133,16 +129,9 @@ swap_workspace() {
 switch_or_swap() {
   target_mon=$(get_active_mon)
   target_wrkspc=$1
-  get_workspaces_array
   # check if the workspace is currently displayed on another monitor
-  local currently_active_on_mon=-1
-  for (( i=0; i<${#mon_wrkspcs[@]}; i++ ))
-  do
-    if [[ "$target_wrkspc" == "${mon_wrkspcs[$i]}" ]]; then
-      currently_active_on_mon=$i
-    fi
-  done
-  if [[ $currently_active_on_mon -lt 0 ]]; then
+  currently_active_on_mon=$(get_currently_active_on_mon "$target_wrkspc")
+  if [[ -z $currently_active_on_mon ]]; then
     # workspace is not active on any monitor, do a normal switch
     ok "switching workspace $target_wrkspc to monitor $target_mon"
     switch_workspace "$target_wrkspc" "$target_mon"
