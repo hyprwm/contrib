@@ -37,7 +37,7 @@ checkUtils() {
 	# shellcheck disable=SC2015
 	check grep && ok "grep" || err "grep"
 	# shellcheck disable=SC2015
-	check grep && ok "cut" || err "cut"
+	check jq && ok "jq" || err "jq"
 	# shellcheck disable=SC2015
 	check notify-send && ok "notify-send (Optional)" || optional "notify-send (Optional)"
 	exit
