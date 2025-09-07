@@ -1,5 +1,13 @@
 # Changelog
 
+### 2025-09-06
+
+grimblast: add -t|--filetype option supporting png, ppm, jpeg formats
+grimblast: massive refactor ensuring correct parsing
+grimblast: introduce unit testing
+grimblast: enhance usage function and man page with options, variables and examples
+grimblast: various code improvements and refactors (better bash style, simpler logic, improved variable names, etc.)
+
 ### 2025-08-17
 
 try_swap_workspace: fix get_mon when hyprctl changes order
@@ -96,11 +104,12 @@ hdrop: add `--focus` option
 ### 2024-09-01
 
 hdrop:
-   - add class replacement for epiphany and godot
-   - refactor
-   - cleanup
-   - add recognition of `--app-id` for foot
-   - disable error notifications when closing foot
+
+- add class replacement for epiphany and godot
+- refactor
+- cleanup
+- add recognition of `--app-id` for foot
+- disable error notifications when closing foot
 
 ### 2024-08-02
 
