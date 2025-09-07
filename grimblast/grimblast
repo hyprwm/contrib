@@ -60,6 +60,7 @@ touch "$GRIMBLASTLOCK"
 NOTIFY=false
 SHOW_FILE_NOTIFY=false
 WAIT=0
+FILETYPE=png
 
 # Notification functions
 notify() {
@@ -112,6 +113,14 @@ grimblast::wait() {
     [[ $WAIT == 0 ]] || sleep "$WAIT"
 }
 
+get-mime-type() {
+    case $FILETYPE in
+        png) echo "image/png" ;;
+        jpeg) echo "image/jpeg" ;;
+        ppm) echo "image/x-portable-pixmap" ;;
+    esac
+}
+
 freezescreen() {
     hyprpicker -rz &
     sleep 0.2
@@ -140,14 +149,14 @@ grimblast::check() {
 
 screenshot() {
     local file="$1" geom="$2" output="$3"
-    xargs grim <<<"${CURSOR:+-c} ${SCALE:+-s \"$SCALE\"} ${output:+-o \"$output\"} ${geom:+-g \"$geom\"} \"$file\""
+    xargs --verbose grim <<<"${CURSOR:+-c} ${SCALE:+-s \"$SCALE\"} -t \"$FILETYPE\" ${output:+-o \"$output\"} ${geom:+-g \"$geom\"} \"$file\""
 }
 
 # Special actions. Because allow the script to exit early.
 usage() {
     cat <<EOF
 Usage:
-  grimblast [-n|--notify] [-o|--openparentdir] [-c|--cursor] [-f|--freeze] [-w N|--wait N] [-s N|--scale N] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]
+  grimblast [-n|--notify] [-o|--openparentdir] [-c|--cursor] [-f|--freeze] [-w N|--wait N] [-s N|--scale N] [-t TYPE|--filetype TYPE] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]
   grimblast check
   grimblast usage
 
@@ -232,13 +241,14 @@ area() {
 # Action functions.
 # These take the global variables from the target functions and take the screenshot.
 copy() {
-    screenshot - "$GEOM" "$OUTPUT" | wl-copy --type image/png || die "Clipboard error"
+    [[ $FILETYPE == "png" ]] || die "Clipboard operations only support PNG format. Use --filetype png or omit the option."
+    screenshot - "$GEOM" "$OUTPUT" | wl-copy --type "$(get-mime-type)" || die "Clipboard error"
     notify::ok "$WHAT copied to buffer"
 }
 
 save() {
     local file title message
-    file="${1:-$DEFAULT_TARGET_DIR/$(date +"$DATE_FORMAT").png}"
+    file="${1:-$DEFAULT_TARGET_DIR/$(date +"$DATE_FORMAT").$FILETYPE}"
     screenshot "$file" "$GEOM" "$OUTPUT" || die "Could not take screenshot with grim"
     title="Screenshot of $WHAT" message="$(basename "$file")"
     killhyprpicker
@@ -250,7 +260,7 @@ edit() {
     local editor="${GRIMBLAST_EDITOR%% *}"
     grimblast::check -q "$editor" || die "$editor is not installed"
     local file title message
-    file="${1:-$DEFAULT_TMP_EDITOR_DIR/$(date +"$DATE_FORMAT").png}"
+    file="${1:-$DEFAULT_TMP_EDITOR_DIR/$(date +"$DATE_FORMAT").$FILETYPE}"
     screenshot "$file" "$GEOM" "$OUTPUT" || die "Could not take screenshot"
     title="Screenshot of $WHAT" message="Open screenshot in $editor"
     notify::ok "$title" "$message" -i "$file"
@@ -259,13 +269,14 @@ edit() {
 }
 
 copysave() {
+    [[ $FILETYPE == "png" ]] || die "Clipboard operations only support PNG format. Use --filetype png or omit the option."
     local file
-    file="${1:-$DEFAULT_TARGET_DIR/$(date +"$DATE_FORMAT").png}"
+    file="${1:-$DEFAULT_TARGET_DIR/$(date +"$DATE_FORMAT").$FILETYPE}"
     if [ "$file" = "-" ]; then
-        screenshot - "$GEOM" "$OUTPUT" | tee >(wl-copy --type image/png) || die "Clipboard error"
+        screenshot - "$GEOM" "$OUTPUT" | tee >(wl-copy --type "$(get-mime-type)") || die "Clipboard error"
         notify::ok "$WHAT copied to buffer and piped to stdout"
     else
-        screenshot - "$GEOM" "$OUTPUT" | tee "$file" | wl-copy --type image/png || die "Clipboard error"
+        screenshot - "$GEOM" "$OUTPUT" | tee "$file" | wl-copy --type "$(get-mime-type)" || die "Clipboard error"
         notify::ok "$WHAT copied to buffer and saved to $file" -i "$file"
         echo "$file"
     fi
@@ -296,7 +307,7 @@ parse-target() {
 main() {
     local parsed_args
 
-    parsed_args="$(getopt --name "$NAME" --options 'nocfw:s:' --longoptions 'notify,openparentdir,cursor,freeze,wait:,scale:' -- "$@")" || {
+    parsed_args="$(getopt --name "$NAME" --options 'nocfw:s:t:' --longoptions 'notify,openparentdir,cursor,freeze,wait:,scale:,filetype:' -- "$@")" || {
         echo "$NAME: ERROR: failed to parse arguments" >&2
         exit 1
     }
@@ -334,6 +345,14 @@ main() {
                     exit 1
                 }
                 SCALE=$2
+                shift 2
+                ;;
+            -t | --filetype)
+                [[ "$2" =~ ^(png|ppm|jpeg)$ ]] || {
+                    echo "$NAME: ERROR: Invalid filetype '$2'. Must be png, ppm, or jpeg" >&2
+                    exit 1
+                }
+                FILETYPE=$2
                 shift 2
                 ;;
             --)
