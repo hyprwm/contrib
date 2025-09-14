@@ -55,7 +55,7 @@ CURSOR=
 FREEZE=
 WAIT=no
 SCALE=
-TIMEOUT=3000
+EXPIRE_TIME=3000
 
 # Store positional arguments
 pos=()
@@ -96,12 +96,12 @@ while [[ $# -gt 0 ]]; do
       exit 1
     fi
     ;;
-  -t | --timeout)
+  -e | --expire-time)
     if [[ -n "${2-}" && "$2" =~ ^[0-9]+$ ]]; then
-      TIMEOUT=$2
+      EXPIRE_TIME=$2
       shift 2
     else
-      echo "Invalid or missing argument for --timeout" >&2
+      echo "Invalid or missing argument for --expire-time" >&2
       exit 1
     fi
     ;;
@@ -135,7 +135,7 @@ FILE_EDITOR=${3:-$(tmp_editor_directory)/$(date -Ins).png}
 
 if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "edit" ] && [ "$ACTION" != "copysave" ] && [ "$ACTION" != "check" ]; then
   echo "Usage:"
-  echo "  grimblast [--notify] [--openfile] [--cursor] [--freeze] [--wait N] [--scale <scale>] [--timeout <ms>] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
+  echo "  grimblast [--notify] [--openfile] [--cursor] [--freeze] [--wait N] [--scale <scale>] [--expire-time <ms>] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
   echo "  grimblast check"
   echo "  grimblast usage"
   echo ""
@@ -156,7 +156,7 @@ if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "edit" ]
 fi
 
 notify() {
-  notify-send -t "$TIMEOUT" -a grimblast "$@"
+  notify-send -t "$EXPIRE_TIME" -a grimblast "$@"
 }
 
 notifyOk() {
