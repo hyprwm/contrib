@@ -321,7 +321,9 @@ else
         notifyOk "$WHAT copied to buffer and piped to stdout"
     else
         takeScreenshot - "$GEOM" "$OUTPUT" | tee "$FILE" | wl-copy --type image/png || die "Clipboard error"
-        notifyOk "$WHAT copied to buffer and saved to $FILE" -i "$FILE"
+        TITLE="Screenshot of $SUBJECT"
+        MESSAGE="$WHAT copied to buffer and saved to $FILE"
+        notifyOpen "$TITLE" "$MESSAGE" -i "$FILE"
         echo "$FILE"
     fi
   else
