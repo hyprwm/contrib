@@ -164,8 +164,8 @@ notifyOpen() {
       if gdbus call --session --dest org.freedesktop.FileManager1 --object-path /org/freedesktop/FileManager1 --method org.freedesktop.FileManager1.ShowItems "['file://$4']" ""; then
         :
       else
-        notify-send -t 3000 -a grimblast "Error displaying folder with dbus-send"
-        echo "Displayed: Error displaying folder with dbus-send"
+        notify-send -t 3000 -a grimblast "Error displaying folder with gdbus"
+        echo "Displayed: Error displaying folder with gdbus"
       fi
     fi
   fi
