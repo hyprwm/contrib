@@ -2,7 +2,7 @@
 
 ### 2025-09-14
 
-grimblast: add timeout flag
+grimblast: add --expire-time flag to configure notification expiry
 
 ### 2025-09-14
 
