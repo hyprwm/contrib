@@ -4,6 +4,10 @@
 
 grimblast: use gdbus instead of dbus-send for opening files to allow filenames with commas in them
 
+### 2025-09-08
+
+grimblast: Refactor screenshot menu script and add support for Wofi/Rofi/Walker
+
 ### 2025-08-17
 
 try_swap_workspace: fix get_mon when hyprctl changes order
