@@ -6,7 +6,7 @@ grimblast - a helper for screenshots within hyprland
 
 # SYNOPSIS
 
-*grimblast* [--notify] [--cursor] [--freeze] [--wait N] [--scale <scale>] (copy|save|copysave|edit) [TARGET] [FILE]++
+*grimblast* [--notify] [--openfile] [--expire-time <ms>] [--cursor] [--freeze] [--wait N] [--scale <scale>] (copy|save|copysave|edit) [TARGET] [FILE]++
 *grimblast* check++
 *grimblast* usage
 
@@ -18,6 +18,10 @@ grimblast - a helper for screenshots within hyprland
 *--openfile*
 	Uses dbus to display the folder containing the file when interacting with the
 	notification, only works with --notify
+
+*--expire-time*
+	Passes this argument to `notify-send` to configure notification expiry.
+    Only works with --notify.
 
 *--cursor*
 	Include cursors in the screenshot.
