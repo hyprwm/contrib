@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-09-14
+
+grimblast: use gdbus instead of dbus-send for opening files to allow filenames with commas in them
+
 ### 2025-09-08
 
 grimblast: Refactor screenshot menu script and add support for Wofi/Rofi/Walker
@@ -100,11 +104,12 @@ hdrop: add `--focus` option
 ### 2024-09-01
 
 hdrop:
-   - add class replacement for epiphany and godot
-   - refactor
-   - cleanup
-   - add recognition of `--app-id` for foot
-   - disable error notifications when closing foot
+
+- add class replacement for epiphany and godot
+- refactor
+- cleanup
+- add recognition of `--app-id` for foot
+- disable error notifications when closing foot
 
 ### 2024-08-02
 
