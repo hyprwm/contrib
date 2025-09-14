@@ -55,6 +55,7 @@ CURSOR=
 FREEZE=
 WAIT=no
 SCALE=
+TIMEOUT=3000
 
 # Store positional arguments
 pos=()
@@ -95,6 +96,15 @@ while [[ $# -gt 0 ]]; do
       exit 1
     fi
     ;;
+  -t | --timeout)
+    if [[ -n "${2-}" && "$2" =~ ^[0-9]+$ ]]; then
+      TIMEOUT=$2 # assign the next argument to TIMEOUT
+      shift 2
+    else
+      echo "Invalid or missing argument for --timeout" >&2
+      exit 1
+    fi
+    ;;
   --)
     shift
     pos+=("$@")
@@ -125,7 +135,7 @@ FILE_EDITOR=${3:-$(tmp_editor_directory)/$(date -Ins).png}
 
 if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "edit" ] && [ "$ACTION" != "copysave" ] && [ "$ACTION" != "check" ]; then
   echo "Usage:"
-  echo "  grimblast [--notify] [--openfile] [--cursor] [--freeze] [--wait N] [--scale <scale>] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
+  echo "  grimblast [--notify] [--openfile] [--cursor] [--freeze] [--wait N] [--scale <scale>] [--timeout <ms>] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]"
   echo "  grimblast check"
   echo "  grimblast usage"
   echo ""
@@ -146,7 +156,7 @@ if [ "$ACTION" != "save" ] && [ "$ACTION" != "copy" ] && [ "$ACTION" != "edit" ]
 fi
 
 notify() {
-  notify-send -t 3000 -a grimblast "$@"
+  notify-send -t "$TIMEOUT" -a grimblast "$@"
 }
 
 notifyOk() {

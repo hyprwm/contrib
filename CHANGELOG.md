@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-09-14
+
+grimblast: add timeout flag
+
 ### 2025-08-17
 
 try_swap_workspace: fix get_mon when hyprctl changes order
@@ -96,11 +100,12 @@ hdrop: add `--focus` option
 ### 2024-09-01
 
 hdrop:
-   - add class replacement for epiphany and godot
-   - refactor
-   - cleanup
-   - add recognition of `--app-id` for foot
-   - disable error notifications when closing foot
+
+- add class replacement for epiphany and godot
+- refactor
+- cleanup
+- add recognition of `--app-id` for foot
+- disable error notifications when closing foot
 
 ### 2024-08-02
 
