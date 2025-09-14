@@ -2,6 +2,10 @@
 
 ### 2025-09-14
 
+grimblast: add --expire-time flag to configure notification expiry
+
+### 2025-09-14
+
 grimblast: use gdbus instead of dbus-send for opening files to allow filenames with commas in them
 
 ### 2025-09-08
