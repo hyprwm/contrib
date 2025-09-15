@@ -21,7 +21,7 @@ grimblast - a helper for screenshots within hyprland
 
 *--expire-time*
 	Passes this argument to `notify-send` to configure notification expiry.
-    Only works with --notify.
+	Only works with --notify.
 
 *--cursor*
 	Include cursors in the screenshot.
