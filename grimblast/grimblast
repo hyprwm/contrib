@@ -83,6 +83,7 @@ notify::error() {
     echo "$1" >&2
 }
 
+# If invoked with -h, print usage before dying
 die() {
     killhyprpicker
     local msg OPTIND option
@@ -125,6 +126,9 @@ freezescreen() {
     sleep 0.2
 }
 
+# Checks whether an individual tool is available
+# If invoked with -q (quiet), no output is printed, useful for use in tests
+# Exits with 0 if the tool is available, non-zero otherwise
 grimblast::check() {
     local cmd result OPTIND option status quiet=false
     while getopts 'q' option; do
@@ -146,6 +150,7 @@ grimblast::check() {
     return $status
 }
 
+# The actual grim command used is printed to stderr
 screenshot() {
     local file="$1" geom="$2" output="$3"
     xargs --verbose grim <<<"${CURSOR:+-c} ${SCALE:+-s \"$SCALE\"} -t \"$FILETYPE\" ${output:+-o \"$output\"} ${geom:+-g \"$geom\"} \"$file\""
