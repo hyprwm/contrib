@@ -269,14 +269,16 @@ edit() {
 
 copysave() {
     [[ $FILETYPE == "png" ]] || die "Clipboard operations only support PNG format. Use --filetype png or omit the option."
-    local file
+    local file title message
     file="${1:-$DEFAULT_TARGET_DIR/$(date +"$DATE_FORMAT").$FILETYPE}"
-    if [ "$file" = "-" ]; then
+    if [[ $file = "-" ]]; then
         screenshot - "$GEOM" "$OUTPUT" | tee >(wl-copy --type "$(get-mime-type)") || die "Clipboard error"
         notify::ok "$WHAT copied to buffer and piped to stdout"
     else
         screenshot - "$GEOM" "$OUTPUT" | tee "$file" | wl-copy --type "$(get-mime-type)" || die "Clipboard error"
-        notify::ok "$WHAT copied to buffer and saved to $file" -i "$file"
+        title="Screenshot of $WHAT"
+        message="$WHAT copied to buffer and saved to $file"
+        notify::showparentdir "$title" "$message" -i "$file"
         echo "$file"
     fi
 }
