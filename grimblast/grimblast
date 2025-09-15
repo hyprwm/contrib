@@ -43,25 +43,25 @@ touch "$GRIMBLASTLOCK"
 }
 
 # Globals
-# General settings
+# General settings. These can be set by the user. See man page for more details
 [[ $DEFAULT_TARGET_DIR ]] || {
     USER_DIRS="${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs"
     [[ -f $USER_DIRS ]] && source "$USER_DIRS"
     DEFAULT_TARGET_DIR="${XDG_SCREENSHOTS_DIR:-${XDG_PICTURES_DIR:-$HOME}}"
 }
 : "${DEFAULT_TMP_EDITOR_DIR:=/tmp}" "${GRIMBLAST_EDITOR:=gimp}" "${DATE_FORMAT:=%Y%m%d_%H%M%S}"
-EXPIRE_TIME=3000
 
 # Screenshot variables. In addition to these, there's:
 #   SCALE
-#
+EXPIRE_TIME=3000
+FILETYPE=png
+
 # These have an effect depending on whether they're set
 #   CURSOR
 #   FREEZE
 NOTIFY=false
 SHOW_FILE_NOTIFY=false
 WAIT=0
-FILETYPE=png
 
 # Notification functions
 notify() {
@@ -152,7 +152,7 @@ screenshot() {
     xargs --verbose grim <<<"${CURSOR:+-c} ${SCALE:+-s \"$SCALE\"} -t \"$FILETYPE\" ${output:+-o \"$output\"} ${geom:+-g \"$geom\"} \"$file\""
 }
 
-# Special actions. Because allow the script to exit early.
+# Special actions: usage and check. These are special because they allow to exit early
 usage() {
     cat <<EOF
 Usage:
@@ -227,7 +227,6 @@ area() {
     windows="$(hyprctl clients -j | jq -r --argjson workspaces "$workspaces" --argjson fullscreenWorkspaces "$fullscreen_workspaces" 'map((select(([.workspace.id] | inside($workspaces)) and ([.workspace.id] | inside($fullscreenWorkspaces) | not) or .fullscreen > 0)))')"
     # convert SLURP_ARGS to a bash array
     IFS=' ' read -ra SLURP_ARGS <<<"$SLURP_ARGS"
-    # shellcheck disable=2086 # if we don't split, spaces mess up slurp
     GEOM="$(jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' <<<"$windows" | slurp "${SLURP_ARGS[@]}")"
 
     # Check if user exited slurp without selecting the area
@@ -239,7 +238,7 @@ area() {
 }
 
 # Action functions.
-# These take the global variables from the target functions and take the screenshot.
+# These take the global variables set by target functions and take the screenshot.
 copy() {
     [[ $FILETYPE == "png" ]] || die "Clipboard operations only support PNG format. Use --filetype png or omit the option."
     screenshot - "$GEOM" "$OUTPUT" | wl-copy --type "$(get-mime-type)" || die "Clipboard error"
@@ -307,7 +306,7 @@ parse-target() {
 main() {
     local parsed_args
 
-<    parsed_args="$(getopt --name "$NAME" --options 'nocfe:w:s:t:' --longoptions 'notify,openparentdir,cursor,freeze,expire-time:,wait:,scale:,filetype:' -- "$@")" || {
+    parsed_args="$(getopt --name "$NAME" --options 'nocfe:w:s:t:' --longoptions 'notify,openparentdir,cursor,freeze,expire-time:,wait:,scale:,filetype:' -- "$@")" || {
         echo "$NAME: ERROR: failed to parse arguments" >&2
         exit 1
     }
