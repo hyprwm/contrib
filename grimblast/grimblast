@@ -21,7 +21,7 @@
 NAME="$(basename "$0")"
 
 # Check whether another instance is running
-GRIMBLASTLOCK="${XDG_RUNTIME_DIR:-${XDG_CACHE_DIR:-$HOME/.cache}}/grimblast.lock"
+GRIMBLASTLOCK="${XDG_RUNTIME_DIR:-${XDG_CACHE_DIR:-$HOME/.cache}}/$NAME.lock"
 
 killhyprpicker() {
     pidof -q hyprpicker && pkill hyprpicker
@@ -42,8 +42,8 @@ touch "$GRIMBLASTLOCK"
     exit 1
 }
 
-# Globlas
-# General settings
+# Globals
+# General settings. These can be set by the user. See man page for more details
 [[ $DEFAULT_TARGET_DIR ]] || {
     USER_DIRS="${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs"
     [[ -f $USER_DIRS ]] && source "$USER_DIRS"
@@ -53,18 +53,19 @@ touch "$GRIMBLASTLOCK"
 
 # Screenshot variables. In addition to these, there's:
 #   SCALE
-#
+EXPIRE_TIME=3000
+FILETYPE=png
+
 # These have an effect depending on whether they're set
 #   CURSOR
 #   FREEZE
 NOTIFY=false
 SHOW_FILE_NOTIFY=false
 WAIT=0
-FILETYPE=png
 
 # Notification functions
 notify() {
-    notify-send -t 3000 -a grimblast "$@"
+    notify-send -t "$EXPIRE_TIME" -a "$NAME" "$@"
 }
 
 notify::ok() {
@@ -82,6 +83,7 @@ notify::error() {
     echo "$1" >&2
 }
 
+# If invoked with -h, print usage before dying
 die() {
     killhyprpicker
     local msg OPTIND option
@@ -98,13 +100,12 @@ die() {
 }
 
 notify::showparentdir() {
-    $SHOW_FILE_NOTIFY || {
+    if $SHOW_FILE_NOTIFY; then
+        if [[ $(notify::ok -A 'Show file="Show file"' "$@") == "Show file" ]]; then
+            gdbus call --session --dest org.freedesktop.FileManager1 --object-path /org/freedesktop/FileManager1 --method org.freedesktop.FileManager1.ShowItems "['file://$4']" "" || die "Could not display parent directory with gdbus"
+        fi
+    else
         notify::ok "$@"
-        return
-    }
-    if [[ $(notify::ok -A 'Show file="Show file"' "$@") == "Show file" ]]; then
-        # this does not work for filenames with commas in them
-        dbus-send --session --print-reply --dest=org.freedesktop.FileManager1 --type=method_call /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:"file://$4" string:"" || die "Could not display parent directory with dbus-send"
     fi
 }
 
@@ -115,8 +116,7 @@ grimblast::wait() {
 
 get-mime-type() {
     case $FILETYPE in
-        png) echo "image/png" ;;
-        jpeg) echo "image/jpeg" ;;
+        png | jpeg) echo "image/$FILETYPE" ;;
         ppm) echo "image/x-portable-pixmap" ;;
     esac
 }
@@ -126,6 +126,9 @@ freezescreen() {
     sleep 0.2
 }
 
+# Checks whether an individual tool is available
+# If invoked with -q (quiet), no output is printed, useful for use in tests
+# Exits with 0 if the tool is available, non-zero otherwise
 grimblast::check() {
     local cmd result OPTIND option status quiet=false
     while getopts 'q' option; do
@@ -147,18 +150,19 @@ grimblast::check() {
     return $status
 }
 
+# The actual grim command used is printed to stderr
 screenshot() {
     local file="$1" geom="$2" output="$3"
     xargs --verbose grim <<<"${CURSOR:+-c} ${SCALE:+-s \"$SCALE\"} -t \"$FILETYPE\" ${output:+-o \"$output\"} ${geom:+-g \"$geom\"} \"$file\""
 }
 
-# Special actions. Because allow the script to exit early.
+# Special actions: usage and check. These are special because they allow to exit early
 usage() {
     cat <<EOF
 Usage:
-  grimblast [-n|--notify] [-o|--openparentdir] [-c|--cursor] [-f|--freeze] [-w N|--wait N] [-s N|--scale N] [-t TYPE|--filetype TYPE] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]
-  grimblast check
-  grimblast usage
+  $NAME [-n|--notify] [-o|--openparentdir] [-e|--expire-time <ms>] [-c|--cursor] [-f|--freeze] [-w N|--wait N] [-s N|--scale N] [-t TYPE|--filetype TYPE] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]
+  $NAME check
+  $NAME usage
 
 Commands:
   copy: Copy the screenshot data into the clipboard.
@@ -227,7 +231,6 @@ area() {
     windows="$(hyprctl clients -j | jq -r --argjson workspaces "$workspaces" --argjson fullscreenWorkspaces "$fullscreen_workspaces" 'map((select(([.workspace.id] | inside($workspaces)) and ([.workspace.id] | inside($fullscreenWorkspaces) | not) or .fullscreen > 0)))')"
     # convert SLURP_ARGS to a bash array
     IFS=' ' read -ra SLURP_ARGS <<<"$SLURP_ARGS"
-    # shellcheck disable=2086 # if we don't split, spaces mess up slurp
     GEOM="$(jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' <<<"$windows" | slurp "${SLURP_ARGS[@]}")"
 
     # Check if user exited slurp without selecting the area
@@ -239,7 +242,7 @@ area() {
 }
 
 # Action functions.
-# These take the global variables from the target functions and take the screenshot.
+# These take the global variables set by target functions and take the screenshot.
 copy() {
     [[ $FILETYPE == "png" ]] || die "Clipboard operations only support PNG format. Use --filetype png or omit the option."
     screenshot - "$GEOM" "$OUTPUT" | wl-copy --type "$(get-mime-type)" || die "Clipboard error"
@@ -270,14 +273,16 @@ edit() {
 
 copysave() {
     [[ $FILETYPE == "png" ]] || die "Clipboard operations only support PNG format. Use --filetype png or omit the option."
-    local file
+    local file title message
     file="${1:-$DEFAULT_TARGET_DIR/$(date +"$DATE_FORMAT").$FILETYPE}"
-    if [ "$file" = "-" ]; then
+    if [[ $file = "-" ]]; then
         screenshot - "$GEOM" "$OUTPUT" | tee >(wl-copy --type "$(get-mime-type)") || die "Clipboard error"
         notify::ok "$WHAT copied to buffer and piped to stdout"
     else
         screenshot - "$GEOM" "$OUTPUT" | tee "$file" | wl-copy --type "$(get-mime-type)" || die "Clipboard error"
-        notify::ok "$WHAT copied to buffer and saved to $file" -i "$file"
+        title="Screenshot of $WHAT"
+        message="$WHAT copied to buffer and saved to $file"
+        notify::showparentdir "$title" "$message" -i "$file"
         echo "$file"
     fi
 }
@@ -307,7 +312,7 @@ parse-target() {
 main() {
     local parsed_args
 
-    parsed_args="$(getopt --name "$NAME" --options 'nocfw:s:t:' --longoptions 'notify,openparentdir,cursor,freeze,wait:,scale:,filetype:' -- "$@")" || {
+    parsed_args="$(getopt --name "$NAME" --options 'nocfe:w:s:t:' --longoptions 'notify,openparentdir,cursor,freeze,expire-time:,wait:,scale:,filetype:' -- "$@")" || {
         echo "$NAME: ERROR: failed to parse arguments" >&2
         exit 1
     }
@@ -322,6 +327,14 @@ main() {
             -o | --openparentdir)
                 SHOW_FILE_NOTIFY=true
                 shift
+                ;;
+            -e | --expire-time)
+                [[ $2 =~ ^[0-9]+$ ]] || {
+                    echo "$NAME: ERROR: Invalid or missing argument for '-e|--expire-time'" >&2
+                    exit 1
+                }
+                EXPIRE_TIME=$2
+                shift 2
                 ;;
             -c | --cursor)
                 CURSOR=1

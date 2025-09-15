@@ -1,22 +1,23 @@
-name: Check packages
+name: Check scripts
 
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
 
   checks:
-    name: Check Packages
+    name: Check scripts
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         package:
-        - grimblast
-        - shellevents
-        - scratchpad
-        - hyprprop
-        - try_swap_workspace
-        - hdrop
+        - "**/*.sh" # checks all .sh files
+        - grimblast/grimblast
+        - shellevents/shellevents
+        - scratchpad/scratchpad
+        - hyprprop/hyprprop
+        - try_swap_workspace/try_swap_workspace
+        - hdrop/hdrop
 
     steps:
       - uses: actions/checkout@v4
@@ -50,4 +51,4 @@ jobs:
           # except any version with the key that is the same as the `primary-key`
           purge-primary-key: never
 
-      - run: nix build -L .#${{ matrix.package }}
+      - run: nix run nixpkgs#shellcheck -- -S error ${{ matrix.package }}

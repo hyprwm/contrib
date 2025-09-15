@@ -16,8 +16,9 @@
 # Run arguments and environment, and exclude pretest:
 #   bats --print-output-on-failure --filter-tags arguments --filter-tags environment --filter-tags \!pretest test/test.bats
 
+# set $BATS_LIB_PATH only if not set already, default to /usr/lib/bats
 setup_file() {
-    export BATS_LIB_PATH='/usr/lib/bats'
+    : "${BATS_LIB_PATH:='/usr/lib/bats'}"
     PATH="$(dirname "$(realpath "$BATS_TEST_FILENAME")")/..:$PATH"
     bats_require_minimum_version 1.5.0
 }
@@ -122,7 +123,7 @@ teardown() {
 
 # bats test_tags=arguments
 @test "Can screenshot area, to a file, with options on both sides" {
-    run --separate-stderr grimblast --openparentdir save area "$TEST_DIR/test.png" --notify --freeze
+    run --separate-stderr grimblast -e 8000 --openparentdir save area "$TEST_DIR/test.png" --notify --freeze
     assert_success
     outfile="$(extract_outfile_from_output "$output")"
     assert_file_exist "$outfile"

@@ -4,6 +4,7 @@
   makeWrapper,
   scdoc,
   coreutils,
+  glib,
   grim,
   jq,
   libnotify,
@@ -32,6 +33,7 @@ stdenvNoCC.mkDerivation {
     wrapProgram $out/bin/grimblast --prefix PATH ':' \
       "${lib.makeBinPath ([
         coreutils
+        glib
         grim
         jq
         libnotify

@@ -6,8 +6,8 @@ grimblast - a helper for screenshots within Hyprland
 
 # SYNOPSIS
 
-*grimblast* [-n|--notify] [-o|--openparentdir] [-c|--cursor] [-f|--freeze] [-w N|--wait N] [-s N|--scale N] [-t TYPE|--filetype TYPE] (copy|save|copysave|edit) [TARGET] [FILE]++
-*grimblast* check++
+*grimblast* [-n|--notify] [-o|--openparentdir] [-e|--expire-time <ms>] [-c|--cursor] [-f|--freeze] [-w N|--wait N] [-s N|--scale N] [-t TYPE|--filetype TYPE] (copy|save|copysave|edit) [TARGET] [FILE]
+*grimblast* check
 *grimblast* usage
 
 # OPTIONS
@@ -18,6 +18,10 @@ grimblast - a helper for screenshots within Hyprland
 *-o, --openparentdir*
 	Uses dbus to display the folder containing the file when interacting with the
 	notification, only works with --notify
+
+*-e, --expire-time <ms>*
+	Passes this argument to `notify-send` to configure notification expiry.
+	Only works with --notify. Default: 3000.
 
 *-c, --cursor*
 	Include cursors in the screenshot.
@@ -136,6 +140,14 @@ Using *satty* as the image editor:
 ```
 GRIMBLAST_EDITOR="satty --filename" grimblast edit screen
 ```
+
+Using combined short options with satty:
+
+```
+GRIMBLAST_EDITOR="satty --file" grimblast -ns 2 -e 2000 edit screen
+```
+
+This example captures the entire screen, scales the image by a factor of 2, displays a notification that expires after 2000ms, and opens the screenshot in satty for editing.
 
 Copy screenshot to clipboard:
 
