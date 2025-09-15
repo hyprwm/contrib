@@ -123,7 +123,7 @@ teardown() {
 
 # bats test_tags=arguments
 @test "Can screenshot area, to a file, with options on both sides" {
-    run --separate-stderr grimblast --openparentdir save area "$TEST_DIR/test.png" --notify --freeze
+    run --separate-stderr grimblast -e 8000 --openparentdir save area "$TEST_DIR/test.png" --notify --freeze
     assert_success
     outfile="$(extract_outfile_from_output "$output")"
     assert_file_exist "$outfile"
