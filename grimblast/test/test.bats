@@ -16,8 +16,9 @@
 # Run arguments and environment, and exclude pretest:
 #   bats --print-output-on-failure --filter-tags arguments --filter-tags environment --filter-tags \!pretest test/test.bats
 
+# set $BATS_LIB_PATH only if not set already, default to /usr/lib/bats
 setup_file() {
-    export BATS_LIB_PATH='/usr/lib/bats'
+    : "${BATS_LIB_PATH:='/usr/lib/bats'}"
     PATH="$(dirname "$(realpath "$BATS_TEST_FILENAME")")/..:$PATH"
     bats_require_minimum_version 1.5.0
 }
