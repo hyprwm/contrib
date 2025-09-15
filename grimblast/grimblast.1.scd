@@ -91,7 +91,7 @@ _area_
 _output_
 	Captures the currently active output.
 
-# ENVIRONMENTAL VARIABLES
+# ENVIRONMENT VARIABLES
 
 *DEFAULT_TARGET_DIR*
 	Directory where screenshots are saved when using the _save_ action.
