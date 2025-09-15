@@ -147,7 +147,7 @@ screenshot() {
 usage() {
     cat <<EOF
 Usage:
-  grimblast [--notify] [--openparentdir] [--expire-time <ms>] [--cursor] [--freeze] [--wait N] [--scale <scale>] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]
+  grimblast [-n|--notify] [-o|--openparentdir] [-e|--expire-time <ms>] [-c|--cursor] [-f|--freeze] [-w N|--wait N] [-s N|--scale N] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]
   grimblast check
   grimblast usage
 
@@ -293,9 +293,6 @@ parse-target() {
     esac
 }
 
-# TODO: make a script to create the tests.
-# Save the options in arrays. Then use loops to have all the iterations.
-# Have the script generate a csv file showing which tests passes and which failed. Have it save the ones that failed in a text file.
 main() {
     local parsed_args
 

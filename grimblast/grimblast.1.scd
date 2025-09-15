@@ -2,46 +2,47 @@ grimblast(1)
 
 # NAME
 
-grimblast - a helper for screenshots within hyprland
+grimblast - a helper for screenshots within Hyprland
 
 # SYNOPSIS
 
-*grimblast* [--notify] [--openfile] [--expire-time <ms>] [--cursor] [--freeze] [--wait N] [--scale <scale>] (copy|save|copysave|edit) [TARGET] [FILE]++
-*grimblast* check++
+*grimblast* [-n|--notify] [-o|--openparentdir] [-e|--expire-time <ms>] [-c|--cursor] [-f|--freeze] [-w N|--wait N] [-s N|--scale N] (copy|save|copysave|edit) [TARGET] [FILE]
+*grimblast* check
 *grimblast* usage
 
 # OPTIONS
 
-*--notify*
+*-n, --notify*
 	Show notifications to the user that a screenshot has been taken.
 
-*--openfile*
+*-o, --openparentdir*
 	Uses dbus to display the folder containing the file when interacting with the
 	notification, only works with --notify
 
-*--expire-time*
+*-e, --expire-time <ms>*
 	Passes this argument to `notify-send` to configure notification expiry.
 	Only works with --notify.
 
-*--cursor*
+*-c, --cursor*
 	Include cursors in the screenshot.
 
-*--freeze*
+*-f, --freeze*
 	Freezes the screen before area selection.
 
-*--wait N*
+*-w N, --wait N*
 	Wait for N seconds before taking a screenshot. Decimal values
 	are also supported. Waits after any manual selection is made.
 	Recommended to combine with --notify in order to know
 	when the screenshot has been taken.
 
-*--scale <scale>*
+*-s N, --scale N*
 	Passes the `-s` argument to `grim`.
 
 *save*
 	Save the screenshot into a regular file. Grimblast will write image
 	files to *XDG_SCREENSHOTS_DIR* if this is set (or defined
-	in *user-dirs.dir*), or otherwise fall back to *XDG_PICTURES_DIR*.
+	in *user-dirs.dir*), otherwise fall back to *XDG_PICTURES_DIR*,
+	and finally *HOME* if neither is defined.
 	Set FILE to '-' to pipe the output to STDOUT.
 
 *copy*
@@ -52,7 +53,7 @@ grimblast - a helper for screenshots within hyprland
 
 *edit*
 	Open screenshot in the image editor of your choice. The default is
-	gimp, but you can set a different one with the enviroment variable
+	gimp, but you can set a different one with the environment variable
 	$GRIMBLAST_EDITOR. Example: `export GRIMBLAST_EDITOR=gimp`.
 
 *check*
@@ -63,7 +64,7 @@ grimblast - a helper for screenshots within hyprland
 
 # DESCRIPTION
 
-Grimblast is an easy-to-use screenshot utility for hyprland, based on grimshot.
+Grimblast is an easy-to-use screenshot utility for Hyprland, based on grimshot.
 It provides a convenient interface over grim, slurp and jq, and supports
 storing the screenshot either directly to the clipboard using wl-copy or to a
 file.
@@ -86,6 +87,25 @@ _area_
 
 _output_
 	Captures the currently active output.
+
+# ENVIRONMENTAL VARIABLES
+
+*DEFAULT_TARGET_DIR*
+	Directory where screenshots are saved when using the _save_ action.
+	Defaults to *XDG_SCREENSHOTS_DIR* if set, otherwise *XDG_PICTURES_DIR*,
+	and finally *HOME* if neither is defined.
+
+*DEFAULT_TMP_EDITOR_DIR*
+	Temporary directory used when editing screenshots. Defaults to */tmp*.
+
+*GRIMBLAST_EDITOR*
+	Image editor to use with the _edit_ action. Defaults to *gimp*.
+
+*DATE_FORMAT*
+	Date format string used for screenshot filenames. Defaults to *%Y%m%d_%H%M%S*.
+
+*SLURP_ARGS*
+	Additional arguments to pass to *slurp* for customizing the selection interface.
 
 # OUTPUT
 
@@ -110,6 +130,36 @@ bind = SUPER, p, exec, grimblast save active
 bind = SUPER SHIFT, p, exec, grimblast save area
 bind = SUPER ALT, p, exec, grimblast save output
 bind = SUPER CTRL, p, exec, grimblast save screen
+```
+
+Using *satty* as the image editor:
+
+```
+GRIMBLAST_EDITOR="satty --filename" grimblast edit screen
+```
+
+Copy screenshot to clipboard:
+
+```
+grimblast copy active
+```
+
+Save screenshot with custom filename:
+
+```
+grimblast save screen ~/screenshots/my-screenshot.png
+```
+
+Take screenshot after a 2-second delay:
+
+```
+grimblast --wait 2 save area
+```
+
+Take screenshot and both save and copy:
+
+```
+grimblast copysave screen
 ```
 
 # EXIT CODES
