@@ -6,7 +6,7 @@ grimblast - a helper for screenshots within Hyprland
 
 # SYNOPSIS
 
-*grimblast* [-n|--notify] [-o|--openparentdir] [-e|--expire-time <ms>] [-c|--cursor] [-f|--freeze] [-w N|--wait N] [-s N|--scale N] (copy|save|copysave|edit) [TARGET] [FILE]
+<*grimblast* [-n|--notify] [-o|--openparentdir] [-e|--expire-time <ms>] [-c|--cursor] [-f|--freeze] [-w N|--wait N] [-s N|--scale N] [-t TYPE|--filetype TYPE] (copy|save|copysave|edit) [TARGET] [FILE]
 *grimblast* check
 *grimblast* usage
 
@@ -38,6 +38,9 @@ grimblast - a helper for screenshots within Hyprland
 *-s N, --scale N*
 	Passes the `-s` argument to `grim`.
 
+*-t TYPE, --filetype TYPE*
+	Output filetype. Supported: png, ppm, jpeg. Default: png. Note: copy and copysave actions only support PNG format.
+
 *save*
 	Save the screenshot into a regular file. Grimblast will write image
 	files to *XDG_SCREENSHOTS_DIR* if this is set (or defined
@@ -46,10 +49,10 @@ grimblast - a helper for screenshots within Hyprland
 	Set FILE to '-' to pipe the output to STDOUT.
 
 *copy*
-	Copy the screenshot data (as image/png) into the clipboard.
+	Copy the screenshot data into the clipboard. Only PNG format is supported for clipboard operations.
 
-*copysave* 
-	Combine the previous 2 options.
+*copysave*
+	Combine the previous 2 options. Only PNG format is supported for clipboard operations.
 
 *edit*
 	Open screenshot in the image editor of your choice. The default is
@@ -160,6 +163,12 @@ Take screenshot and both save and copy:
 
 ```
 grimblast copysave screen
+```
+
+Save screenshot in JPEG format:
+
+```
+grimblast --filetype jpeg save screen
 ```
 
 # EXIT CODES

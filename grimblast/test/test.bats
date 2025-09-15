@@ -33,7 +33,7 @@ setup() {
     # Extract the outfile from the output
     # Tests will necessarily need to have DEFAULT_TARGET_DIR="$TEST_DIR"
     extract_outfile_from_output() {
-        grep -Eo "$TEST_DIR/.+\.png" <<<"$1"
+        grep -Eo "$TEST_DIR/.+\.(png|ppm|jpeg)" <<<"$1"
     }
 }
 
@@ -147,4 +147,66 @@ teardown() {
     outfile="$(extract_outfile_from_output "$output")"
     assert_file_exist "$outfile"
     pngcheck -q "$outfile"
+}
+
+# bats test_tags=filetype
+@test "Can save screenshot in PPM format" {
+    DEFAULT_TARGET_DIR="$TEST_DIR" run --separate-stderr grimblast --filetype ppm save active
+    assert_success
+    assert_output --regexp "$TEST_DIR/.+\.ppm$"
+    outfile="$(extract_outfile_from_output "$output")"
+    assert_file_exist "$outfile"
+    # Validate PPM format using file command
+    run file "$outfile"
+    assert_output --regexp "Netpbm"
+}
+
+# bats test_tags=filetype
+@test "Can save screenshot in JPEG format" {
+    DEFAULT_TARGET_DIR="$TEST_DIR" run --separate-stderr grimblast --filetype jpeg save active
+    assert_success
+    assert_output --regexp "$TEST_DIR/.+\.jpeg$"
+    outfile="$(extract_outfile_from_output "$output")"
+    assert_file_exist "$outfile"
+    # Validate JPEG format using file command
+    run file "$outfile"
+    assert_output --regexp "JPEG image data"
+}
+
+# bats test_tags=filetype
+@test "Can save screenshot in PPM format with short option" {
+    DEFAULT_TARGET_DIR="$TEST_DIR" run --separate-stderr grimblast -t ppm save screen
+    assert_success
+    assert_output --regexp "$TEST_DIR/.+\.ppm$"
+    outfile="$(extract_outfile_from_output "$output")"
+    assert_file_exist "$outfile"
+    # Validate PPM format
+    run file "$outfile"
+    assert_output --regexp "Netpbm"
+}
+
+# bats test_tags=filetype
+@test "Can save screenshot in JPEG format with short option" {
+    DEFAULT_TARGET_DIR="$TEST_DIR" run --separate-stderr grimblast -t jpeg save screen
+    assert_success
+    assert_output --regexp "$TEST_DIR/.+\.jpeg$"
+    outfile="$(extract_outfile_from_output "$output")"
+    assert_file_exist "$outfile"
+    # Validate JPEG format
+    run file "$outfile"
+    assert_output --regexp "JPEG image data"
+}
+
+# bats test_tags=filetype
+@test "Copy action rejects non-PNG formats" {
+    run grimblast --filetype ppm copy active
+    assert_failure
+    assert_output --partial "Clipboard operations only support PNG format"
+}
+
+# bats test_tags=filetype
+@test "Copysave action rejects non-PNG formats" {
+    run grimblast --filetype ppm copysave active
+    assert_failure
+    assert_output --partial "Clipboard operations only support PNG format"
 }
