@@ -21,7 +21,7 @@
 NAME="$(basename "$0")"
 
 # Check whether another instance is running
-GRIMBLASTLOCK="${XDG_RUNTIME_DIR:-${XDG_CACHE_DIR:-$HOME/.cache}}/grimblast.lock"
+GRIMBLASTLOCK="${XDG_RUNTIME_DIR:-${XDG_CACHE_DIR:-$HOME/.cache}}/$NAME.lock"
 
 killhyprpicker() {
     pidof -q hyprpicker && pkill hyprpicker
@@ -65,7 +65,7 @@ WAIT=0
 
 # Notification functions
 notify() {
-    notify-send -t "$EXPIRE_TIME" -a grimblast "$@"
+    notify-send -t "$EXPIRE_TIME" -a "$NAME" "$@"
 }
 
 notify::ok() {
@@ -156,9 +156,9 @@ screenshot() {
 usage() {
     cat <<EOF
 Usage:
-  grimblast [-n|--notify] [-o|--openparentdir] [-e|--expire-time <ms>] [-c|--cursor] [-f|--freeze] [-w N|--wait N] [-s N|--scale N] [-t TYPE|--filetype TYPE] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]
-  grimblast check
-  grimblast usage
+  $NAME [-n|--notify] [-o|--openparentdir] [-e|--expire-time <ms>] [-c|--cursor] [-f|--freeze] [-w N|--wait N] [-s N|--scale N] [-t TYPE|--filetype TYPE] (copy|save|copysave|edit) [active|screen|output|area] [FILE|-]
+  $NAME check
+  $NAME usage
 
 Commands:
   copy: Copy the screenshot data into the clipboard.
