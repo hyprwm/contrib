@@ -115,8 +115,7 @@ grimblast::wait() {
 
 get-mime-type() {
     case $FILETYPE in
-        png) echo "image/png" ;;
-        jpeg) echo "image/jpeg" ;;
+        png | jpeg) echo "image/$FILETYPE" ;;
         ppm) echo "image/x-portable-pixmap" ;;
     esac
 }
