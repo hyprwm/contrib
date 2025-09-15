@@ -3,18 +3,20 @@
 ### 2025-09-14
 
 grimblast: allow opening file when using copysave
-
-### 2025-09-14
-
 grimblast: add --expire-time flag to configure notification expiry
-
-### 2025-09-14
-
 grimblast: use gdbus instead of dbus-send for opening files to allow filenames with commas in them
 
 ### 2025-09-08
 
 grimblast: Refactor screenshot menu script and add support for Wofi/Rofi/Walker
+
+### 2025-09-06
+
+grimblast: add -t|--filetype option supporting png, ppm, jpeg formats
+grimblast: massive refactor ensuring correct parsing
+grimblast: introduce unit testing
+grimblast: enhance usage function and man page with options, variables and examples
+grimblast: various code improvements and refactors (better bash style, simpler logic, improved variable names, etc.)
 
 ### 2025-08-17
 
