@@ -1,14 +1,26 @@
 #!/usr/bin/env -S bats --print-output-on-failure
 
-# First:
-#   paru -Syu --needed bats bats-assert bats-support bats-file
-#
 # It's probably impossible to have 100% coverage due to the nature of grimblast.
 # But it's good to test what we can.
+# bats tests are TAP compliant, so these can potentially be added to CI pipelines (though these particular tests require interaction).
+#
+# Pre-requisites:
+#   bats
+#   bats-assert
+#   bats-support
+#   bats-file
+#   pngcheck
+#   satty
+#   gimp
+#   all the dependencies of grimblast
+#
 #
 # The comments preceding each test are bats tags. These allow you to run specific tests.
 #
 # Examples assuming you're in the grimblast directory:
+#
+# Run all tests:
+#   ./test/test.bats
 #
 # Run only the arguments tests:
 #   bats --print-output-on-failure --filter-tags arguments test/test.bats
