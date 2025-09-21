@@ -16,7 +16,7 @@
 
 ## This tool is based on grimshot, with swaymsg commands replaced by their
 ## hyprctl equivalents.
-## https://github.com/swaywm/sway/blob/master/contrib/grimshot
+## https://github.com/OctopusET/sway-contrib/blob/master/grimshot/grimshot
 
 NAME="$(basename "$0")"
 
