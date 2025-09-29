@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-09-29
+
+grimblast: add getopt to Nix wrapper
+
 ### 2025-09-15
 
 grimblast: add -t|--filetype option supporting png, ppm, jpeg formats
