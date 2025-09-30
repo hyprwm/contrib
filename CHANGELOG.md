@@ -3,6 +3,7 @@
 ### 2025-09-29
 
 grimblast: add getopt to Nix wrapper
+grimblast: refactor getopt error handling to avoid duplicate error messages
 
 ### 2025-09-15
 

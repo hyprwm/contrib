@@ -6,8 +6,8 @@ grimblast - a helper for screenshots within Hyprland
 
 # SYNOPSIS
 
-*grimblast* [-n|--notify] [-o|--openparentdir] [-e|--expire-time <ms>] [-c|--cursor] [-f|--freeze] [-w N|--wait N] [-s N|--scale N] [-t TYPE|--filetype TYPE] (copy|save|copysave|edit) [TARGET] [FILE]
-*grimblast* check
+*grimblast* [OPTIONS] (copy|save|copysave|edit) [TARGET] [FILE]++
+*grimblast* check++
 *grimblast* usage
 
 # OPTIONS

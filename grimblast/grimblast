@@ -313,7 +313,7 @@ main() {
     local parsed_args
 
     parsed_args="$(getopt --name "$NAME" --options 'nocfe:w:s:t:' --longoptions 'notify,openparentdir,cursor,freeze,expire-time:,wait:,scale:,filetype:' -- "$@")" || {
-        echo "$NAME: ERROR: failed to parse arguments" >&2
+        usage >&2
         exit 1
     }
     eval "set -- $parsed_args"
