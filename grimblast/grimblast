@@ -33,8 +33,8 @@ cleanup() {
 }
 
 # Entry point
-trap cleanup EXIT
 [[ -e $GRIMBLASTLOCK ]] && exit 2
+trap cleanup EXIT
 touch "$GRIMBLASTLOCK"
 
 [[ $HYPRLAND_INSTANCE_SIGNATURE ]] || {
