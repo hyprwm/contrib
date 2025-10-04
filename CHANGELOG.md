@@ -2,6 +2,10 @@
 
 ### 2025-09-29
 
+grimblast: Fix a bug where grimblast would delete the lock file when early exiting
+
+### 2025-09-29
+
 grimblast: add getopt to Nix wrapper
 grimblast: refactor getopt error handling to avoid duplicate error messages
 
