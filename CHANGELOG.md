@@ -1,5 +1,9 @@
 # Changelog
 
+### 2025-11-29
+
+grimblast: remove superfluous use of external commands on test setup
+
 ### 2025-09-29
 
 grimblast: Fix a bug where grimblast would delete the lock file when early exiting

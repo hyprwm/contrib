@@ -31,7 +31,7 @@
 # set $BATS_LIB_PATH only if not set already, default to /usr/lib/bats
 setup_file() {
     : "${BATS_LIB_PATH:='/usr/lib/bats'}"
-    PATH="$(dirname "$(realpath "$BATS_TEST_FILENAME")")/..:$PATH"
+    PATH="${BATS_TEST_DIRNAME}/..:$PATH"
     bats_require_minimum_version 1.5.0
 }
 
