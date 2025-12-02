@@ -1,0 +1,16 @@
+#!/bin/bash
+
+VOL_INFO=$(wpctl get-volume @DEFAULT_AUDIO_SINK@)
+VOL=$(echo "$VOL_INFO" | awk '{print int($2*100)}')
+MUTED=$(echo "$VOL_INFO" | grep -o MUTED)
+
+makoctl list | awk '/Volume/ {id=$2; sub(":", "", id); system("makoctl dismiss " id)}'
+
+if [ "$MUTED" ]; then
+  notify-send -u low -r 91190 "Volume" "Muted" --hint=int:value:0
+else
+  notify-send -u low -r 91190 "Volume" "${VOL}%" --hint=int:value:"$VOL"
+fi
+
+# Optional icons (requires a Nerd Font)
+# VOLUME_ICONS=("" "" "")
