@@ -17,6 +17,7 @@ jobs:
         - hyprprop
         - try_swap_workspace
         - hdrop
+        - hyprosd-mako
 
     steps:
       - uses: actions/checkout@v4
