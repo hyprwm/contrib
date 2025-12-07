@@ -16,6 +16,7 @@
     overlays.default = _: prev: {
       grimblast = prev.callPackage ./grimblast {hyprland = null;};
       hdrop = prev.callPackage ./hdrop {hyprland = null;};
+      hyprosd-mako = prev.callPackage ./hyprosd-mako {};
       hyprprop = prev.callPackage ./hyprprop {};
       scratchpad = prev.callPackage ./scratchpad {hyprland = null;};
       shellevents = prev.callPackage ./shellevents {hyprland = null;};
