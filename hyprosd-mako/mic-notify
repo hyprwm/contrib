@@ -1,12 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 STATE=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | grep -o MUTED)
 
 makoctl list | awk '/Microphone/ {id=$2; sub(":", "", id); system("makoctl dismiss " id)}'
 
 if [ "$STATE" ]; then
-  notify-send -u low -r 91192 "Microphone" "Muted" --hint=int:value:0
+  notify-send -u low "Microphone" "Muted" --hint=int:value:0
 else
-  notify-send -u low -r 91192 "Microphone" "Unmuted" --hint=int:value:100
+  notify-send -u low "Microphone" "Unmuted" --hint=int:value:100
 fi
 
 # Optional icons (requires a Nerd Font)

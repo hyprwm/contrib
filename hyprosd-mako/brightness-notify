@@ -6,7 +6,7 @@ PCT=$((CUR * 100 / MAX))
 
 makoctl list | awk '/Brightness/ {id=$2; sub(":", "", id); system("makoctl dismiss " id)}'
 
-notify-send -u low -r 91191 "Brightness" "${PCT}%" --hint=int:value:"$PCT"
+notify-send -u low "Brightness" "${PCT}%" --hint=int:value:"$PCT"
 
 # Optional icons (requires a Nerd Font)
 # BRIGHTNESS_ICONS=("" "" "")
