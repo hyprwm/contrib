@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+CUR=$(brightnessctl g)
+MAX=$(brightnessctl m)
+PCT=$((CUR * 100 / MAX))
+
+makoctl list | awk '/Brightness/ {id=$2; sub(":", "", id); system("makoctl dismiss " id)}'
+
+notify-send -u low "Brightness" "${PCT}%" --hint=int:value:"$PCT"
+
+# Optional icons (requires a Nerd Font)
+# BRIGHTNESS_ICONS=("" "" "")
