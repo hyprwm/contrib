@@ -1,5 +1,8 @@
 # Changelog
 
+### 2025-12-07
+hyprosd-mako: add OSD scripts for volume, brightness, and microphone
+
 ### 2025-11-29
 
 grimblast: remove superfluous use of external commands on test setup
