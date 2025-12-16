@@ -215,7 +215,6 @@ output() {
 
 area() {
     local fullscreen_workspaces workspaces windows
-    grimblast::wait
     [[ $CURSOR ]] && die "'-c|--cursor' cannot be used with TARGET 'area'"
 
     if [[ $FREEZE ]] && grimblast::check -q hyprpicker; then
@@ -232,6 +231,8 @@ area() {
     # convert SLURP_ARGS to a bash array
     IFS=' ' read -ra SLURP_ARGS <<<"$SLURP_ARGS"
     GEOM="$(jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' <<<"$windows" | slurp "${SLURP_ARGS[@]}")"
+
+    grimblast::wait
 
     # Check if user exited slurp without selecting the area
     [[ $GEOM ]] || {
