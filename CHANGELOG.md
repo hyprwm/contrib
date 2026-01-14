@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-01-14
+
+grimblast: adapt windowrule to v3
+
 ### 2025-12-16
 
 grimblast: fix wait for area when frozen
