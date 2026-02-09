@@ -284,8 +284,9 @@ if $FLOATING; then
     notify "hdrop: --position -> invalid argument"
     ;;
   esac
-
-  if [[ $(hyprctl -j version | jq -r .version | tr '.' '\n' | head -n 2 | tail -n 1) -ge 48 ]]; then
+  if [[ $(hyprctl -j version | jq -r .version | tr '.' '\n' | head -n 2 | tail -n 1) -ge 53 ]]; then
+    hyprctl --batch "keyword windowrule float on,match:class ^$CLASS$ ; keyword windowrule move $POSITION_xy,match:class ^$CLASS$"
+  elif [[ $(hyprctl -j version | jq -r .version | tr '.' '\n' | head -n 2 | tail -n 1) -ge 48 ]]; then
     hyprctl --batch "keyword windowrule float,class:^$CLASS$ ; keyword windowrule move $POSITION_xy,class:^$CLASS$"
   else
     hyprctl --batch "keyword windowrule float,^$CLASS$ ; keyword windowrule move $POSITION_xy,^$CLASS$"
