@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-02-09
+
+hdrop: Fix windowrule invocations for version 53+
+
 ### 2026-01-14
 
 grimblast: adapt windowrule to v3
