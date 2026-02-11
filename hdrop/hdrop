@@ -255,6 +255,8 @@ if $FLOATING; then
     ACTIVE_MONITOR_HEIGHT_SCALED=$(($ACTIVE_MONITOR_HEIGHT / $ACTIVE_MONITOR_SCALE))
   fi
 
+  HYPRLAND_VERSION="$(hyprctl -j version | jq -r .version | tr '.' '\n' | head -n 2 | tail -n 1)"
+
   case "$POSITION" in
   "t" | "top")
     if [[ -n $WIDTH ]]; then WIDTH_xy=$WIDTH; else WIDTH_xy="100"; fi
@@ -284,9 +286,9 @@ if $FLOATING; then
     notify "hdrop: --position -> invalid argument"
     ;;
   esac
-  if [[ $(hyprctl -j version | jq -r .version | tr '.' '\n' | head -n 2 | tail -n 1) -ge 53 ]]; then
+  if [[ $HYPRLAND_VERSION -ge 53 ]]; then
     hyprctl --batch "keyword windowrule float on,match:class ^$CLASS$ ; keyword windowrule move $POSITION_xy,match:class ^$CLASS$"
-  elif [[ $(hyprctl -j version | jq -r .version | tr '.' '\n' | head -n 2 | tail -n 1) -ge 48 ]]; then
+  elif [[ $HYPRLAND_VERSION -ge 48 ]]; then
     hyprctl --batch "keyword windowrule float,class:^$CLASS$ ; keyword windowrule move $POSITION_xy,class:^$CLASS$"
   else
     hyprctl --batch "keyword windowrule float,^$CLASS$ ; keyword windowrule move $POSITION_xy,^$CLASS$"
