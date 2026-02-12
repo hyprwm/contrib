@@ -255,38 +255,68 @@ if $FLOATING; then
     ACTIVE_MONITOR_HEIGHT_SCALED=$(($ACTIVE_MONITOR_HEIGHT / $ACTIVE_MONITOR_SCALE))
   fi
 
-  case "$POSITION" in
-  "t" | "top")
-    if [[ -n $WIDTH ]]; then WIDTH_xy=$WIDTH; else WIDTH_xy="100"; fi
-    if [[ -n $HEIGHT ]]; then HEIGHT_xy=$HEIGHT; else HEIGHT_xy="50"; fi
-    POSITION_xy="$((50 - $WIDTH_xy / 2))% $GAP"
-    ;;
-  "b" | "bottom")
-    if [[ -n $WIDTH ]]; then WIDTH_xy=$WIDTH; else WIDTH_xy="100"; fi
-    if [[ -n $HEIGHT ]]; then HEIGHT_xy=$HEIGHT; else HEIGHT_xy="50"; fi
-    if [[ $GAP -ne 0 ]]; then
-      POSITION_xy="$((50 - $WIDTH_xy / 2))% $(($ACTIVE_MONITOR_HEIGHT_SCALED * $HEIGHT_xy / 100 - $GAP))"
-    else POSITION_xy="$((50 - $WIDTH_xy / 2))% $((100 - $HEIGHT_xy))%"; fi
-    ;;
-  "l" | "left")
-    if [[ -n $WIDTH ]]; then WIDTH_xy=$WIDTH; else WIDTH_xy="50"; fi
-    if [[ -n $HEIGHT ]]; then HEIGHT_xy=$HEIGHT; else HEIGHT_xy="100"; fi
-    POSITION_xy="$GAP $((50 - $HEIGHT_xy / 2))%"
-    ;;
-  "r" | "right")
-    if [[ -n $WIDTH ]]; then WIDTH_xy=$WIDTH; else WIDTH_xy="50"; fi
-    if [[ -n $HEIGHT ]]; then HEIGHT_xy=$HEIGHT; else HEIGHT_xy="100"; fi
-    if [[ $GAP -ne 0 ]]; then
-      POSITION_xy="$(($ACTIVE_MONITOR_WIDTH_SCALED * $WIDTH_xy / 100 - $GAP)) $((50 - $HEIGHT_xy / 2))%"
-    else POSITION_xy="$((100 - $WIDTH_xy))% $((50 - $HEIGHT_xy / 2))%"; fi
-    ;;
-  *)
-    notify "hdrop: --position -> invalid argument"
-    ;;
-  esac
-  if [[ $(hyprctl -j version | jq -r .version | tr '.' '\n' | head -n 2 | tail -n 1) -ge 53 ]]; then
+  HYPRLAND_VERSION="$(hyprctl -j version | jq -r .version | tr '.' '\n' | head -n 2 | tail -n 1)"
+
+  if [[ $HYPRLAND_VERSION -ge 53 ]]; then
+      case "$POSITION" in "t" | "top")
+              if [[ -n $WIDTH ]]; then WIDTH_xy=$WIDTH; else WIDTH_xy="100"; fi
+              if [[ -n $HEIGHT ]]; then HEIGHT_xy=$HEIGHT; else HEIGHT_xy="50"; fi
+              # this looks awful, but that's the hyprland way according to vaxlary...
+              POSITION_xy="(monitor_w/2*(1-$WIDTH_xy/100)) ($GAP)"
+              ;;
+          "b" | "bottom")
+              if [[ -n $WIDTH ]]; then WIDTH_xy=$WIDTH; else WIDTH_xy="100"; fi
+              if [[ -n $HEIGHT ]]; then HEIGHT_xy=$HEIGHT; else HEIGHT_xy="50"; fi
+              POSITION_xy="(monitor_w/2*(1-$WIDTH_xy/100)) (monitor_h*(1-($HEIGHT_xy/100))-$GAP)"  
+              ;;
+          "l" | "left")
+              if [[ -n $WIDTH ]]; then WIDTH_xy=$WIDTH; else WIDTH_xy="50"; fi
+              if [[ -n $HEIGHT ]]; then HEIGHT_xy=$HEIGHT; else HEIGHT_xy="100"; fi
+              POSITION_xy="($GAP) (monitor_h/2*(1-$HEIGHT_xy/100))"
+              ;;
+          "r" | "right")
+              if [[ -n $WIDTH ]]; then WIDTH_xy=$WIDTH; else WIDTH_xy="50"; fi
+              if [[ -n $HEIGHT ]]; then HEIGHT_xy=$HEIGHT; else HEIGHT_xy="100"; fi
+              POSITION_xy="(monitor_w*(1-($WIDTH_xy/100))-$GAP) (monitor_h/2*(1-$HEIGHT_xy/100))"
+              ;;
+          *)
+              notify "hdrop: --position -> invalid argument"
+              ;;
+      esac
+  else
+      case "$POSITION" in "t" | "top")
+              if [[ -n $WIDTH ]]; then WIDTH_xy=$WIDTH; else WIDTH_xy="100"; fi
+              if [[ -n $HEIGHT ]]; then HEIGHT_xy=$HEIGHT; else HEIGHT_xy="50"; fi
+              POSITION_xy="$((50 - $WIDTH_xy / 2))% $GAP"
+              ;;
+          "b" | "bottom")
+              if [[ -n $WIDTH ]]; then WIDTH_xy=$WIDTH; else WIDTH_xy="100"; fi
+              if [[ -n $HEIGHT ]]; then HEIGHT_xy=$HEIGHT; else HEIGHT_xy="50"; fi
+              if [[ $GAP -ne 0 ]]; then
+                  POSITION_xy="$((50 - $WIDTH_xy / 2))% $(($ACTIVE_MONITOR_HEIGHT_SCALED * $HEIGHT_xy / 100 - $GAP))"
+              else POSITION_xy="$((50 - $WIDTH_xy / 2))% $((100 - $HEIGHT_xy))%"; fi
+              ;;
+          "l" | "left")
+              if [[ -n $WIDTH ]]; then WIDTH_xy=$WIDTH; else WIDTH_xy="50"; fi
+              if [[ -n $HEIGHT ]]; then HEIGHT_xy=$HEIGHT; else HEIGHT_xy="100"; fi
+              POSITION_xy="$GAP $((50 - $HEIGHT_xy / 2))%"
+              ;;
+          "r" | "right")
+              if [[ -n $WIDTH ]]; then WIDTH_xy=$WIDTH; else WIDTH_xy="50"; fi
+              if [[ -n $HEIGHT ]]; then HEIGHT_xy=$HEIGHT; else HEIGHT_xy="100"; fi
+              if [[ $GAP -ne 0 ]]; then
+                  POSITION_xy="$(($ACTIVE_MONITOR_WIDTH_SCALED * $WIDTH_xy / 100 - $GAP)) $((50 - $HEIGHT_xy / 2))%"
+              else POSITION_xy="$((100 - $WIDTH_xy))% $((50 - $HEIGHT_xy / 2))%"; fi
+              ;;
+          *)
+              notify "hdrop: --position -> invalid argument"
+              ;;
+      esac
+  fi
+
+  if [[ $HYPRLAND_VERSION -ge 53 ]]; then
     hyprctl --batch "keyword windowrule float on,match:class ^$CLASS$ ; keyword windowrule move $POSITION_xy,match:class ^$CLASS$"
-  elif [[ $(hyprctl -j version | jq -r .version | tr '.' '\n' | head -n 2 | tail -n 1) -ge 48 ]]; then
+  elif [[ $HYPRLAND_VERSION -ge 48 ]]; then
     hyprctl --batch "keyword windowrule float,class:^$CLASS$ ; keyword windowrule move $POSITION_xy,class:^$CLASS$"
   else
     hyprctl --batch "keyword windowrule float,^$CLASS$ ; keyword windowrule move $POSITION_xy,^$CLASS$"
