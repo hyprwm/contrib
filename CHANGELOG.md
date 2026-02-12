@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-02-12
+
+hdrop: Fix position not being set due to windowrules api change
+
 ### 2026-02-09
 
 hdrop: Fix windowrule invocations for version 53+
