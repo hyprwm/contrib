@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-02-15
+
+hdrop: Apply changes from upstream & sync with it
+
 ### 2026-02-12
 
 hdrop: Fix position not being set due to windowrules api change
