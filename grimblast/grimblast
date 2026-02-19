@@ -225,12 +225,20 @@ area() {
     # this removes the black border seen around screenshots
     hyprctl keyword layerrule "match:selection, no_anim on" >/dev/null
 
-    fullscreen_workspaces="$(hyprctl workspaces -j | jq -r 'map(select(.hasfullscreen) | .id)')"
-    workspaces="$(hyprctl monitors -j | jq -r '[(foreach .[] as $monitor (0; if $monitor.specialWorkspace.name == "" then $monitor.activeWorkspace else $monitor.specialWorkspace end)).id]')"
-    windows="$(hyprctl clients -j | jq -r --argjson workspaces "$workspaces" --argjson fullscreenWorkspaces "$fullscreen_workspaces" 'map((select(([.workspace.id] | inside($workspaces)) and ([.workspace.id] | inside($fullscreenWorkspaces) | not) or .fullscreen > 0)))')"
+    if [[ -n "${SLURP_RECTS+x}" ]]; then
+        # user may supply custom rectangles via SLURP_RECTS
+        rects="$SLURP_RECTS"
+    else
+        # by default, resolve all windows on all workspaces for input rectangles
+        fullscreen_workspaces="$(hyprctl workspaces -j | jq -r 'map(select(.hasfullscreen) | .id)')"
+        workspaces="$(hyprctl monitors -j | jq -r '[(foreach .[] as $monitor (0; if $monitor.specialWorkspace.name == "" then $monitor.activeWorkspace else $monitor.specialWorkspace end)).id]')"
+        windows="$(hyprctl clients -j | jq -r --argjson workspaces "$workspaces" --argjson fullscreenWorkspaces "$fullscreen_workspaces" 'map((select(([.workspace.id] | inside($workspaces)) and ([.workspace.id] | inside($fullscreenWorkspaces) | not) or .fullscreen > 0)))')"
+        rects=$(jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' <<<"$windows")
+    fi
+
     # convert SLURP_ARGS to a bash array
     IFS=' ' read -ra SLURP_ARGS <<<"$SLURP_ARGS"
-    GEOM="$(jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' <<<"$windows" | slurp "${SLURP_ARGS[@]}")"
+    GEOM="$(echo -n "$rects" | slurp "${SLURP_ARGS[@]}")"
 
     grimblast::wait
 

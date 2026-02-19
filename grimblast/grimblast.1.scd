@@ -87,6 +87,8 @@ _area_
 	and captures that.
 	Slurp can be customized by setting its arguments in the *SLURP_ARGS*
 	environment variable.
+	Custom predefined rectangles can be piped to slurp via the *SLURP_RECTS*
+	environment variable.
 
 _output_
 	Captures the currently active output.
@@ -109,6 +111,10 @@ _output_
 
 *SLURP_ARGS*
 	Additional arguments to pass to *slurp* for customizing the selection interface.
+
+*SLURP_RECTS*
+	Custom predefinied rectangles to be piped to slurp in the format *X,Y WxH*.
+	Each rectangle should be newline-separated. See *slurp -r* for more context.
 
 # OUTPUT
 

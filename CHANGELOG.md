@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-02-19
+
+grimblast: allow custom rectangles to be piped to slurp
+
 ### 2026-02-15
 
 hdrop: Apply changes from upstream & sync with it
