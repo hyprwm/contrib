@@ -113,7 +113,7 @@ _output_
 	Additional arguments to pass to *slurp* for customizing the selection interface.
 
 *SLURP_RECTS*
-	Custom predefinied rectangles to be piped to slurp in the format *X,Y WxH*.
+	Custom predefined rectangles to be piped to slurp in the format *X,Y WxH*.
 	Each rectangle should be newline-separated. See *slurp -r* for more context.
 
 # OUTPUT
