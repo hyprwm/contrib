@@ -133,7 +133,7 @@ An example usage pattern is to add these bindings to your hyprland config:
 # Super+Ctrl+p All outputs
 
 # Optionally, customize slurp's appearance
-env = SLURP_ARGS, -d -b -B F050F022 -b 10101022 -c ff00ff
+env = SLURP_ARGS, -d -B F050F022 -b 10101022 -c ff00ff
 
 bind = SUPER, p, exec, grimblast save active
 bind = SUPER SHIFT, p, exec, grimblast save area

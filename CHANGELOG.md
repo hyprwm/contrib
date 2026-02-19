@@ -3,6 +3,7 @@
 ### 2026-02-19
 
 grimblast: allow custom rectangles to be piped to slurp
+grimblast: fix slurp color args in man page
 
 ### 2026-02-15
 
