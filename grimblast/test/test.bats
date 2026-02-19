@@ -115,6 +115,24 @@ teardown() {
     pngcheck -q "$outfile"
 }
 
+# bats test_tags=environment
+@test "Can set SLURP_RECTS and screenshot area" {
+    DEFAULT_TARGET_DIR="$TEST_DIR" SLURP_RECTS='0,0 10x10' run --separate-stderr grimblast save area
+    assert_success
+    outfile="$(extract_outfile_from_output "$output")"
+    assert_file_exist "$outfile"
+    pngcheck -q "$outfile"
+}
+
+# bats test_tags=environment
+@test "Can set SLURP_RECTS to empty string and screenshot area" {
+    DEFAULT_TARGET_DIR="$TEST_DIR" SLURP_RECTS='' run --separate-stderr grimblast save area
+    assert_success
+    outfile="$(extract_outfile_from_output "$output")"
+    assert_file_exist "$outfile"
+    pngcheck -q "$outfile"
+}
+
 # bats test_tags=arguments
 @test "Can screenshot area with freeze and notify at the end" {
     DEFAULT_TARGET_DIR="$TEST_DIR" run --separate-stderr grimblast save area --notify --freeze
