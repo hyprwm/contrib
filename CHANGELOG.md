@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-03-20
+
+grimblast: fix invalid layerrule syntax for area selection
+
 ### 2026-02-19
 
 grimblast: allow custom rectangles to be piped to slurp
