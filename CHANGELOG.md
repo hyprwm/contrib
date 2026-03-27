@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-03-27
+
+cycle-layout: added cycle-layout script
+
 ### 2026-03-20
 
 grimblast: fix invalid layerrule syntax for area selection

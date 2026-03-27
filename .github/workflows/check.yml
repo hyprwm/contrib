@@ -18,6 +18,7 @@ jobs:
         - try_swap_workspace
         - hdrop
         - hyprosd-mako
+        - cycle-layout
 
     steps:
       - uses: actions/checkout@v4
