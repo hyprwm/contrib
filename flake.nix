@@ -14,6 +14,7 @@
     pkgsFor = nixpkgs.legacyPackages;
   in {
     overlays.default = _: prev: {
+      cycle-layout = prev.callPackage ./cycle-layout {hyprland = null;};
       grimblast = prev.callPackage ./grimblast {hyprland = null;};
       hdrop = prev.callPackage ./hdrop {hyprland = null;};
       hyprosd-mako = prev.callPackage ./hyprosd-mako {};

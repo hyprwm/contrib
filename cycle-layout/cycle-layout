@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+LAYOUTS=(dwindle scrolling monocle master)
+
+INFO=$(hyprctl activeworkspace -j)
+
+LAYOUT=$(printf '%s' "$INFO" | jq -r '.tiledLayout')
+WORKSPACE_ID=$(printf '%s' "$INFO" | jq -r '.id')
+WORKSPACE_NAME=$(printf '%s' "$INFO" | jq -r '.name')
+
+NEXT=-1
+
+for i in "${!LAYOUTS[@]}"; do
+  if [ "${LAYOUTS[i]}" = "$LAYOUT" ]; then
+    NEXT=$(( (i + 1) % ${#LAYOUTS[@]} ))
+    break
+  fi
+done
+
+hyprctl keyword workspace "$WORKSPACE_ID", layout:"${LAYOUTS[$NEXT]}" > /dev/null
+
+notify-send --icon state-information \
+            --app-name $0 \
+            -h "string:x-canonical-private-synchronous:$0" \
+            "Workspace layout was changed" "Layout for workspace $WORKSPACE_NAME: - ${LAYOUTS[$NEXT]}"
