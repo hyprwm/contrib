@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-03-28
+
+cycle-layout: added a flag to set previous layout
+
 ### 2026-03-27
 
 cycle-layout: added cycle-layout script
