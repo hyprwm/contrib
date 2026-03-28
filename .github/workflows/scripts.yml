@@ -18,6 +18,7 @@ jobs:
         - hyprprop/hyprprop
         - try_swap_workspace/try_swap_workspace
         - hdrop/hdrop
+        - cycle-layout/cycle-layout
 
     steps:
       - uses: actions/checkout@v4
