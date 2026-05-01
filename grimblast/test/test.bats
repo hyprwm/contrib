@@ -143,6 +143,22 @@ teardown() {
 }
 
 # bats test_tags=arguments
+@test "Can screenshot area with freeze and cursor" {
+    DEFAULT_TARGET_DIR="$TEST_DIR" run --separate-stderr grimblast save area --freeze --cursor
+    assert_success
+    outfile="$(extract_outfile_from_output "$output")"
+    assert_file_exist "$outfile"
+    pngcheck -q "$outfile"
+}
+
+# bats test_tags=arguments
+@test "Rejects cursor for area without freeze" {
+    run grimblast --cursor save area
+    assert_failure
+    assert_output --partial "can only be used with TARGET 'area' when '-f|--freeze' is also set"
+}
+
+# bats test_tags=arguments
 @test "Can screenshot area, to a file, with freeze and notify at the end" {
     run --separate-stderr grimblast save area "$TEST_DIR/test.png" --notify --freeze
     assert_success
