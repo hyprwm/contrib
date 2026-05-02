@@ -58,6 +58,7 @@ FILETYPE=png
 
 # These have an effect depending on whether they're set
 #   CURSOR
+#   CAPTURE_CURSOR
 #   FREEZE
 NOTIFY=false
 SHOW_FILE_NOTIFY=false
@@ -122,7 +123,9 @@ get-mime-type() {
 }
 
 freezescreen() {
-    hyprpicker -rz &
+    local args=(-r -z)
+    [[ $CURSOR ]] && args+=(-c)
+    hyprpicker "${args[@]}" &
     sleep 0.2
 }
 
@@ -153,7 +156,7 @@ grimblast::check() {
 # The actual grim command used is printed to stderr
 screenshot() {
     local file="$1" geom="$2" output="$3"
-    xargs --verbose grim <<<"${CURSOR:+-c} ${SCALE:+-s \"$SCALE\"} -t \"$FILETYPE\" ${output:+-o \"$output\"} ${geom:+-g \"$geom\"} \"$file\""
+    xargs --verbose grim <<<"${CAPTURE_CURSOR:+-c} ${SCALE:+-s \"$SCALE\"} -t \"$FILETYPE\" ${output:+-o \"$output\"} ${geom:+-g \"$geom\"} \"$file\""
 }
 
 # Special actions: usage and check. These are special because they allow to exit early
@@ -215,10 +218,12 @@ output() {
 
 area() {
     local fullscreen_workspaces workspaces windows
-    [[ $CURSOR ]] && die "'-c|--cursor' cannot be used with TARGET 'area'"
+    [[ $CURSOR && ! $FREEZE ]] && die "'-c|--cursor' can only be used with TARGET 'area' when '-f|--freeze' is also set"
 
-    if [[ $FREEZE ]] && grimblast::check -q hyprpicker; then
+    if [[ $FREEZE ]]; then
+        grimblast::check -q hyprpicker || die "'-f|--freeze' requires hyprpicker"
         freezescreen
+        CAPTURE_CURSOR=
     fi
 
     # disable animation for layer namespace "selection" (slurp)
@@ -347,6 +352,7 @@ main() {
                 ;;
             -c | --cursor)
                 CURSOR=1
+                CAPTURE_CURSOR=1
                 shift
                 ;;
             -f | --freeze)

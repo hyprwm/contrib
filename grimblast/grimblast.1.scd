@@ -24,7 +24,9 @@ grimblast - a helper for screenshots within Hyprland
 	Only works with --notify. Default: 3000.
 
 *-c, --cursor*
-	Include cursors in the screenshot.
+	Include cursors in the screenshot. With the _area_ target, this option
+	requires *--freeze* so the cursor is included in the frozen preview and
+	not captured again at the final selection position.
 
 *-f, --freeze*
 	Freezes the screen before area selection.
