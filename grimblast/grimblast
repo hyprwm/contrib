@@ -58,7 +58,6 @@ FILETYPE=png
 
 # These have an effect depending on whether they're set
 #   CURSOR
-#   CAPTURE_CURSOR
 #   FREEZE
 NOTIFY=false
 SHOW_FILE_NOTIFY=false
@@ -124,9 +123,13 @@ get-mime-type() {
 
 freezescreen() {
     local args=(-r -z)
-    [[ $CURSOR ]] && args+=(-c)
+    [[ $CURSOR ]] && hyprpicker-supports-cursor && args+=(-c)
     hyprpicker "${args[@]}" &
     sleep 0.2
+}
+
+hyprpicker-supports-cursor() {
+    hyprpicker --help 2>&1 | grep -q -- '--cursor'
 }
 
 # Checks whether an individual tool is available
@@ -156,7 +159,7 @@ grimblast::check() {
 # The actual grim command used is printed to stderr
 screenshot() {
     local file="$1" geom="$2" output="$3"
-    xargs --verbose grim <<<"${CAPTURE_CURSOR:+-c} ${SCALE:+-s \"$SCALE\"} -t \"$FILETYPE\" ${output:+-o \"$output\"} ${geom:+-g \"$geom\"} \"$file\""
+    xargs --verbose grim <<<"${CURSOR:+-c} ${SCALE:+-s \"$SCALE\"} -t \"$FILETYPE\" ${output:+-o \"$output\"} ${geom:+-g \"$geom\"} \"$file\""
 }
 
 # Special actions: usage and check. These are special because they allow to exit early
@@ -222,8 +225,9 @@ area() {
 
     if [[ $FREEZE ]]; then
         grimblast::check -q hyprpicker || die "'-f|--freeze' requires hyprpicker"
+        [[ ! $CURSOR ]] || hyprpicker-supports-cursor || die "'-c|--cursor' with TARGET 'area' and '-f|--freeze' requires a hyprpicker version with --cursor support"
         freezescreen
-        CAPTURE_CURSOR=
+        CURSOR=
     fi
 
     # disable animation for layer namespace "selection" (slurp)
@@ -352,7 +356,6 @@ main() {
                 ;;
             -c | --cursor)
                 CURSOR=1
-                CAPTURE_CURSOR=1
                 shift
                 ;;
             -f | --freeze)

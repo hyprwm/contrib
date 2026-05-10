@@ -26,7 +26,8 @@ grimblast - a helper for screenshots within Hyprland
 *-c, --cursor*
 	Include cursors in the screenshot. With the _area_ target, this option
 	requires *--freeze* so the cursor is included in the frozen preview and
-	not captured again at the final selection position.
+	not captured again at the final selection position. This also requires a
+	hyprpicker version with *--cursor* support.
 
 *-f, --freeze*
 	Freezes the screen before area selection.
