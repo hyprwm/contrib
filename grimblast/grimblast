@@ -122,8 +122,14 @@ get-mime-type() {
 }
 
 freezescreen() {
-    hyprpicker -rz &
+    local args=(-r -z)
+    [[ $CURSOR ]] && hyprpicker-supports-cursor && args+=(-c)
+    hyprpicker "${args[@]}" &
     sleep 0.2
+}
+
+hyprpicker-supports-cursor() {
+    hyprpicker --help 2>&1 | grep -q -- '--cursor'
 }
 
 # Checks whether an individual tool is available
@@ -215,10 +221,13 @@ output() {
 
 area() {
     local fullscreen_workspaces workspaces windows
-    [[ $CURSOR ]] && die "'-c|--cursor' cannot be used with TARGET 'area'"
+    [[ $CURSOR && ! $FREEZE ]] && die "'-c|--cursor' can only be used with TARGET 'area' when '-f|--freeze' is also set"
 
-    if [[ $FREEZE ]] && grimblast::check -q hyprpicker; then
+    if [[ $FREEZE ]]; then
+        grimblast::check -q hyprpicker || die "'-f|--freeze' requires hyprpicker"
+        [[ ! $CURSOR ]] || hyprpicker-supports-cursor || die "'-c|--cursor' with TARGET 'area' and '-f|--freeze' requires a hyprpicker version with --cursor support"
         freezescreen
+        CURSOR=
     fi
 
     # disable animation for layer namespace "selection" (slurp)

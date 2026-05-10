@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-05-02
+
+grimblast: support cursor in frozen area capture
+
 ### 2026-03-28
 
 cycle-layout: added a flag to set previous layout
