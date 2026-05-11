@@ -6,10 +6,8 @@ Tiny script to cycle layouts (dwindle, scrolling, monocle, master) for current w
 
 Run Makefile or simply copy this script where you'd want to, then add this to your hyprland config: 
 
-```ini
-# Set next layout
-bind = SUPER CTRL, tab, exec, cycle-layout
-# Set previous layout
-bind = SUPER SHIFT CTRL, tab, exec, cycle-layout --prev
+```lua
+hl.bind("SUPER + CTRL + tab",         hl.dsp.exec_cmd("cycle-layout")) -- Set next layout
+hl.bind("SUPER + SHIFT + CTRL + tab", hl.dsp.exec_cmd("cycle-layout --prev")) -- Set previous layout
 ```
 

@@ -23,7 +23,10 @@ else
   TARGET=$(( (i + 1) % ${#LAYOUTS[@]} ))
 fi
 
-hyprctl keyword workspace "$WORKSPACE_ID", layout:"${LAYOUTS[$TARGET]}" > /dev/null
+# CLI used before v0.55.0
+# hyprctl keyword workspace "$WORKSPACE_ID", layout:"${LAYOUTS[$TARGET]}" > /dev/null
+
+hyprctl eval "hl.workspace_rule({ workspace = '$WORKSPACE_ID', layout = '${LAYOUTS[$TARGET]}' })" > /dev/null
 
 notify-send --icon state-information \
             --app-name $0 \

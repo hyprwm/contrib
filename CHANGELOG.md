@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-05-10
+
+cycle-layout: fix hyprland 0.55.0 compatibility
+
 ### 2026-03-28
 
 cycle-layout: added a flag to set previous layout
