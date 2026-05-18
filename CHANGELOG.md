@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-06-29
+
+grimblast: add toplevel handle support for window selection
+
 ### 2026-05-29
 
 grimblast: add -o arg to slurp
