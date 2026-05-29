@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-05-29
+
+grimblast: add -o arg to slurp
+
 ### 2026-05-10
 
 cycle-layout: fix hyprland 0.55.0 compatibility

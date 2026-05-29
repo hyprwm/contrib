@@ -238,7 +238,7 @@ area() {
 
     # convert SLURP_ARGS to a bash array
     IFS=' ' read -ra SLURP_ARGS <<<"$SLURP_ARGS"
-    GEOM="$(echo -n "$rects" | slurp "${SLURP_ARGS[@]}")"
+    GEOM="$(echo -n "$rects" | slurp -o "${SLURP_ARGS[@]}")"
 
     grimblast::wait
 
