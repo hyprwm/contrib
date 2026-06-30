@@ -238,9 +238,8 @@ area() {
 
   # convert SLURP_ARGS to a bash array
   IFS=' ' read -ra SLURP_ARGS <<<"$SLURP_ARGS"
-  GEOM="$(echo -n "$rects" | slurp -o "${SLURP_ARGS[@]}")"
   # use `|` as separator for stableId label
-  choice="$(echo -n "$rects" | slurp "${SLURP_ARGS[@]}" -f "%x,%y %wx%h|%l")"
+  choice="$(echo -n "$rects" | slurp -o "${SLURP_ARGS[@]}" -f "%x,%y %wx%h|%l")"
 
   WINDOW="$(jq -r --arg c "$choice" '.[] | select("\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])|\(.stableId)" == $c) | .stableId' <<<"$windows")"
   [[ -z "$WINDOW" ]] && GEOM="${choice%|*}"
