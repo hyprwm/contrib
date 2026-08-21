@@ -223,7 +223,7 @@ area() {
 
   # disable animation for layer namespace "selection" (slurp)
   # this removes the black border seen around screenshots
-  hyprctl keyword layerrule "match:namespace ^selection$, no_anim on" >/dev/null
+  hyprctl eval 'hl.layer_rule({ match = { namespace = "^selection$" }, no_anim = true })' >/dev/null
 
   if [[ -n "${SLURP_RECTS+x}" ]]; then
     # user may supply custom rectangles via SLURP_RECTS

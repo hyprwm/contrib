@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-08-21
+
+grimblast: update layerrule to lua syntax
+
 ### 2026-06-29
 
 grimblast: add toplevel handle support for window selection
