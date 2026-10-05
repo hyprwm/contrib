@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-10-05
+
+grimblast: create parent dirs when saving to file instead of failing when they don't exist.
+
 ### 2026-08-21
 
 grimblast: update layerrule to lua syntax
