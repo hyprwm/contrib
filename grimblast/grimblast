@@ -223,13 +223,14 @@ output() {
 }
 
 area() {
-  local fullscreen_workspaces workspaces windows choice rects
+  local fullscreen_workspaces workspaces windows choice rects frozen_cursor
   [[ $CURSOR && ! $FREEZE ]] && die "'-c|--cursor' can only be used with TARGET 'area' when '-f|--freeze' is also set"
 
   if [[ $FREEZE ]]; then
     grimblast::check -q hyprpicker || die "'-f|--freeze' requires hyprpicker"
     [[ ! $CURSOR ]] || hyprpicker-supports-cursor || die "'-c|--cursor' with TARGET 'area' and '-f|--freeze' requires a hyprpicker version with --cursor support"
     freezescreen
+    frozen_cursor=$CURSOR
     CURSOR=
   fi
 
@@ -253,7 +254,8 @@ area() {
   # use `|` as separator for stableId label
   choice="$(echo -n "$rects" | slurp -o "${SLURP_ARGS[@]}" -f "%x,%y %wx%h|%l")"
 
-  WINDOW="$(jq -r --arg c "$choice" '.[] | select("\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])|\(.stableId)" == $c) | .stableId' <<<"$windows")"
+  # toplevel capture is live, so it would miss the cursor drawn in the frozen preview
+  [[ $frozen_cursor ]] || WINDOW="$(jq -r --arg c "$choice" '.[] | select("\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])|\(.stableId)" == $c) | .stableId' <<<"$windows")"
   [[ -z "$WINDOW" ]] && GEOM="${choice%|*}"
 
   grimblast::wait
