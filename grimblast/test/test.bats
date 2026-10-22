@@ -107,6 +107,22 @@ teardown() {
 }
 
 # bats test_tags=environment
+@test "Can stream a valid PNG to stdout" {
+    output_file="$TEST_DIR/stdout.png"
+
+    run --separate-stderr bash -c "grimblast save screen - > \"\$1\"" _ "$output_file"
+    assert_success
+    assert_file_exist "$output_file"
+    pngcheck -q "$output_file"
+
+    # Every PNG should end with a valid 12-byte IEND chunk
+    # Make sure we don't write anything past this end
+    run bash -c "tail -c 12 \"\$1\" | xxd -p" _ "$output_file"
+    assert_success
+    assert_output "0000000049454e44ae426082"
+}
+
+# bats test_tags=environment
 @test "Can set SLURP_ARGS and screenshot area" {
     DEFAULT_TARGET_DIR="$TEST_DIR" SLURP_ARGS='-b 00ff0080 -c 00ff00 -w 4' run --separate-stderr grimblast save area
     assert_success

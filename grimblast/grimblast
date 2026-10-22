@@ -283,7 +283,9 @@ save() {
   title="Screenshot of $WHAT" message="$(basename "$file")"
   killhyprpicker
   notify::showparentdir "$title" "$message" -i "$file"
-  echo "$file"
+  # A '-' destination streams the image to stdout. Do not append its name to
+  # that binary image data stream.
+  [[ $file == - ]] || echo "$file"
 }
 
 edit() {
