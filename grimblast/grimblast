@@ -163,6 +163,10 @@ screenshot() {
     mkdir -p "$(dirname "$file")"
   fi
   xargs --verbose grim <<<"${CAPTURE_CURSOR:+-c} ${SCALE:+-s \"$SCALE\"} -t \"$FILETYPE\" ${output:+-o \"$output\"} ${GEOM:+-g \"$GEOM\"} ${WINDOW:+-T \"$WINDOW\"} \"$file\""
+  # Screenshot has been taken, if we froze the screen then we can unfreeze the screen now.
+  if [[ $FREEZE ]]; then
+    killhyprpicker
+  fi
 }
 
 # Special actions: usage and check. These are special because they allow to exit early
@@ -281,7 +285,6 @@ save() {
   file="${1:-$DEFAULT_TARGET_DIR/$(date +"$DATE_FORMAT").$FILETYPE}"
   screenshot "$file" "$OUTPUT" || die "Could not take screenshot with grim"
   title="Screenshot of $WHAT" message="$(basename "$file")"
-  killhyprpicker
   notify::showparentdir "$title" "$message" -i "$file"
   # A '-' destination streams the image to stdout. Do not append its name to
   # that binary image data stream.
