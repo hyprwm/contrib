@@ -163,6 +163,7 @@ screenshot() {
     mkdir -p "$(dirname "$file")"
   fi
   xargs --verbose grim <<<"${CAPTURE_CURSOR:+-c} ${SCALE:+-s \"$SCALE\"} -t \"$FILETYPE\" ${output:+-o \"$output\"} ${GEOM:+-g \"$GEOM\"} ${WINDOW:+-T \"$WINDOW\"} \"$file\""
+  # Screenshot has been taken, if we froze the screen then we can unfreeze the screen now.
   if [[ $FREEZE ]]; then
     killhyprpicker
   fi
