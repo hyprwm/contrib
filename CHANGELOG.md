@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-11-24
+
+grimblast: unfreeze the screen after screenshot has been taken
+
 ### 2026-10-22
 
 grimblast: correctly preserve the PNG stream when saving to stdout (don't output anything past PNG's file end)
