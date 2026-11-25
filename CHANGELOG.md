@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-11-25
+
+grimblast: check workspaces by name instead of ID
+
 ### 2026-10-22
 
 grimblast: correctly preserve the PNG stream when saving to stdout (don't output anything past PNG's file end)

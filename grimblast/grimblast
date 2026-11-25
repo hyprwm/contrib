@@ -243,9 +243,10 @@ area() {
     rects="$SLURP_RECTS"
   else
     # by default, resolve all windows on all workspaces for input rectangles
-    fullscreen_workspaces="$(hyprctl workspaces -j | jq -r 'map(select(.hasfullscreen) | .id)')"
-    workspaces="$(hyprctl monitors -j | jq -r '[(foreach .[] as $monitor (0; if $monitor.specialWorkspace.name == "" then $monitor.activeWorkspace else $monitor.specialWorkspace end)).id]')"
-    windows="$(hyprctl clients -j | jq -r --argjson workspaces "$workspaces" --argjson fullscreenWorkspaces "$fullscreen_workspaces" 'map((select(([.workspace.id] | inside($workspaces)) and ([.workspace.id] | inside($fullscreenWorkspaces) | not) or .fullscreen > 0)))')"
+    # workspaces are compared by name because special workspaces have a null id
+    fullscreen_workspaces="$(hyprctl workspaces -j | jq -r 'map(select(.hasfullscreen) | .name)')"
+    workspaces="$(hyprctl monitors -j | jq -r '[(foreach .[] as $monitor (0; if $monitor.specialWorkspace.name == "" then $monitor.activeWorkspace else $monitor.specialWorkspace end)).name]')"
+    windows="$(hyprctl clients -j | jq -r --argjson workspaces "$workspaces" --argjson fullscreenWorkspaces "$fullscreen_workspaces" 'map((select(([.workspace.name] | inside($workspaces)) and ([.workspace.name] | inside($fullscreenWorkspaces) | not) or .fullscreen > 0)))')"
     rects=$(jq -r '.[] | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1]) \(.stableId)"' <<<"$windows")
   fi
 
